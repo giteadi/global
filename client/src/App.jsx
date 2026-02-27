@@ -8,7 +8,10 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
-import Cart from './pages/Cart'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import ForgetPassword from './pages/ForgetPassword'
+import Profile from './pages/Profile'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
@@ -24,9 +27,12 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
               <Route path="/about" element={<About />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forget-password" element={<ForgetPassword />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/admin" element={<Admin />} />
             </Routes>

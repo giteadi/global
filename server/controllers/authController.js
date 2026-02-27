@@ -1,6 +1,8 @@
 const User = require('../models/User')
-const bcrypt = require('bcryptjs')
+// const bcrypt = require('bcryptjs')  // Removed for plain text passwords
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
+const crypto = require('crypto')
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -12,7 +14,7 @@ const generateToken = (id) => {
 // Register user
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body
+    const { name, email, password, phone, street, city, state, pincode, country } = req.body
 
     // Check if user exists
     const existingUser = await User.emailExists(email)
@@ -23,16 +25,17 @@ exports.register = async (req, res) => {
       })
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-
     // Create user
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
-      phone
+      password,
+      phone,
+      street,
+      city,
+      state,
+      pincode,
+      country
     })
 
     // Generate token
@@ -65,9 +68,34 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    // Find user
+    // Special admin login
+    if (email === 'admin@globaleximtraders.com') {
+      if (password === 'admin123') {
+        const token = generateToken(1) // Admin ID
+        return res.json({
+          success: true,
+          data: {
+            user: {
+              id: 1,
+              name: 'Admin',
+              email: 'admin@globaleximtraders.com',
+              role: 'admin'
+            },
+            token
+          },
+          message: 'Admin login successful'
+        })
+      } else {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid admin credentials'
+        })
+      }
+    }
+
+    // Regular user login
     const user = await User.findByEmail(email)
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || password !== user.password) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -147,34 +175,29 @@ exports.getProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const updates = {
-      name: req.body.name,
-      phone: req.body.phone,
-      street: req.body.address?.street,
-      city: req.body.address?.city,
-      state: req.body.address?.state,
-      pincode: req.body.address?.pincode,
-      country: req.body.address?.country
-    }
+    const { name, phone } = req.body
+    const userId = req.user.id
 
-    const user = await User.findByIdAndUpdate(req.user.id, updates)
+    // Update user
+    const updatedUser = await User.findByIdAndUpdate(userId, { name, phone })
 
     res.json({
       success: true,
       data: {
         user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          phone: user.phone,
+          id: updatedUser.id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          phone: updatedUser.phone,
           address: {
-            street: user.street,
-            city: user.city,
-            state: user.state,
-            pincode: user.pincode,
-            country: user.country
-          }
+            street: updatedUser.street,
+            city: updatedUser.city,
+            state: updatedUser.state,
+            pincode: updatedUser.pincode,
+            country: updatedUser.country
+          },
+          created_at: updatedUser.created_at
         }
       },
       message: 'Profile updated successfully'
@@ -183,6 +206,55 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating profile',
+      error: error.message
+    })
+  }
+}
+// Forget password
+exports.forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    const user = await User.findByEmail(email)
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    const resetExpire = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+
+    await User.updateResetToken(user.id, resetToken, resetExpire)
+
+    // Send email
+    const transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    })
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Password Reset - Global Exim Traders',
+      text: `You requested a password reset. Click this link to reset your password: http://localhost:5173/reset-password/${resetToken}\n\nThis link will expire in 10 minutes.`
+    }
+
+    await transporter.sendMail(mailOptions)
+
+    res.json({
+      success: true,
+      message: 'Password reset email sent'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error sending reset email',
       error: error.message
     })
   }

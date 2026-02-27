@@ -53,11 +53,18 @@ const ProductDetail = () => {
   const handleBuyNow = async () => {
     if (!singleProduct) return
 
+    // Check if user is logged in
+    if (!user) {
+      toast.error('Please login to make a purchase')
+      navigate('/login')
+      return
+    }
+
     const amount = singleProduct.price * quantity
 
     try {
       // Create order
-      const response = await fetch('http://localhost:5000/api/payments/create-order', {
+      const response = await fetch('http://localhost:4000/api/payments/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +84,7 @@ const ProductDetail = () => {
         order_id: order.id,
         handler: async function (response) {
           // Verify payment
-          const verifyResponse = await fetch('http://localhost:5000/api/payments/verify-payment', {
+          const verifyResponse = await fetch('http://localhost:4000/api/payments/verify-payment', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -125,7 +132,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="min-h-screen py-20 px-4">
+    <div className="min-h-screen py-20 px-4 bg-black/60">
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumb removed as requested */}
 
@@ -158,13 +165,13 @@ const ProductDetail = () => {
           <div>
             <div className="mb-6">
               <span className="text-yellow-400 text-sm uppercase tracking-wider">{singleProduct.category}</span>
-              <h1 className="text-4xl font-serif text-white mt-2 mb-4">{singleProduct.name}</h1>
+              <h1 className="text-4xl font-serif text-white mt-2 mb-4 text-with-shadow">{singleProduct.name}</h1>
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl text-yellow-400 font-bold">${singleProduct.price}</span>
                 <span className="text-teal-200 line-through">${Math.round(singleProduct.price * 1.5)}</span>
                 <span className="bg-yellow-400 text-black px-2 py-1 rounded-full text-sm font-semibold">33% OFF</span>
               </div>
-              <p className="text-teal-200 text-lg leading-relaxed">{singleProduct.description}</p>
+              <p className="text-teal-200 text-lg leading-relaxed text-with-shadow">{singleProduct.description}</p>
             </div>
 
             {/* Quantity and Actions */}
@@ -211,7 +218,7 @@ const ProductDetail = () => {
 
             {/* Product Details */}
             <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 mb-6">
-              <h3 className="text-xl font-serif text-white mb-4">Product Details</h3>
+              <h3 className="text-xl font-serif text-white mb-4 text-with-shadow">Product Details</h3>
               <div className="space-y-3">
                 {Object.entries(singleProduct.details).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
@@ -224,7 +231,7 @@ const ProductDetail = () => {
 
             {/* Features */}
             <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6">
-              <h3 className="text-xl font-serif text-white mb-4">Key Features</h3>
+              <h3 className="text-xl font-serif text-white mb-4 text-with-shadow">Key Features</h3>
               <ul className="space-y-2">
                 {singleProduct.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">

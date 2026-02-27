@@ -100,19 +100,21 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="hidden md:flex items-center space-x-4">
-                  <button
+                  <Link
+                    to="/login"
                     className="text-sm"
                     style={{ color: 'var(--text-soft)' }}
                   >
                     Login
-                  </button>
+                  </Link>
 
-                  <button
+                  <Link
+                    to="/signup"
                     className="px-4 py-1 rounded-full font-semibold"
                     style={{ background: 'var(--gold)', color: '#000' }}
                   >
                     Sign Up
-                  </button>
+                  </Link>
                 </div>
               )}
 
@@ -157,6 +159,40 @@ const Navbar = () => {
                 <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="nav-link">
                   Admin
                 </Link>
+              )}
+
+              {user ? (
+                <div className="pt-2 space-y-2">
+                  <div className="text-sm" style={{ color: 'var(--gold-bright)' }}>
+                    Hi, {user.name}
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="nav-link w-full text-left"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-2 space-y-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="nav-link"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="nav-link"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
               )}
             </div>
           </div>

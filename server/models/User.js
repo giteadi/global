@@ -1,15 +1,14 @@
 const { pool } = require('../config/database')
-const bcrypt = require('bcryptjs')
+// const bcrypt = require('bcryptjs')  // Removed for plain text passwords
 
 class User {
   // Create new user
   static async create(userData) {
-    const { name, email, password, phone } = userData
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const { name, email, password, phone, street, city, state, pincode, country } = userData
 
     const [result] = await pool.execute(
-      `INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)`,
-      [name, email, hashedPassword, phone]
+      `INSERT INTO users (name, email, password, phone, street, city, state, pincode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [name, email, password, phone, street, city, state, pincode, country]
     )
 
     return { id: result.insertId, name, email, phone, role: 'user' }
@@ -77,6 +76,14 @@ class User {
 
     const [rows] = await pool.execute(query, params)
     return rows.length > 0
+  }
+
+  // Update reset token
+  static async updateResetToken(id, token, expire) {
+    await pool.execute(
+      'UPDATE users SET reset_password_token = ?, reset_password_expire = ? WHERE id = ?',
+      [token, expire, id]
+    )
   }
 }
 

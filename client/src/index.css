@@ -1,0 +1,76 @@
+:root {
+  --teal:        #1B9E9B;
+  --teal-bright: #25CCC8;
+  --teal-light:  #5EDBD7;
+  --teal-pale:   #B8EFED;
+  --teal-deep:   #0D6E6C;
+  --gold:        #C8A96E;
+  --gold-bright: #E0C280;
+  --gold-pale:   #F5E6C0;
+  --maroon:      #5C1A28;
+  --maroon-deep: #3A0D18;
+  --pink-soft:   #D4A0B0;
+  --glass:       rgba(10,40,45,0.72);
+  --glass-light: rgba(10,40,45,0.55);
+  --glass-card:  rgba(10,50,55,0.65);
+  --glass-border:rgba(37,204,200,0.25);
+  --text-bright: #F0F9F9;
+  --text-soft:   rgba(230,248,248,0.8);
+  --text-muted:  rgba(200,235,235,0.55);
+  --white: #fff;
+}
+
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background: #0a2830;
+  color: var(--text-bright);
+  font-family: 'Lora', Georgia, serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { background: #0a1c22; }
+::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 0; }
+
+nav {
+
+  background: rgba(8,30,35,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+}
+.nav-logo {
+  font-family:'Playfair Display', serif;
+  font-size:1rem; font-weight:700;
+  color:var(--gold-bright);
+  text-decoration:none; letter-spacing:0.04em; line-height:1.15;
+}
+.nav-logo span {
+  font-family:'Raleway', sans-serif;
+  font-size:0.48rem; font-weight:300; letter-spacing:0.45em;
+  color:var(--teal-light); text-transform:uppercase;
+}
+.nav-links a {
+  font-family:'Raleway', sans-serif; font-size:0.68rem; font-weight:500;
+  letter-spacing:0.25em; color:var(--text-soft);
+  text-decoration:none; text-transform:uppercase;
+  transition:color 0.3s;
+}
+.nav-links a::after {
+  content:''; position:absolute; bottom:-5px; left:0;
+  height:1px; background:var(--teal-bright);
+  transition:width 0.35s ease;
+}
+.nav-links a:hover { color:var(--teal-light); }
+.nav-links a:hover::after { width:100%; }
+.nav-cta {
+  font-family:'Raleway', sans-serif; font-size:0.62rem;
+  font-weight:700; letter-spacing:0.25em; text-transform:uppercase;
+  color:#0a2830; background:var(--teal-bright);
+  text-decoration:none;
+  transition:all 0.3s;
+}
+.nav-cta:hover {
+  background:var(--teal-light);
+  box-shadow:0 6px 25px rgba(37,204,200,0.5);
+}

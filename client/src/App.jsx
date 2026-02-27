@@ -18,7 +18,7 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
-        <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900">
+        <div className="min-h-screen" style={{ background: '#0a2830' }}>
           <Navbar />
           <main className="pt-16">
             <Routes>
@@ -38,19 +38,19 @@ function App() {
           toastOptions={{
             duration: 3000,
             style: {
-              background: '#1B9E9B',
-              color: '#fff',
+              background: 'var(--teal)',
+              color: 'var(--white)',
             },
             success: {
               style: {
-                background: '#C8A96E',
-                color: '#000',
+                background: 'var(--gold)',
+                color: 'var(--text-bright)',
               },
             },
             error: {
               style: {
-                background: '#5C1A28',
-                color: '#fff',
+                background: 'var(--maroon)',
+                color: 'var(--white)',
               },
             },
           }}

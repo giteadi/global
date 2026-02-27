@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-teal-950 border-t border-teal-700/30">
+    <footer style={{ background: 'rgba(8,30,35,0.92)', borderTop: '1px solid rgba(37,204,200,0.25)' }}>
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -13,22 +13,22 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <span className="text-2xl">🏛️</span>
-              <span className="text-xl font-serif text-yellow-400 font-bold">Global Exim</span>
+              <span className="text-xl font-serif font-bold" style={{ color: 'var(--gold-bright)' }}>Global Exim</span>
             </div>
-            <p className="text-teal-200 text-sm leading-relaxed mb-4">
+            <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-soft)' }}>
               Where Heritage Meets Global Elegance. Premium Indian handicrafts and fashion jewellery delivered worldwide.
             </p>
             <div className="flex space-x-3">
-              <a href="#" className="w-8 h-8 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all text-sm">
+              <a href="#" className="w-8 h-8 rounded-full flex items-center justify-center transition-all text-sm" style={{ background: 'rgba(200,162,110,0.1)', border: '1px solid var(--gold)' }}>
                 f
               </a>
-              <a href="#" className="w-8 h-8 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all text-sm">
+              <a href="#" className="w-8 h-8 rounded-full flex items-center justify-center transition-all text-sm" style={{ background: 'rgba(200,162,110,0.1)', border: '1px solid var(--gold)' }}>
                 📷
               </a>
-              <a href="#" className="w-8 h-8 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all text-sm">
+              <a href="#" className="w-8 h-8 rounded-full flex items-center justify-center transition-all text-sm" style={{ background: 'rgba(200,162,110,0.1)', border: '1px solid var(--gold)' }}>
                 in
               </a>
-              <a href="#" className="w-8 h-8 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all text-sm">
+              <a href="#" className="w-8 h-8 rounded-full flex items-center justify-center transition-all text-sm" style={{ background: 'rgba(200,162,110,0.1)', border: '1px solid var(--gold)' }}>
                 🐦
               </a>
             </div>
@@ -36,25 +36,25 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+            <h3 className="font-semibold mb-4" style={{ color: 'var(--text-bright)' }}>Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <Link to="/" className="footer-link text-sm">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/products" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <Link to="/products" className="footer-link text-sm">
                   Products
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <Link to="/about" className="footer-link text-sm">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <Link to="/contact" className="footer-link text-sm">
                   Contact
                 </Link>
               </li>
@@ -63,25 +63,25 @@ const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Categories</h3>
+            <h3 className="font-semibold mb-4" style={{ color: 'var(--text-bright)' }}>Categories</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <a href="#" className="footer-link text-sm">
                   Temple Heritage Jewellery
                 </a>
               </li>
               <li>
-                <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <a href="#" className="footer-link text-sm">
                   Contemporary Ethnic Fashion
                 </a>
               </li>
               <li>
-                <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <a href="#" className="footer-link text-sm">
                   Handcrafted Artisan Décor
                 </a>
               </li>
               <li>
-                <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors text-sm">
+                <a href="#" className="footer-link text-sm">
                   Export-Grade Handicrafts
                 </a>
               </li>
@@ -90,22 +90,22 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Contact Info</h3>
+            <h3 className="font-semibold mb-4" style={{ color: 'var(--text-bright)' }}>Contact Info</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-start space-x-2">
-                <span className="text-yellow-400 mt-1">📍</span>
-                <span className="text-teal-200">
+                <span style={{ color: 'var(--gold-bright)' }}>📍</span>
+                <span style={{ color: 'var(--text-soft)' }}>
                   Export Import Zone<br/>
                   Rajasthan, India
                 </span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="text-yellow-400">📞</span>
-                <span className="text-teal-200">+91 98765 43210</span>
+                <span style={{ color: 'var(--gold-bright)' }}>📞</span>
+                <span style={{ color: 'var(--text-soft)' }}> +91 98765 43210</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="text-yellow-400">✉️</span>
-                <span className="text-teal-200">info@globaleximtraders.com</span>
+                <span style={{ color: 'var(--gold-bright)' }}>✉️</span>
+                <span style={{ color: 'var(--text-soft)' }}>info@globaleximtraders.com</span>
               </li>
             </ul>
           </div>
@@ -113,46 +113,46 @@ const Footer = () => {
       </div>
 
       {/* Certifications */}
-      <div className="border-t border-teal-700/30 py-6">
+      <div className="py-6" style={{ borderTop: '1px solid rgba(37,204,200,0.25)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-4">
-            <span className="text-yellow-400 text-sm uppercase tracking-wider">Certifications & Compliance</span>
+            <span className="text-sm uppercase tracking-wider" style={{ color: 'var(--gold-bright)' }}>Certifications & Compliance</span>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg px-4 py-2">
-              <span className="text-yellow-400 text-xs font-semibold">GSTIN Registered</span>
+            <div className="rounded-lg px-4 py-2" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
+              <span className="text-xs font-semibold" style={{ color: 'var(--gold-bright)' }}>GSTIN Registered</span>
             </div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg px-4 py-2">
-              <span className="text-yellow-400 text-xs font-semibold">IEC Code Holder</span>
+            <div className="rounded-lg px-4 py-2" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
+              <span className="text-xs font-semibold" style={{ color: 'var(--gold-bright)' }}>IEC Code Holder</span>
             </div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg px-4 py-2">
-              <span className="text-yellow-400 text-xs font-semibold">EPCH Associated</span>
+            <div className="rounded-lg px-4 py-2" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
+              <span className="text-xs font-semibold" style={{ color: 'var(--gold-bright)' }}>EPCH Associated</span>
             </div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg px-4 py-2">
-              <span className="text-yellow-400 text-xs font-semibold">Export Compliant</span>
+            <div className="rounded-lg px-4 py-2" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
+              <span className="text-xs font-semibold" style={{ color: 'var(--gold-bright)' }}>Export Compliant</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Footer */}
-      <div className="border-t border-teal-700/30 py-4">
+      <div className="py-4" style={{ borderTop: '1px solid rgba(37,204,200,0.25)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm">
-            <div className="text-teal-200 mb-2 md:mb-0">
+            <div className="mb-2 md:mb-0" style={{ color: 'var(--text-soft)' }}>
               © {currentYear} Global Exim Traders. All rights reserved.
             </div>
             <div className="flex space-x-6">
-              <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors">
+              <a href="#" className="footer-link">
                 Privacy Policy
               </a>
-              <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors">
+              <a href="#" className="footer-link">
                 Terms of Service
               </a>
-              <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors">
+              <a href="#" className="footer-link">
                 Shipping Policy
               </a>
-              <a href="#" className="text-teal-200 hover:text-yellow-400 transition-colors">
+              <a href="#" className="footer-link">
                 Refund Policy
               </a>
             </div>

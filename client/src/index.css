@@ -31,11 +31,23 @@ body {
   color: var(--text-bright);
   font-family: 'Lora', Georgia, serif;
   overflow-x: hidden;
+  position: relative;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { background: #0a1c22; }
-::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 0; }
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+.text-with-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
 
 nav {
 

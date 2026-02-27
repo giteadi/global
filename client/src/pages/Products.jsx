@@ -38,11 +38,11 @@ const Products = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <span className="text-sm uppercase tracking-wider" style={{ color: 'var(--gold-bright)' }}>Our Collections</span>
-          <h1 className="text-4xl md:text-5xl font-serif mt-2 mb-4" style={{ color: 'var(--text-bright)' }}>
+          <h1 className="text-4xl md:text-5xl font-serif mt-2 mb-4" style={{ color: 'var(--text-bright)', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
             Premium Indian Jewelry & Handicrafts
           </h1>
           <div className="w-24 h-1 mx-auto mb-6" style={{ background: 'var(--gold)' }}></div>
-          <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-soft)' }}>
+          <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-soft)', textShadow: '1px 1px 2px rgba(0,0,0,0.6)' }}>
             Explore our exquisite collection of handcrafted jewelry and decorative items
           </p>
         </div>

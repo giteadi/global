@@ -11,10 +11,10 @@ const Home = () => {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-serif mb-6 animate-pulse" style={{ color: 'var(--gold-bright)' }}>
+          <h1 className="text-5xl md:text-7xl font-serif mb-6 animate-pulse text-with-shadow" style={{ color: 'var(--gold-bright)' }}>
             Global Exim Traders
           </h1>
-          <p className="text-xl md:text-2xl mb-8 font-light" style={{ color: 'var(--text-soft)' }}>
+          <p className="text-xl md:text-2xl mb-8 font-light text-with-shadow" style={{ color: 'var(--text-soft)' }}>
             Where Heritage Meets Global Elegance
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

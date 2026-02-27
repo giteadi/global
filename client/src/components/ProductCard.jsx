@@ -30,9 +30,9 @@ const ProductCard = ({ product }) => {
         <div className="flex justify-between items-start mb-3">
           <span className="text-yellow-400 text-sm uppercase tracking-wider">{product.category}</span>
           <div className="text-right">
-            <span className="text-2xl text-yellow-400 font-bold">${product.price}</span>
+            <span className="text-2xl text-yellow-400 font-bold">₹{product.price}</span>
             {product.originalPrice && (
-              <span className="text-teal-200 line-through text-sm block">${product.originalPrice}</span>
+              <span className="text-teal-200 line-through text-sm block">₹{product.originalPrice}</span>
             )}
           </div>
         </div>

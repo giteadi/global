@@ -46,11 +46,17 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 py-20 px-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-serif text-white mb-8 text-center">Shopping Cart</h1>
-        
-        <div className="grid lg:grid-cols-3 gap-8">
+    <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 py-20 px-4 relative overflow-hidden">
+      {/* Parallax Background Effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-900/30 via-transparent to-teal-800/30"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(37,204,200,0.1),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(200,162,110,0.1),transparent_50%)]"></div>
+      
+      <div className="relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl font-serif text-white mb-8 text-center">Shopping Cart</h1>
+          
+          <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-6">
@@ -102,8 +108,8 @@ const Cart = () => {
                             </button>
                           </div>
                           <div className="text-right">
-                            <p className="text-yellow-400 font-semibold">${item.price}</p>
-                            <p className="text-white text-sm">${(item.price * item.quantity).toFixed(2)}</p>
+                            <p className="text-yellow-400 font-semibold">₹{item.price}</p>
+                            <p className="text-white text-sm">₹{(item.price * item.quantity).toFixed(2)}</p>
                           </div>
                         </div>
                       </div>
@@ -122,7 +128,7 @@ const Cart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-teal-200">
                   <span>Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-teal-200">
                   <span>Shipping</span>
@@ -130,12 +136,12 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between text-teal-200">
                   <span>Tax</span>
-                  <span>${(total * 0.1).toFixed(2)}</span>
+                  <span>₹{(total * 0.1).toFixed(2)}</span>
                 </div>
                 <div className="border-t border-teal-600/30 pt-3">
                   <div className="flex justify-between text-white text-lg font-semibold">
                     <span>Total</span>
-                    <span className="text-yellow-400">${(total * 1.1).toFixed(2)}</span>
+                    <span className="text-yellow-400">₹{(total * 1.1).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -171,6 +177,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }

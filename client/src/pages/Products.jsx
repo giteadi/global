@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setProducts, setLoading } from '../store/slices/productsSlice'
+import { addToCart } from '../store/slices/cartSlice'
+import toast from 'react-hot-toast'
 
 const Products = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { products, loading, categories } = useSelector(state => state.products)
+  const { user } = useSelector(state => state.auth)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -106,12 +110,23 @@ const Products = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
                     <span className="text-sm" style={{ color: 'var(--gold-bright)' }}>{product.category}</span>
-                    <span className="text-2xl font-bold" style={{ color: 'var(--gold-bright)' }}>${product.price}</span>
+                    <span className="text-2xl font-bold" style={{ color: 'var(--gold-bright)' }}>₹{product.price}</span>
                   </div>
                   <h3 className="text-xl font-serif mb-3" style={{ color: 'var(--text-bright)' }}>{product.name}</h3>
                   <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-soft)' }}>{product.description}</p>
                   <div className="flex gap-2">
-                    <button className="flex-1 btn-primary text-sm">
+                    <button 
+                      onClick={() => {
+                        if (!user) {
+                          toast.error('Please login to add items to cart')
+                          navigate('/login')
+                          return
+                        }
+                        dispatch(addToCart({ ...product, quantity: 1 }))
+                        toast.success(`${product.name} added to cart!`)
+                      }}
+                      className="flex-1 btn-primary text-sm"
+                    >
                       Add to Cart
                     </button>
                     <Link to={`/product/${product.id}`} className="btn-secondary text-sm">

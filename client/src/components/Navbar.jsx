@@ -251,7 +251,7 @@ const Navbar = () => {
                               {item.name}
                             </h4>
                             <p style={{ color: 'var(--gold-bright)' }}>
-                              ${item.price}
+                              ₹{item.price}
                             </p>
                             <p className="text-sm text-gray-400">
                               Qty: {item.quantity}
@@ -271,7 +271,7 @@ const Navbar = () => {
                         className="text-xl font-bold"
                         style={{ color: 'var(--gold-bright)' }}
                       >
-                        ${total.toFixed(2)}
+                        ₹{total.toFixed(2)}
                       </span>
                     </div>
 

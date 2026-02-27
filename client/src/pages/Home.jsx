@@ -62,7 +62,7 @@ const Home = () => {
                   <h3 className="text-xl font-serif mt-2 mb-3" style={{ color: 'var(--text-bright)' }}>{product.name}</h3>
                   <p className="text-sm mb-4" style={{ color: 'var(--text-soft)' }}>{product.description}</p>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold" style={{ color: 'var(--gold-bright)' }}>${product.price}</span>
+                    <span className="text-2xl font-bold" style={{ color: 'var(--gold-bright)' }}>₹{product.price}</span>
                     <Link 
                       to={`/product/${product.id}`}
                       className="btn-primary text-sm"

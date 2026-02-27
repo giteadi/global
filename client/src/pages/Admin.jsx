@@ -133,7 +133,7 @@ const Admin = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-teal-200 text-sm">Total Value</p>
-                <p className="text-2xl font-bold text-yellow-400">${stats.totalValue}</p>
+                <p className="text-2xl font-bold text-yellow-400">₹{stats.totalValue}</p>
               </div>
               <span className="text-3xl">💰</span>
             </div>
@@ -151,7 +151,7 @@ const Admin = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-teal-200 text-sm">Avg Price</p>
-                <p className="text-2xl font-bold text-yellow-400">${stats.avgPrice}</p>
+                <p className="text-2xl font-bold text-yellow-400">₹{stats.avgPrice}</p>
               </div>
               <span className="text-3xl">📊</span>
             </div>
@@ -231,7 +231,7 @@ const Admin = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-teal-200">{product.category}</td>
-                        <td className="px-6 py-4 text-yellow-400 font-semibold">${product.price}</td>
+                        <td className="px-6 py-4 text-yellow-400 font-semibold">₹{product.price}</td>
                         <td className="px-6 py-4">
                           <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-sm">
                             Active
@@ -289,7 +289,7 @@ const Admin = () => {
                           <p className="text-teal-200 text-sm">john@example.com</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-yellow-400 font-semibold">$299.00</td>
+                      <td className="px-6 py-4 text-yellow-400 font-semibold">₹299.00</td>
                       <td className="px-6 py-4">
                         <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-sm">
                           Paid
@@ -305,7 +305,7 @@ const Admin = () => {
                           <p className="text-teal-200 text-sm">jane@example.com</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-yellow-400 font-semibold">$149.00</td>
+                      <td className="px-6 py-4 text-yellow-400 font-semibold">₹149.00</td>
                       <td className="px-6 py-4">
                         <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-sm">
                           Paid

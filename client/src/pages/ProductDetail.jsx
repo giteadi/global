@@ -10,6 +10,7 @@ const ProductDetail = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { singleProduct } = useSelector(state => state.products)
+  const { user } = useSelector(state => state.auth)
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
 
@@ -44,6 +45,11 @@ const ProductDetail = () => {
   }, [id, dispatch])
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error('Please login to add items to cart')
+      navigate('/login')
+      return
+    }
     if (singleProduct) {
       dispatch(addToCart({ ...singleProduct, quantity }))
       toast.success(`${singleProduct.name} added to cart!`)
@@ -167,8 +173,8 @@ const ProductDetail = () => {
               <span className="text-yellow-400 text-sm uppercase tracking-wider">{singleProduct.category}</span>
               <h1 className="text-4xl font-serif text-white mt-2 mb-4 text-with-shadow">{singleProduct.name}</h1>
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-3xl text-yellow-400 font-bold">${singleProduct.price}</span>
-                <span className="text-teal-200 line-through">${Math.round(singleProduct.price * 1.5)}</span>
+                <span className="text-3xl text-yellow-400 font-bold">₹{singleProduct.price}</span>
+                <span className="text-teal-200 line-through">₹{Math.round(singleProduct.price * 1.5)}</span>
                 <span className="bg-yellow-400 text-black px-2 py-1 rounded-full text-sm font-semibold">33% OFF</span>
               </div>
               <p className="text-teal-200 text-lg leading-relaxed text-with-shadow">{singleProduct.description}</p>

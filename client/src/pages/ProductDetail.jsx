@@ -50,37 +50,89 @@ const ProductDetail = () => {
     }
   }
 
-  const handleBuyNow = () => {
-    handleAddToCart()
-    navigate('/cart')
+  const handleBuyNow = async () => {
+    if (!singleProduct) return
+
+    const amount = singleProduct.price * quantity
+
+    try {
+      // Create order
+      const response = await fetch('http://localhost:5000/api/payments/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount }),
+      })
+
+      const order = await response.json()
+
+      // Razorpay options
+      const options = {
+        key: 'YOUR_RAZORPAY_KEY_ID', // Replace with actual key
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Global Exim Traders',
+        description: `Purchase of ${singleProduct.name}`,
+        order_id: order.id,
+        handler: async function (response) {
+          // Verify payment
+          const verifyResponse = await fetch('http://localhost:5000/api/payments/verify-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          })
+
+          const verifyResult = await verifyResponse.json()
+
+          if (verifyResult.success) {
+            toast.success('Payment successful!')
+            // Here you can save the order to database or redirect
+          } else {
+            toast.error('Payment verification failed!')
+          }
+        },
+        prefill: {
+          name: 'Customer Name',
+          email: 'customer@example.com',
+          contact: '9999999999',
+        },
+        theme: {
+          color: '#C8A96E',
+        },
+      }
+
+      const rzp = new window.Razorpay(options)
+      rzp.open()
+    } catch (error) {
+      toast.error('Payment failed!')
+      console.error(error)
+    }
   }
 
   if (!singleProduct) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 flex items-center justify-center">
-        <div className="text-yellow-400 text-2xl animate-pulse">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-2xl animate-pulse text-with-shadow">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 py-20 px-4">
+    <div className="min-h-screen py-20 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb */}
-        <nav className="mb-8">
-          <ol className="flex items-center space-x-2 text-yellow-400">
-            <li><button onClick={() => navigate('/')} className="hover:text-yellow-300">Home</button></li>
-            <li>/</li>
-            <li><button onClick={() => navigate('/products')} className="hover:text-yellow-300">Products</button></li>
-            <li>/</li>
-            <li className="text-white">{singleProduct.name}</li>
-          </ol>
-        </nav>
+        {/* Breadcrumb removed as requested */}
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Product Images */}
           <div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-8 mb-4">
+            <div className="bg-teal-800/50 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8 mb-4">
               <div className="h-96 flex items-center justify-center">
                 <span className="text-9xl">{singleProduct.images[selectedImage]}</span>
               </div>
@@ -90,7 +142,7 @@ const ProductDetail = () => {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`bg-teal-800/30 border rounded-lg p-4 transition-all ${
+                  className={`bg-teal-800/50 border rounded-lg p-4 transition-all ${
                     selectedImage === index 
                       ? 'border-yellow-400' 
                       : 'border-teal-600/30 hover:border-yellow-400/50'
@@ -119,7 +171,7 @@ const ProductDetail = () => {
             <div className="mb-8">
               <div className="flex items-center gap-4 mb-6">
                 <label className="text-white font-semibold">Quantity:</label>
-                <div className="flex items-center border border-teal-600/30 rounded-lg">
+                <div className="flex items-center bg-teal-800/50 backdrop-blur-sm border border-teal-600/30 rounded-lg">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="px-3 py-2 text-yellow-400 hover:bg-teal-800/50 transition-all"
@@ -130,7 +182,7 @@ const ProductDetail = () => {
                     type="number"
                     value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-16 text-center bg-transparent text-white border-x border-teal-600/30 py-2"
+                    className="w-16 text-center bg-teal-800/30 text-white border-x border-teal-600/30 py-2"
                   />
                   <button
                     onClick={() => setQuantity(quantity + 1)}

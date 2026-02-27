@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setProducts, setLoading } from '../store/slices/productsSlice'
 
@@ -55,7 +56,7 @@ const Products = () => {
               <button
                 onClick={() => setSelectedCategory('All')}
                 className="px-4 py-2 rounded-full font-semibold transition-all"
-                style={selectedCategory === 'All' ? { background: 'var(--gold)', color: 'var(--text-bright)' } : { border: '1px solid var(--gold)', color: 'var(--gold-bright)' }}
+                style={selectedCategory === 'All' ? { background: 'var(--gold)', color: 'var(--text-bright)' } : { background: 'rgba(200,162,110,0.2)', border: '1px solid var(--gold)', color: 'var(--gold-bright)' }}
               >
                 All Products
               </button>
@@ -64,7 +65,7 @@ const Products = () => {
                   key={category}
                   onClick={() => setSelectedCategory(category)}
                   className="px-4 py-2 rounded-full font-semibold transition-all"
-                  style={selectedCategory === category ? { background: 'var(--gold)', color: 'var(--text-bright)' } : { border: '1px solid var(--gold)', color: 'var(--gold-bright)' }}
+                  style={selectedCategory === category ? { background: 'var(--gold)', color: 'var(--text-bright)' } : { background: 'rgba(200,162,110,0.2)', border: '1px solid var(--gold)', color: 'var(--gold-bright)' }}
                 >
                   {category}
                 </button>
@@ -78,8 +79,8 @@ const Products = () => {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 pr-10 rounded-full focus:outline-none transition-all"
-                style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)', color: 'var(--text-bright)' }}
+                className="px-4 py-2 pr-10 rounded-full focus:outline-none transition-all backdrop-blur-sm"
+                style={{ background: 'rgba(27,158,155,0.5)', border: '1px solid rgba(37,204,200,0.12)', color: 'var(--text-bright)' }}
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--gold-bright)' }}>🔍</span>
             </div>
@@ -98,7 +99,7 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="rounded-lg overflow-hidden transition-all transform hover:scale-105" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
+              <div key={product.id} className="rounded-lg overflow-hidden transition-all transform hover:scale-105" style={{ background: 'rgba(27,158,155,0.5)', border: '1px solid rgba(37,204,200,0.12)' }}>
                 <div className="h-64 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0D6E6C, #1B9E9B)' }}>
                   <span className="text-6xl">{product.icon}</span>
                 </div>
@@ -113,9 +114,9 @@ const Products = () => {
                     <button className="flex-1 btn-primary text-sm">
                       Add to Cart
                     </button>
-                    <button className="btn-secondary text-sm">
+                    <Link to={`/product/${product.id}`} className="btn-secondary text-sm">
                       View
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

@@ -264,9 +264,59 @@ const Admin = () => {
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
-          <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-8">
-            <h2 className="text-2xl font-serif text-white mb-6">Order Management</h2>
-            <p className="text-teal-200 text-center py-12">No orders yet. Orders will appear here when customers make purchases.</p>
+          <div>
+            <h2 className="text-2xl font-serif text-white mb-6">Payment Management</h2>
+            
+            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-teal-900/50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-yellow-400">Order ID</th>
+                      <th className="px-6 py-3 text-left text-yellow-400">Customer</th>
+                      <th className="px-6 py-3 text-left text-yellow-400">Amount</th>
+                      <th className="px-6 py-3 text-left text-yellow-400">Status</th>
+                      <th className="px-6 py-3 text-left text-yellow-400">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Sample payments - in real app, this would come from API */}
+                    <tr className="border-t border-teal-600/20">
+                      <td className="px-6 py-4 text-white">#ORD001</td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="text-white font-semibold">John Doe</p>
+                          <p className="text-teal-200 text-sm">john@example.com</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-yellow-400 font-semibold">$299.00</td>
+                      <td className="px-6 py-4">
+                        <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-sm">
+                          Paid
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-teal-200">2024-01-15</td>
+                    </tr>
+                    <tr className="border-t border-teal-600/20">
+                      <td className="px-6 py-4 text-white">#ORD002</td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="text-white font-semibold">Jane Smith</p>
+                          <p className="text-teal-200 text-sm">jane@example.com</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-yellow-400 font-semibold">$149.00</td>
+                      <td className="px-6 py-4">
+                        <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-sm">
+                          Paid
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-teal-200">2024-01-14</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 

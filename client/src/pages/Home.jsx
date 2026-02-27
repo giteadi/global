@@ -6,7 +6,7 @@ const Home = () => {
   const { featuredProducts } = useSelector(state => state.products)
 
   return (
-    <div className="min-h-screen" style={{ background: '#0a2830' }}>
+    <div className="min-h-screen py-20 px-4">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>

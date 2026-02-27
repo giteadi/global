@@ -18,7 +18,7 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
-        <div className="min-h-screen" style={{ background: '#0a2830' }}>
+        <div className="min-h-screen">
           <Navbar />
           <main className="pt-16">
             <Routes>

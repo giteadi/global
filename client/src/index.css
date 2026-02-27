@@ -23,7 +23,11 @@
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body {
-  background: #0a2830;
+  background-image: url('/src/assets/Gemini_Generated_Image_ed5q3led5q3led5q.png');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--text-bright);
   font-family: 'Lora', Georgia, serif;
   overflow-x: hidden;

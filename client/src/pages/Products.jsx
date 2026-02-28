@@ -8,27 +8,45 @@ import toast from 'react-hot-toast'
 const Products = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { products, loading, categories } = useSelector(state => state.products)
+  const { products, loading } = useSelector(state => state.products)
   const { user } = useSelector(state => state.auth)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
+  const [categories, setCategories] = useState([])
+
+  const fetchProducts = async () => {
+    try {
+      dispatch(setLoading(true))
+      const response = await fetch('http://localhost:4000/api/products')
+      const data = await response.json()
+      if (data.success) {
+        dispatch(setProducts(data.data.products))
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      toast.error('Failed to fetch products')
+    } finally {
+      dispatch(setLoading(false))
+    }
+  }
 
   useEffect(() => {
-    // Mock data - in real app, this would come from API
-    const mockProducts = [
-      { id: 1, name: 'Temple Necklace Set', category: 'Temple Heritage', price: 299, icon: '🏛️', description: 'Traditional temple jewelry with intricate gold work' },
-      { id: 2, name: 'Ethnic Earrings', category: 'Contemporary Ethnic', price: 149, icon: '💎', description: 'Modern ethnic design with traditional motifs' },
-      { id: 3, name: 'Handcrafted Decor Vase', category: 'Handcrafted Decor', price: 199, icon: '🏺', description: 'Artisan vase with traditional Indian patterns' },
-      { id: 4, name: 'Export Bracelet Set', category: 'Export Grade', price: 249, icon: '📦', description: 'Premium quality bracelet set for global markets' },
-      { id: 5, name: 'Peacock Motif Necklace', category: 'Temple Heritage', price: 399, icon: '🦚', description: 'Regal peacock design inspired by Indian royalty' },
-      { id: 6, name: 'Kundan Pendant Set', category: 'Contemporary Ethnic', price: 349, icon: '🌸', description: 'Elegant kundan work with modern styling' },
-      { id: 7, name: 'Brass Decor Set', category: 'Handcrafted Decor', price: 179, icon: '🏛️', description: 'Traditional brass decorative items' },
-      { id: 8, name: 'Global Collection Set', category: 'Export Grade', price: 449, icon: '📦', description: 'Complete export-ready jewelry collection' },
-    ]
-    
-    dispatch(setProducts(mockProducts))
-    dispatch(setLoading(false))
-  }, [dispatch])
+    fetchProducts()
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/categories')
+      const data = await response.json()
+      if (data.success) {
+        setCategories(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+      toast.error('Failed to fetch categories')
+    }
+  }
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory
@@ -66,12 +84,12 @@ const Products = () => {
               </button>
               {categories.map((category) => (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.name)}
                   className="px-4 py-2 rounded-full font-semibold transition-all"
-                  style={selectedCategory === category ? { background: 'var(--gold)', color: 'var(--text-bright)' } : { background: 'rgba(200,162,110,0.2)', border: '1px solid var(--gold)', color: 'var(--gold-bright)' }}
+                  style={selectedCategory === category.name ? { background: 'var(--gold)', color: 'var(--text-bright)' } : { background: 'rgba(200,162,110,0.2)', border: '1px solid var(--gold)', color: 'var(--gold-bright)' }}
                 >
-                  {category}
+                  {category.name}
                 </button>
               ))}
             </div>
@@ -109,7 +127,7 @@ const Products = () => {
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-sm" style={{ color: 'var(--gold-bright)' }}>{product.category}</span>
+                    <span className="text-sm" style={{ color: 'var(--gold-bright)' }}>{product.category_name || product.category}</span>
                     <span className="text-2xl font-bold" style={{ color: 'var(--gold-bright)' }}>₹{product.price}</span>
                   </div>
                   <h3 className="text-xl font-serif mb-3" style={{ color: 'var(--text-bright)' }}>{product.name}</h3>

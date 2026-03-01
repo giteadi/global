@@ -40,7 +40,7 @@ const Products = () => {
       const response = await fetch('http://localhost:4000/api/categories')
       const data = await response.json()
       if (data.success) {
-        setCategories(data.data)
+        setCategories(Array.isArray(data.data) ? data.data : [])
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
@@ -82,7 +82,7 @@ const Products = () => {
               >
                 All Products
               </button>
-              {categories.map((category) => (
+              {Array.isArray(categories) && categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.name)}

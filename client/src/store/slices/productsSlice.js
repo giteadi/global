@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 const initialState = {
   products: [],
@@ -13,6 +13,21 @@ const initialState = {
   error: null,
   singleProduct: null,
 }
+
+// Async thunks
+export const getProducts = createAsyncThunk(
+  'products/getProducts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/products')
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch products')
+      return data.data.products
+    } catch (error) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
 
 const productsSlice = createSlice({
   name: 'products',
@@ -45,6 +60,21 @@ const productsSlice = createSlice({
     deleteProduct: (state, action) => {
       state.products = state.products.filter(p => p.id !== action.payload)
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getProducts.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(getProducts.fulfilled, (state, action) => {
+        state.loading = false
+        state.products = action.payload
+      })
+      .addCase(getProducts.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
   },
 })
 

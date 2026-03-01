@@ -24,7 +24,7 @@ const auth = async (req, res, next) => {
       // Get user from token
       const user = await User.findById(decoded.id).select('-password')
 
-      if (!user || !user.isActive) {
+      if (!user || !user.is_active) {
         return res.status(401).json({
           success: false,
           message: 'User not found or account deactivated'

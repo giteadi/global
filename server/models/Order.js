@@ -3,18 +3,9 @@ const { pool } = require('../config/database')
 class Order {
   // Find orders with filters
   static async find(query = {}, options = {}) {
-    let sql = `SELECT o.*, JSON_ARRAYAGG(
-      JSON_OBJECT(
-        'product', oi.product_id,
-        'name', oi.name,
-        'icon', oi.icon,
-        'price', oi.price,
-        'quantity', oi.quantity,
-        'category', oi.category
-      )
-    ) as items
+    let sql = `SELECT o.*, u.name as user_name, u.email as user_email
     FROM orders o
-    LEFT JOIN order_items oi ON o.id = oi.order_id`
+    LEFT JOIN users u ON o.user_id = u.id`
 
     const params = []
     const conditions = []
@@ -30,34 +21,36 @@ class Order {
       params.push(query.orderStatus)
     }
 
+    if (query.payment_status) {
+      conditions.push('o.payment_status = ?')
+      params.push(query.payment_status)
+    }
+
     if (conditions.length > 0) {
       sql += ' WHERE ' + conditions.join(' AND ')
     }
 
-    sql += ' GROUP BY o.id'
-
-    // Add sorting
+    // Add sorting with validation
     const sortField = options.sort || 'o.created_at'
+    const allowedSortFields = ['o.id', 'o.created_at', 'o.total', 'o.order_status', 'o.payment_status']
+    const validSort = allowedSortFields.includes(sortField) ? sortField : 'o.created_at'
     const sortOrder = options.order === 'asc' ? 'ASC' : 'DESC'
-    sql += ` ORDER BY ${sortField} ${sortOrder}`
+    sql += ` ORDER BY ${validSort} ${sortOrder}`
 
-    // Add pagination
+    // Add pagination without parameterized values for MySQL compatibility
     if (options.limit) {
-      sql += ` LIMIT ?`
-      params.push(options.limit)
+      const limitNum = parseInt(options.limit) || 10
+      const skipNum = parseInt(options.skip) || 0
+      sql += ` LIMIT ${limitNum} OFFSET ${skipNum}`
     }
 
-    if (options.skip) {
-      sql += ` OFFSET ?`
-      params.push(options.skip)
-    }
+    const [rows] = await pool.query(sql, params)
 
-    const [rows] = await pool.execute(sql, params)
-
-    // Parse items JSON for each order
+    // Parse JSON fields for each order
     return rows.map(order => ({
       ...order,
-      items: order.items && order.items[0] !== null ? order.items : []
+      items: order.items ? JSON.parse(order.items) : [],
+      shipping_address: order.shipping_address ? JSON.parse(order.shipping_address) : null
     }))
   }
 
@@ -77,68 +70,53 @@ class Order {
       params.push(query.orderStatus)
     }
 
+    if (query.payment_status) {
+      conditions.push('o.payment_status = ?')
+      params.push(query.payment_status)
+    }
+
     if (conditions.length > 0) {
       sql += ' WHERE ' + conditions.join(' AND ')
     }
 
-    const [rows] = await pool.execute(sql, params)
+    const [rows] = await pool.query(sql, params)
     return rows[0].count
   }
 
   // Find order by ID
   static async findOne(query) {
-    const [rows] = await pool.execute(
-      `SELECT o.*, JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'product', oi.product_id,
-          'name', oi.name,
-          'icon', oi.icon,
-          'price', oi.price,
-          'quantity', oi.quantity,
-          'category', oi.category
-        )
-      ) as items
+    const [rows] = await pool.query(
+      `SELECT o.*, u.name as user_name, u.email as user_email
       FROM orders o
-      LEFT JOIN order_items oi ON o.id = oi.order_id
-      WHERE o.id = ? AND o.user_id = ?
-      GROUP BY o.id`,
+      LEFT JOIN users u ON o.user_id = u.id
+      WHERE o.id = ? AND o.user_id = ?`,
       [query._id || query.id, query.user]
     )
 
     if (rows.length === 0) return null
 
     const order = rows[0]
-    order.items = order.items && order.items[0] !== null ? order.items : []
+    order.items = order.items ? JSON.parse(order.items) : []
+    order.shipping_address = order.shipping_address ? JSON.parse(order.shipping_address) : null
 
     return order
   }
 
   // Find by ID (for admin)
   static async findById(id) {
-    const [rows] = await pool.execute(
-      `SELECT o.*, u.name as user_name, u.email as user_email,
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'product', oi.product_id,
-          'name', oi.name,
-          'icon', oi.icon,
-          'price', oi.price,
-          'quantity', oi.quantity,
-          'category', oi.category
-        )
-      ) as items
+    const [rows] = await pool.query(
+      `SELECT o.*, u.name as user_name, u.email as user_email
       FROM orders o
       LEFT JOIN users u ON o.user_id = u.id
-      LEFT JOIN order_items oi ON o.id = oi.order_id
-      WHERE o.id = ?
-      GROUP BY o.id, u.name, u.email`,
+      WHERE o.id = ?`,
       [id]
     )
 
     if (rows.length === 0) return null
 
     const order = rows[0]
-    order.items = order.items && order.items[0] !== null ? order.items : []
+    order.items = order.items ? JSON.parse(order.items) : []
+    order.shipping_address = order.shipping_address ? JSON.parse(order.shipping_address) : null
 
     return order
   }
@@ -163,24 +141,21 @@ class Order {
         expectedDelivery
       } = orderData
 
-      // Insert order
+      // Insert order with JSON fields
       const [orderResult] = await connection.execute(
         `INSERT INTO orders (
-          user_id, shipping_name, shipping_phone, shipping_email,
-          shipping_street, shipping_city, shipping_state, shipping_pincode, shipping_country,
-          payment_method, subtotal, tax, shipping, total, notes, expected_delivery
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          user_id, payment_method, subtotal, tax, shipping, total, notes, 
+          expected_delivery, items, shipping_address
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          user, shippingAddress.name, shippingAddress.phone, shippingAddress.email,
-          shippingAddress.street, shippingAddress.city, shippingAddress.state,
-          shippingAddress.pincode, shippingAddress.country, paymentMethod,
-          subtotal, tax, shipping, total, notes, expectedDelivery
+          user, paymentMethod, subtotal, tax, shipping, total, notes, 
+          expectedDelivery, JSON.stringify(items), JSON.stringify(shippingAddress)
         ]
       )
 
       const orderId = orderResult.insertId
 
-      // Insert order items
+      // Also insert into order_items for backward compatibility
       if (items && items.length > 0) {
         const itemValues = items.map(item => [
           orderId,
@@ -221,8 +196,14 @@ class Order {
 
     Object.keys(updates).forEach(key => {
       if (updates[key] !== undefined) {
-        fields.push(`${key} = ?`)
-        values.push(updates[key])
+        // Handle JSON fields
+        if (key === 'items' || key === 'shipping_address') {
+          fields.push(`${key} = ?`)
+          values.push(JSON.stringify(updates[key]))
+        } else {
+          fields.push(`${key} = ?`)
+          values.push(updates[key])
+        }
       }
     })
 
@@ -230,7 +211,7 @@ class Order {
 
     values.push(id)
 
-    await pool.execute(
+    await pool.query(
       `UPDATE orders SET ${fields.join(', ')} WHERE id = ?`,
       values
     )
@@ -238,6 +219,88 @@ class Order {
     if (options.new !== false) {
       return this.findById(id)
     }
+  }
+
+  // Update order status
+  static async updateStatus(id, status, trackingNumber = null) {
+    const updates = { order_status: status }
+    if (trackingNumber) {
+      updates.tracking_number = trackingNumber
+    }
+
+    return this.findByIdAndUpdate(id, updates)
+  }
+
+  // Update payment status
+  static async updatePaymentStatus(id, paymentStatus, transactionId = null) {
+    const updates = { payment_status: paymentStatus }
+    if (transactionId) {
+      updates.transaction_id = transactionId
+    }
+    if (paymentStatus === 'Completed') {
+      updates.payment_date = new Date()
+    }
+
+    return this.findByIdAndUpdate(id, updates)
+  }
+
+  // Process refund
+  static async processRefund(id, refundAmount, refundReason) {
+    const updates = {
+      payment_status: 'Refunded',
+      refund_amount: refundAmount,
+      refund_reason: refundReason,
+      refund_date: new Date(),
+      refund_transaction_id: `REF${Date.now()}`
+    }
+
+    return this.findByIdAndUpdate(id, updates)
+  }
+
+  // Cancel order
+  static async cancelOrder(id) {
+    return this.updateStatus(id, 'Cancelled')
+  }
+
+  // Get order statistics
+  static async getStats() {
+    const [rows] = await pool.query(`
+      SELECT 
+        order_status,
+        COUNT(*) as count,
+        SUM(total) as total_revenue
+      FROM orders
+      GROUP BY order_status
+      ORDER BY count DESC
+    `)
+    return rows
+  }
+
+  // Get payment statistics
+  static async getPaymentStats() {
+    const [rows] = await pool.query(`
+      SELECT 
+        payment_status,
+        COUNT(*) as count,
+        SUM(total) as total_amount
+      FROM orders
+      GROUP BY payment_status
+      ORDER BY count DESC
+    `)
+    return rows
+  }
+
+  // Get recent orders for dashboard
+  static async getRecentOrders(limit = 5) {
+    const [rows] = await pool.query(
+      `SELECT o.id, o.total, o.order_status, o.created_at, u.name as customer_name, u.email as customer_email
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.id
+      ORDER BY o.created_at DESC
+      LIMIT ?`,
+      [limit]
+    )
+    return rows
   }
 }
 

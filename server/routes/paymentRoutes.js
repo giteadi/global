@@ -1,13 +1,20 @@
 const express = require('express')
 const router = express.Router()
 const Razorpay = require('razorpay')
+const {
+  getPayments,
+  getPayment,
+  processRefund,
+  updatePaymentStatus,
+  getPaymentStats
+} = require('../controllers/paymentController')
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET
 })
 
-// Create order
+// Public routes
 router.post('/create-order', async (req, res) => {
   const { amount, currency = 'INR' } = req.body
   const options = {
@@ -23,7 +30,6 @@ router.post('/create-order', async (req, res) => {
   }
 })
 
-// Verify payment
 router.post('/verify-payment', async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body
   const crypto = require('crypto')
@@ -31,11 +37,17 @@ router.post('/verify-payment', async (req, res) => {
     .update(razorpay_order_id + '|' + razorpay_payment_id)
     .digest('hex')
   if (expectedSignature === razorpay_signature) {
-    // Payment verified
     res.json({ success: true })
   } else {
     res.status(400).json({ success: false })
   }
 })
+
+// Admin routes (without auth middleware for now)
+router.get('/admin/payments', getPayments)
+router.get('/admin/payments/:id', getPayment)
+router.post('/admin/payments/:id/refund', processRefund)
+router.put('/admin/payments/:id', updatePaymentStatus)
+router.get('/admin/payments/stats', getPaymentStats)
 
 module.exports = router

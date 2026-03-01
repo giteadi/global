@@ -16,6 +16,13 @@ import Profile from './pages/Profile'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
+import AdminProducts from './pages/AdminProducts'
+import AdminOrders from './pages/AdminOrders'
+import AdminUsers from './pages/AdminUsers'
+import AdminCategories from './pages/AdminCategories'
+import AdminPayments from './pages/AdminPayments'
+import AdminAnalytics from './pages/AdminAnalytics'
+import AdminSettings from './pages/AdminSettings'
 import './styles.css'
 
 function App() {
@@ -37,6 +44,13 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/products" element={<AdminProducts />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/categories" element={<AdminCategories />} />
+              <Route path="/admin/payments" element={<AdminPayments />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
             </Routes>
           </main>
           <Footer />

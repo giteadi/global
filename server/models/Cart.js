@@ -3,7 +3,7 @@ const { pool } = require('../config/database')
 class Cart {
   // Find cart by user ID
   static async findOne(query) {
-    const [rows] = await pool.execute(
+    const [rows] = await pool.query(
       `SELECT c.*, JSON_ARRAYAGG(
         JSON_OBJECT(
           'product', ci.product_id,
@@ -39,7 +39,7 @@ class Cart {
 
     if (!cart) {
       // Create new cart
-      const [result] = await pool.execute(
+      const [result] = await pool.query(
         'INSERT INTO carts (user_id) VALUES (?)',
         [user]
       )
@@ -55,7 +55,7 @@ class Cart {
   // Update cart items
   static async updateCartItems(cartId, items) {
     // Clear existing items
-    await pool.execute('DELETE FROM cart_items WHERE cart_id = ?', [cartId])
+    await pool.query('DELETE FROM cart_items WHERE cart_id = ?', [cartId])
 
     // Insert new items
     if (items.length > 0) {
@@ -72,7 +72,7 @@ class Cart {
       const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?, ?)').join(', ')
       const flattenedValues = values.flat()
 
-      await pool.execute(
+      await pool.query(
         `INSERT INTO cart_items (cart_id, product_id, name, icon, price, quantity, category) VALUES ${placeholders}`,
         flattenedValues
       )
@@ -104,8 +104,8 @@ class Cart {
   static async clearCart(userId) {
     const cart = await this.findOne({ user: userId })
     if (cart) {
-      await pool.execute('DELETE FROM cart_items WHERE cart_id = ?', [cart.id])
-      await pool.execute('UPDATE carts SET total = 0 WHERE id = ?', [cart.id])
+      await pool.query('DELETE FROM cart_items WHERE cart_id = ?', [cart.id])
+      await pool.query('UPDATE carts SET total = 0 WHERE id = ?', [cart.id])
     }
   }
 }

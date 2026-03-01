@@ -1,19 +1,43 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { getProducts } from '../store/slices/productsSlice'
+import { useGetProductsQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../store/slices/adminApi'
 import toast from 'react-hot-toast'
 
 const AdminProducts = () => {
-  const dispatch = useDispatch()
-  const { products, loading } = useSelector(state => state.products)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState('All')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingProduct, setEditingProduct] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    category: 'Temple Heritage',
+    price: '',
+    stock: '',
+    material: '',
+    craftsmanship: '',
+    origin: 'Rajasthan, India',
+    weight: '',
+    dimensions: '',
+    care: '',
+    icon: '🏛️',
+    is_featured: false,
+    is_active: true
+  })
 
-  useEffect(() => {
-    dispatch(getProducts())
-  }, [dispatch])
+  const params = {
+    page: 1,
+    limit: 100, // Assuming admin wants to see all or many products
+    ...(filterCategory !== 'All' && { category: filterCategory }),
+    ...(searchTerm && { search: searchTerm })
+  }
+  const { data: productsData, isLoading: loading, refetch } = useGetProductsQuery(params)
+  const [createProduct] = useCreateProductMutation()
+  const [updateProduct] = useUpdateProductMutation()
+  const [deleteProduct] = useDeleteProductMutation()
+
+  const products = productsData?.data?.products || []
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -22,6 +46,92 @@ const AdminProducts = () => {
   })
 
   const categories = ['All', 'Temple Heritage', 'Contemporary Ethnic', 'Handcrafted Decor', 'Export Grade']
+
+  const handleFormChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+  }
+
+  const handleAddProduct = () => {
+    setEditingProduct(null)
+    setFormData({
+      name: '',
+      description: '',
+      category: 'Temple Heritage',
+      price: '',
+      stock: '',
+      material: '',
+      craftsmanship: '',
+      origin: 'Rajasthan, India',
+      weight: '',
+      dimensions: '',
+      care: '',
+      icon: '🏛️',
+      is_featured: false,
+      is_active: true
+    })
+    setShowAddModal(true)
+  }
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product)
+    setFormData({
+      name: product.name || '',
+      description: product.description || '',
+      category: product.category || 'Temple Heritage',
+      price: product.price || '',
+      stock: product.stock || '',
+      material: product.material || '',
+      craftsmanship: product.craftsmanship || '',
+      origin: product.origin || 'Rajasthan, India',
+      weight: product.weight || '',
+      dimensions: product.dimensions || '',
+      care: product.care || '',
+      icon: product.icon || '🏛️',
+      is_featured: product.is_featured || false,
+      is_active: product.is_active !== false
+    })
+    setShowEditModal(true)
+  }
+
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await deleteProduct(id).unwrap()
+        toast.success('Product deleted successfully')
+      } catch (error) {
+        const errorMessage = error?.data?.message || error?.message || 'Unknown error occurred'
+        toast.error('Failed to delete product: ' + errorMessage)
+      }
+    }
+  }
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        stock: parseInt(formData.stock)
+      }
+
+      if (editingProduct) {
+        await updateProduct({ id: editingProduct.id, ...productData }).unwrap()
+        toast.success('Product updated successfully')
+        setShowEditModal(false)
+      } else {
+        await createProduct(productData).unwrap()
+        toast.success('Product created successfully')
+        setShowAddModal(false)
+      }
+      refetch()
+    } catch (error) {
+      toast.error('Failed to save product: ' + error)
+    }
+  }
 
   return (
     <AdminLayout>
@@ -33,7 +143,7 @@ const AdminProducts = () => {
             <p style={{ color: 'var(--text-soft)' }}>Manage your product catalog</p>
           </div>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={handleAddProduct}
             className="btn-primary"
           >
             Add New Product
@@ -162,10 +272,18 @@ const AdminProducts = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80">
+                        <button 
+                          onClick={() => handleEditProduct(product)}
+                          style={{ color: 'var(--teal-bright)' }} 
+                          className="mr-3 hover:opacity-80"
+                        >
                           Edit
                         </button>
-                        <button style={{ color: 'var(--gold-bright)' }} className="hover:opacity-80">
+                        <button 
+                          onClick={() => handleDeleteProduct(product.id)}
+                          style={{ color: 'var(--gold-bright)' }} 
+                          className="hover:opacity-80"
+                        >
                           Delete
                         </button>
                       </td>
@@ -177,14 +295,19 @@ const AdminProducts = () => {
           </div>
         </div>
 
-        {/* Add Product Modal */}
-        {showAddModal && (
+        {/* Add/Edit Product Modal */}
+        {(showAddModal || showEditModal) && (
           <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
             <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>Add New Product</h2>
+                <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
+                  {editingProduct ? 'Edit Product' : 'Add New Product'}
+                </h2>
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false)
+                    setShowEditModal(false)
+                  }}
                   style={{ color: 'var(--text-soft)' }}
                   className="hover:opacity-80"
                 >
@@ -194,12 +317,15 @@ const AdminProducts = () => {
                 </button>
               </div>
               
-              <form className="space-y-4">
+              <form onSubmit={handleFormSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Product Name</label>
                     <input
                       type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleFormChange}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--glass-border)',
@@ -212,12 +338,18 @@ const AdminProducts = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category</label>
-                    <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" style={{
-                      borderColor: 'var(--glass-border)',
-                      background: 'var(--glass-light)',
-                      color: 'var(--text-bright)',
-                      '--tw-ring-color': 'var(--teal-bright)'
-                    }}>
+                    <select 
+                      name="category"
+                      value={formData.category}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" 
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                    >
                       {categories.filter(cat => cat !== 'All').map(cat => (
                         <option key={cat} value={cat} style={{ background: 'var(--glass)', color: 'var(--text-bright)' }}>{cat}</option>
                       ))}
@@ -227,6 +359,9 @@ const AdminProducts = () => {
                     <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Price</label>
                     <input
                       type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleFormChange}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--glass-border)',
@@ -241,6 +376,9 @@ const AdminProducts = () => {
                     <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Stock</label>
                     <input
                       type="number"
+                      name="stock"
+                      value={formData.stock}
+                      onChange={handleFormChange}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--glass-border)',
@@ -257,6 +395,9 @@ const AdminProducts = () => {
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Description</label>
                   <textarea
                     rows="3"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleFormChange}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                     style={{
                       borderColor: 'var(--glass-border)',
@@ -271,7 +412,10 @@ const AdminProducts = () => {
                 <div className="flex justify-end space-x-3">
                   <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false)
+                      setShowEditModal(false)
+                    }}
                     className="px-4 py-2 rounded-lg transition-colors"
                     style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
                   >
@@ -282,7 +426,7 @@ const AdminProducts = () => {
                     className="px-4 py-2 rounded-lg transition-colors"
                     style={{ background: 'var(--teal)', color: 'var(--white)' }}
                   >
-                    Add Product
+                    {editingProduct ? 'Update Product' : 'Add Product'}
                   </button>
                 </div>
               </form>

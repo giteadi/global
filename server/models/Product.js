@@ -151,27 +151,6 @@ class Product {
       [quantity, id]
     )
   }
-
-  // Count products
-  static async countDocuments(filters = {}) {
-    let query = 'SELECT COUNT(*) as count FROM products'
-    const params = []
-    
-    const filterClauses = []
-    Object.keys(filters).forEach(key => {
-      if (filters[key] !== undefined) {
-        filterClauses.push(`${key} = ?`)
-        params.push(filters[key])
-      }
-    })
-    
-    if (filterClauses.length > 0) {
-      query += ' WHERE ' + filterClauses.join(' AND ')
-    }
-    
-    const [rows] = await pool.query(query, params)
-    return rows[0].count
-  }
 }
 
 module.exports = Product

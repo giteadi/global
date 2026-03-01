@@ -1,20 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAdminOrders } from '../store/slices/adminOrdersSlice'
+import { useGetOrdersQuery, useUpdateOrderMutation } from '../store/slices/adminApi'
+import toast from 'react-hot-toast'
 
 const AdminOrders = () => {
-  const dispatch = useDispatch()
-  const { orders, loading, error } = useSelector(state => state.adminOrders)
   const [statusFilter, setStatusFilter] = useState('All')
+  const params = statusFilter !== 'All' ? { status: statusFilter } : {}
+  const { data: ordersData, isLoading, error, refetch } = useGetOrdersQuery(params)
+  const [updateOrder] = useUpdateOrderMutation()
 
-  useEffect(() => {
-    const params = statusFilter !== 'All' ? { status: statusFilter } : {}
-    dispatch(getAdminOrders(params))
-  }, [dispatch, statusFilter])
+  const orders = ordersData?.data?.orders || []
+  const filteredOrders = statusFilter === 'All' ? orders : orders.filter(order => order.status === statusFilter)
+  const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
 
-  const filteredOrders = statusFilter === 'All' ? orders : orders.filter(order => order.orderStatus === statusFilter)
-  const statuses = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      await updateOrder({ id: orderId, status: newStatus }).unwrap()
+      toast.success('Order status updated successfully')
+      refetch()
+    } catch (err) {
+      toast.error('Failed to update order status')
+    }
+  }
 
   return (
     <AdminLayout>
@@ -126,45 +133,51 @@ const AdminOrders = () => {
                   </tr>
                 ) : (
                   filteredOrders.map((order) => (
-                    <tr key={order._id} className="hover:opacity-80">
+                    <tr key={order.id} className="hover:opacity-80">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
-                          {order._id ? `ORD${order._id.slice(-6)}` : 'N/A'}
+                          #{order.id}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
-                          {order.user?.name || 'Guest User'}
+                          {order.customer_name || 'N/A'}
                         </div>
                         <div className="text-sm" style={{ color: 'var(--text-soft)' }}>
-                          {order.user?.email || 'N/A'}
+                          {order.customer_email || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        ₹{order.total || 0}
+                        ₹{order.total_amount || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {order.items?.length || 0}
+                        {order.items_count || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          order.orderStatus === 'Delivered' ? 'bg-green-900/20 text-green-300' :
-                          order.orderStatus === 'Shipped' ? 'bg-blue-900/20 text-blue-300' :
-                          order.orderStatus === 'Processing' ? 'bg-yellow-900/20 text-yellow-300' :
-                          'bg-red-900/20 text-red-300'
-                        }`}>
-                          {order.orderStatus || 'Unknown'}
-                        </span>
+                        <select
+                          value={order.status || 'Pending'}
+                          onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                          className="px-2 py-1 text-xs rounded-full border focus:outline-none focus:ring-1"
+                          style={{
+                            borderColor: 'var(--glass-border)',
+                            background: 'var(--glass-light)',
+                            color: 'var(--text-bright)',
+                            '--tw-ring-color': 'var(--teal-bright)'
+                          }}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-soft)' }}>
-                        {new Date(order.created_at).toLocaleDateString('en-IN')}
+                        {order.created_at ? new Date(order.created_at).toLocaleDateString('en-IN') : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80">
-                          View
-                        </button>
-                        <button style={{ color: 'var(--gold-bright)' }} className="hover:opacity-80">
-                          Update
+                          View Details
                         </button>
                       </td>
                     </tr>

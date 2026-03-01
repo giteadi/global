@@ -119,23 +119,89 @@ exports.getProductAnalytics = async (req, res) => {
   }
 }
 
+// Get analytics data based on period and type
+exports.getAnalytics = async (req, res) => {
+  try {
+    const { period = 'month', type = 'overview' } = req.query
+
+    let data = {}
+
+    if (type === 'overview') {
+      // Get basic counts
+      const totalOrders = await Order.countDocuments()
+      const totalProducts = await Product.countDocuments()
+      const totalUsers = await User.countDocuments()
+
+      // Get revenue from completed orders
+      const completedOrders = await Order.find({ orderStatus: 'Delivered' })
+      const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total || 0), 0)
+
+      // Get recent orders
+      const recentOrders = await Order.find().sort({ created_at: -1 }).limit(5)
+
+      // Get top categories (simplified aggregation)
+      const categoryData = await Product.aggregate([
+        { $group: { _id: '$category', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 5 }
+      ])
+
+      const topCategories = categoryData.map(cat => ({
+        name: cat._id,
+        products_count: cat.count,
+        percentage: 0 // Would need more complex calculation
+      }))
+
+      // Recent activity (simplified)
+      const recentActivity = [
+        { action: 'New Order', details: 'Order #1001', time: '2 hours ago' },
+        { action: 'User Registration', details: 'New customer joined', time: '4 hours ago' },
+        { action: 'Payment Completed', details: 'Payment received', time: '6 hours ago' }
+      ]
+
+      data = {
+        totalRevenue,
+        totalOrders,
+        totalCustomers: totalUsers,
+        avgOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0,
+        monthlyGrowth: '0%', // Simplified
+        topCategories,
+        recentActivity
+      }
+    }
+
+    res.json({
+      success: true,
+      data
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching analytics',
+      error: error.message
+    })
+  }
+}
+
 // Get customer analytics
 exports.getCustomerAnalytics = async (req, res) => {
   try {
     // Simplified customer analytics
     const newCustomers = [
-      { _id: { year: 2024, month: 2 }, count: 3 },
-      { _id: { year: 2024, month: 1 }, count: 1 }
+      { month: 'Jan', count: 12 },
+      { month: 'Feb', count: 15 },
+      { month: 'Mar', count: 18 }
     ]
     
     const topCustomers = [
-      { name: 'Priya Patel', totalSpent: 547.80, orderCount: 2 },
-      { name: 'Amit Singh', totalSpent: 542.80, orderCount: 1 }
+      { name: 'John Doe', totalOrders: 5, totalSpent: 1500 },
+      { name: 'Jane Smith', totalOrders: 3, totalSpent: 1200 },
+      { name: 'Bob Johnson', totalOrders: 4, totalSpent: 1800 }
     ]
     
     const customerRetention = {
-      totalCustomers: 3,
-      returningCustomers: 1
+      returning: 65,
+      new: 35
     }
     
     res.json({

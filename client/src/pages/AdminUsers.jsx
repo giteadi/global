@@ -1,20 +1,80 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchUsers } from '../store/slices/adminUsersSlice'
+import { useGetUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation } from '../store/slices/adminApi'
 
 const AdminUsers = () => {
-  const dispatch = useDispatch()
-  const { users, loading, error } = useSelector(state => state.adminUsers)
   const [roleFilter, setRoleFilter] = useState('All')
+  const params = roleFilter !== 'All' ? { role: roleFilter } : {}
+  const { data: usersData, isLoading: loading, error, refetch } = useGetUsersQuery(params)
+  const [createUser] = useCreateUserMutation()
+  const [updateUser] = useUpdateUserMutation()
+  const [deleteUser] = useDeleteUserMutation()
 
-  useEffect(() => {
-    const params = roleFilter !== 'All' ? { role: roleFilter } : {}
-    dispatch(fetchUsers(params))
-  }, [dispatch, roleFilter])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: 'customer',
+    status: 'Active'
+  })
 
+  const users = usersData?.data?.users || []
   const filteredUsers = roleFilter === 'All' ? users : users.filter(user => user.role === roleFilter)
   const roles = ['All', 'customer', 'admin']
+
+  const handleAddUser = () => {
+    setEditingUser(null)
+    setFormData({ name: '', email: '', role: 'customer', status: 'Active' })
+    setIsModalOpen(true)
+  }
+
+  const handleEditUser = (user) => {
+    setEditingUser(user)
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      role: user.role || 'customer',
+      status: user.status || 'Active'
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      if (editingUser) {
+        await updateUser({ id: editingUser._id, ...formData }).unwrap()
+      } else {
+        await createUser(formData).unwrap()
+      }
+      setIsModalOpen(false)
+      refetch()
+    } catch (err) {
+      console.error('Error saving user:', err)
+    }
+  }
+
+  const handleToggleStatus = async (user) => {
+    try {
+      const newStatus = user.status === 'Active' ? 'Inactive' : 'Active'
+      await updateUser({ id: user._id, status: newStatus }).unwrap()
+      refetch()
+    } catch (err) {
+      console.error('Error updating status:', err)
+    }
+  }
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        await deleteUser(userId).unwrap()
+        refetch()
+      } catch (err) {
+        console.error('Error deleting user:', err)
+      }
+    }
+  }
 
   return (
     <AdminLayout>
@@ -27,6 +87,7 @@ const AdminUsers = () => {
           </div>
           <button
             className="btn-primary"
+            onClick={handleAddUser}
           >
             Add New User
           </button>
@@ -156,11 +217,14 @@ const AdminUsers = () => {
                         {user.orderCount || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80">
+                        <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80" onClick={() => handleEditUser(user)}>
                           Edit
                         </button>
-                        <button style={{ color: 'var(--gold-bright)' }} className="hover:opacity-80">
+                        <button style={{ color: 'var(--gold-bright)' }} className="mr-3 hover:opacity-80" onClick={() => handleToggleStatus(user)}>
                           {user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button style={{ color: 'var(--red)' }} className="hover:opacity-80" onClick={() => handleDeleteUser(user._id)}>
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -170,6 +234,102 @@ const AdminUsers = () => {
             </table>
           </div>
         </div>
+
+        {/* Modal for Add/Edit User */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="p-6 rounded-lg w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-bright)' }}>
+                {editingUser ? 'Edit User' : 'Add New User'}
+              </h2>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Name</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Email</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Role</label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                  >
+                    <option value="customer">Customer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 rounded-lg"
+                    style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-lg"
+                    style={{ background: 'var(--teal)', color: 'white' }}
+                  >
+                    {editingUser ? 'Update' : 'Create'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   )

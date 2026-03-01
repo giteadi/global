@@ -7,6 +7,7 @@ import adminUsersSlice from './slices/adminUsersSlice'
 import adminPaymentsSlice from './slices/adminPaymentsSlice'
 import adminCategoriesSlice from './slices/adminCategoriesSlice'
 import analyticsSlice from './slices/analyticsSlice'
+import { adminApi } from './slices/adminApi'
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +19,8 @@ export const store = configureStore({
     adminPayments: adminPaymentsSlice,
     adminCategories: adminCategoriesSlice,
     analytics: analyticsSlice,
+    [adminApi.reducerPath]: adminApi.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(adminApi.middleware),
 })

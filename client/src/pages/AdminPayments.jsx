@@ -1,18 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAdminPayments } from '../store/slices/adminPaymentsSlice'
+import { useGetPaymentsQuery } from '../store/slices/adminApi'
 
 const AdminPayments = () => {
-  const dispatch = useDispatch()
-  const { payments, loading, error } = useSelector(state => state.adminPayments)
   const [statusFilter, setStatusFilter] = useState('All')
+  const params = statusFilter !== 'All' ? { status: statusFilter } : {}
+  const { data: paymentsData, isLoading, error } = useGetPaymentsQuery(params)
 
-  useEffect(() => {
-    const params = statusFilter !== 'All' ? { status: statusFilter } : {}
-    dispatch(getAdminPayments(params))
-  }, [dispatch, statusFilter])
-
+  const payments = paymentsData?.data?.payments || []
   const filteredPayments = statusFilter === 'All' ? payments : payments.filter(payment => payment.status === statusFilter)
   const statuses = ['All', 'Completed', 'Pending', 'Failed', 'Refunded']
 
@@ -129,40 +124,47 @@ const AdminPayments = () => {
                   </tr>
                 ) : (
                   filteredPayments.map((payment) => (
-                    <tr key={payment._id} className="hover:opacity-80">
+                    <tr key={payment.id} className="hover:opacity-80">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
-                          {payment._id ? `PAY${payment._id.slice(-6)}` : 'N/A'}
+                          #{payment.id}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.orderId ? `ORD${payment.orderId.slice(-6)}` : 'N/A'}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
+                          #{payment.order_id}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.customer?.name || 'Guest'}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
+                          {payment.customer_name || 'N/A'}
+                        </div>
+                        <div className="text-sm" style={{ color: 'var(--text-soft)' }}>
+                          {payment.customer_email || 'N/A'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
                         ₹{payment.amount || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.method || 'Unknown'}
+                        {payment.method || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           payment.status === 'Completed' ? 'bg-green-900/20 text-green-300' :
                           payment.status === 'Pending' ? 'bg-yellow-900/20 text-yellow-300' :
                           payment.status === 'Failed' ? 'bg-red-900/20 text-red-300' :
-                          'bg-purple-900/20 text-purple-300'
+                          'bg-blue-900/20 text-blue-300'
                         }`}>
                           {payment.status || 'Unknown'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-soft)' }}>
-                        {new Date(payment.created_at).toLocaleDateString('en-IN')}
+                        {payment.created_at ? new Date(payment.created_at).toLocaleDateString('en-IN') : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80">
-                          View
+                          View Details
                         </button>
                         {payment.status === 'Completed' && (
                           <button style={{ color: 'var(--gold-bright)' }} className="hover:opacity-80">

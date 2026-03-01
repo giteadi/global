@@ -197,14 +197,18 @@ exports.updateProduct = async (req, res) => {
 // Admin: Delete product
 exports.deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, { is_active: false })
+    // First check if product exists
+    const existingProduct = await Product.findById(req.params.id)
 
-    if (!product) {
+    if (!existingProduct) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       })
     }
+
+    // Perform soft delete
+    await Product.findByIdAndUpdate(req.params.id, { is_active: false })
 
     res.json({
       success: true,

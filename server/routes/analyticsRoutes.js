@@ -3,12 +3,14 @@ const {
   getDashboardStats,
   getSalesAnalytics,
   getProductAnalytics,
-  getCustomerAnalytics
+  getCustomerAnalytics,
+  getAnalytics
 } = require('../controllers/analyticsController')
 
 const router = express.Router()
 
 // All analytics routes (without auth middleware for now)
+router.get('/', getAnalytics)
 router.get('/dashboard', getDashboardStats)
 router.get('/sales', getSalesAnalytics)
 router.get('/products', getProductAnalytics)

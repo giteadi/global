@@ -13,36 +13,36 @@ const ProductDetail = () => {
   const { user } = useSelector(state => state.auth)
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Mock product data - in real app, this would come from API
-    const mockProduct = {
-      id: parseInt(id),
-      name: 'Temple Necklace Set',
-      category: 'Temple Heritage',
-      price: 299,
-      icon: '🏛️',
-      description: 'Traditional temple jewelry with intricate gold work',
-      images: ['🏛️', '💎', '🦚', '🌸'],
-      details: {
-        material: 'Gold Plated Brass',
-        craftsmanship: 'Handcrafted',
-        origin: 'Rajasthan, India',
-        weight: '250 grams',
-        dimensions: 'Length: 18 inches, Width: 2 inches',
-        care: 'Keep away from water and chemicals'
-      },
-      features: [
-        'Traditional temple design',
-        'Intricate gold work',
-        'Adjustable chain',
-        'Hypoallergenic',
-        'Export quality packaging'
-      ]
+    const fetchProduct = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch(`http://localhost:4000/api/products/${id}`)
+        const data = await response.json()
+        
+        if (data.success) {
+          dispatch(setSingleProduct(data.data))
+        } else {
+          toast.error('Product not found')
+          navigate('/products')
+          return
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error)
+        toast.error('Failed to load product details')
+        navigate('/products')
+        return
+      } finally {
+        setLoading(false)
+      }
     }
-    
-    dispatch(setSingleProduct(mockProduct))
-  }, [id, dispatch])
+
+    if (id) {
+      fetchProduct()
+    }
+  }, [id, dispatch, navigate])
 
   const handleAddToCart = () => {
     if (!user) {
@@ -129,7 +129,7 @@ const ProductDetail = () => {
     }
   }
 
-  if (!singleProduct) {
+  if (loading || !singleProduct) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-2xl animate-pulse text-with-shadow">Loading...</div>

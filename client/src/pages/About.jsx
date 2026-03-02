@@ -1,21 +1,31 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 
 const About = () => {
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <span className="text-yellow-400 text-sm uppercase tracking-wider">Our Story</span>
           <h1 className="text-4xl md:text-5xl font-serif text-white mt-2 mb-4">
             India's Heritage, <span className="italic">Delivered Globally</span>
           </h1>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
-        </div>
+        </motion.div>
 
         {/* Main Content */}
         <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             <p className="text-teal-200 text-lg leading-relaxed mb-6">
               GLOBAL EXIM TRADERS is a registered export-import enterprise committed to delivering premium Indian handicrafts and fashion jewellery across global marketplaces.
             </p>
@@ -30,8 +40,13 @@ const About = () => {
             <p className="text-teal-200 text-lg leading-relaxed">
               With full statutory certifications and a commitment to quality, every transaction reflects our dedication to excellence and trust.
             </p>
-          </div>
-          <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8"
+          >
             <h3 className="text-2xl font-serif text-yellow-400 mb-6 text-center">
               Certified | Compliant | Committed
             </h3>
@@ -72,7 +87,7 @@ const About = () => {
             <p className="text-yellow-400 text-center mt-6 text-sm">
               ◆ Your trust is our capital. ◆
             </p>
-          </div>
+          </motion.div>
         </div>
 
         {/* Collections Section */}
@@ -87,26 +102,26 @@ const About = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 text-center hover:border-yellow-400/50 transition-all">
-              <span className="text-4xl mb-4 block">✨</span>
-              <h3 className="text-xl font-serif text-white mb-3">Temple Heritage Jewellery</h3>
-              <p className="text-teal-200 text-sm">Temple-inspired pieces rooted in centuries of artisan tradition</p>
-            </div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 text-center hover:border-yellow-400/50 transition-all">
-              <span className="text-4xl mb-4 block">💫</span>
-              <h3 className="text-xl font-serif text-white mb-3">Contemporary Ethnic Fashion</h3>
-              <p className="text-teal-200 text-sm">Modern silhouettes carrying the soul of traditional craft</p>
-            </div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 text-center hover:border-yellow-400/50 transition-all">
-              <span className="text-4xl mb-4 block">🏺</span>
-              <h3 className="text-xl font-serif text-white mb-3">Handcrafted Artisan Décor</h3>
-              <p className="text-teal-200 text-sm">Exclusive home décor embodying India's artistic heritage</p>
-            </div>
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 text-center hover:border-yellow-400/50 transition-all">
-              <span className="text-4xl mb-4 block">📦</span>
-              <h3 className="text-xl font-serif text-white mb-3">Export-Grade Handicrafts</h3>
-              <p className="text-teal-200 text-sm">Certified collections ready for global retail and wholesale</p>
-            </div>
+            {[
+              { icon: '✨', title: 'Temple Heritage Jewellery', desc: 'Temple-inspired pieces rooted in centuries of artisan tradition' },
+              { icon: '💫', title: 'Contemporary Ethnic Fashion', desc: 'Modern silhouettes carrying the soul of traditional craft' },
+              { icon: '🏺', title: 'Handcrafted Artisan Décor', desc: 'Exclusive home décor embodying India\'s artistic heritage' },
+              { icon: '📦', title: 'Export-Grade Handicrafts', desc: 'Certified collections ready for global retail and wholesale' }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 text-center hover:border-yellow-400/50 transition-all"
+              >
+                <span className="text-4xl mb-4 block">{item.icon}</span>
+                <h3 className="text-xl font-serif text-white mb-3">{item.title}</h3>
+                <p className="text-teal-200 text-sm">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </section>
 

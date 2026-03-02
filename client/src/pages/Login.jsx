@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginUser } from '../store/slices/authSlice'
 import toast from 'react-hot-toast'
+import { motion } from 'framer-motion'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +34,12 @@ const Login = () => {
 
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
-      <div className="max-w-md mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-md mx-auto"
+      >
         {/* Header */}
         <div className="text-center mb-8">
           <span className="text-yellow-400 text-sm uppercase tracking-wider">Welcome Back</span>
@@ -97,7 +103,7 @@ const Login = () => {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

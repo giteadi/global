@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setSingleProduct } from '../store/slices/productsSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
+import { motion } from 'framer-motion'
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -153,7 +154,11 @@ const ProductDetail = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Product Images */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             <div className="bg-teal-800/50 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8 mb-4">
               <div className="h-96 flex items-center justify-center">
                 <img 
@@ -182,10 +187,14 @@ const ProductDetail = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Product Info */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             <div className="mb-6">
               <span className="text-yellow-400 text-sm uppercase tracking-wider">{singleProduct.category}</span>
               <h1 className="text-4xl font-serif text-white mt-2 mb-4 text-with-shadow">{singleProduct.name}</h1>
@@ -266,7 +275,7 @@ const ProductDetail = () => {
                 ))}
               </ul>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

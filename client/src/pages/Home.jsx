@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { getProducts, getFeaturedProducts } from '../store/slices/productsSlice'
+import { motion } from 'framer-motion'
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -143,51 +144,99 @@ const Home = () => {
       {/* HERO */}
       <section className="relative py-16 flex items-center justify-center">
         <div className="text-center max-w-4xl">
-          <h1 className="text-6xl font-serif mb-6 text-yellow-400">
+          <motion.h1 
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-6xl font-serif mb-6 text-yellow-400"
+          >
             Global Exim Traders
-          </h1>
-          <p className="text-xl text-gray-300 mb-8">
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl text-gray-300 mb-8"
+          >
             Where Heritage Meets Global Elegance
-          </p>
-          <div className="flex justify-center gap-4 mb-8">
+          </motion.p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex justify-center gap-4 mb-8"
+          >
             <Link to="/products" className="btn-primary">
               Explore Collections
             </Link>
             <Link to="/about" className="btn-secondary">
               Our Story
             </Link>
-          </div>
+          </motion.div>
           
           {/* Additional Info */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 text-center">
-            <div className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50"
+            >
               <div className="text-4xl mb-3">🏛️</div>
               <h3 className="text-lg font-semibold text-yellow-400 mb-2">Traditional Heritage</h3>
               <p className="text-sm text-gray-300">Authentic Indian craftsmanship passed through generations</p>
-            </div>
-            <div className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50">
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50"
+            >
               <div className="text-4xl mb-3">🌍</div>
               <h3 className="text-lg font-semibold text-yellow-400 mb-2">Global Quality</h3>
               <p className="text-sm text-gray-300">Export-grade products meeting international standards</p>
-            </div>
-            <div className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50">
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+              className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50"
+            >
               <div className="text-4xl mb-3">✨</div>
               <h3 className="text-lg font-semibold text-yellow-400 mb-2">Premium Collection</h3>
               <p className="text-sm text-gray-300">Curated selection of finest jewelry and handicrafts</p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* ALL PRODUCTS CAROUSEL */}
-      <section className="py-20">
+      <motion.section 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="py-20"
+      >
         <div className="max-w-7xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-serif text-yellow-400 mb-4">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl font-serif text-yellow-400 mb-4"
+          >
             Top Products
-          </h2>
-          <p className="text-gray-400">
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-gray-400"
+          >
             Explore our complete collection from all categories
-          </p>
+          </motion.p>
         </div>
 
         {allProducts.length === 0 ? (
@@ -252,17 +301,35 @@ const Home = () => {
             )}
           </div>
         )}
-      </section>
+      </motion.section>
 
       {/* FEATURED SECTION */}
-      <section className="py-20">
+      <motion.section 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="py-20"
+      >
         <div className="max-w-7xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-serif text-yellow-400 mb-4">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl font-serif text-yellow-400 mb-4"
+          >
             Featured Collections
-          </h2>
-          <p className="text-gray-400">
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-gray-400"
+          >
             Discover our curated selection of premium jewelry & handicrafts
-          </p>
+          </motion.p>
         </div>
 
         {featuredProducts.length === 0 ? (
@@ -327,7 +394,7 @@ const Home = () => {
             )}
           </div>
         )}
-      </section>
+      </motion.section>
     </div>
   )
 }

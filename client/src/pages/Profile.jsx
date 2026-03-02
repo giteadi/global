@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getUserProfile, updateUserProfile } from '../store/slices/authSlice'
 import toast from 'react-hot-toast'
+import { motion } from 'framer-motion'
 
 const Profile = () => {
   const dispatch = useDispatch()
@@ -66,7 +67,12 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen py-20 px-4">
-      <div className="max-w-2xl mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-2xl mx-auto"
+      >
         {/* Header */}
         <div className="text-center mb-8">
           <span className="text-yellow-400 text-sm uppercase tracking-wider">My Profile</span>
@@ -190,7 +196,7 @@ const Profile = () => {
             </button>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

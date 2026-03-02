@@ -121,11 +121,57 @@ class Product {
   // Create new product
   static async create(productData) {
     try {
-      const { name, description, category, price, original_price, discount, icon = '🏛️', material, craftsmanship, origin, weight, dimensions, care, stock = 10, is_featured = false, is_active = true, images = [] } = productData
+      const { 
+        name, 
+        description, 
+        category, 
+        price, 
+        original_price, 
+        discount, 
+        icon = '🏛️', 
+        material, 
+        craftsmanship, 
+        origin = 'Rajasthan, India', 
+        weight, 
+        dimensions, 
+        care, 
+        stock = 10, 
+        is_featured = false, 
+        is_active = true, 
+        images = [],
+        features = [],
+        tags = [],
+        seo_keywords = []
+      } = productData
       
       const [result] = await pool.query(
-        `INSERT INTO products (name, description, category, price, original_price, discount, icon, material, craftsmanship, origin, weight, dimensions, care, stock, is_featured, is_active, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, description, category, price, original_price || null, discount || null, icon, material || null, craftsmanship || null, origin || null, weight || null, dimensions || null, care || null, stock, is_featured, is_active, JSON.stringify(images)]
+        `INSERT INTO products (
+          name, description, category, price, original_price, discount, 
+          icon, material, craftsmanship, origin, weight, dimensions, care, 
+          stock, is_featured, is_active, images, features, tags, seo_keywords
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          name, 
+          description, 
+          category, 
+          price, 
+          original_price || null, 
+          discount || null, 
+          icon, 
+          material || null, 
+          craftsmanship || null, 
+          origin, 
+          weight || null, 
+          dimensions || null, 
+          care || null, 
+          stock, 
+          is_featured, 
+          is_active, 
+          JSON.stringify(images),
+          JSON.stringify(features),
+          JSON.stringify(tags),
+          JSON.stringify(seo_keywords)
+        ]
       )
 
       console.log('Product inserted with ID:', result.insertId)
@@ -143,8 +189,8 @@ class Product {
 
     Object.keys(updates).forEach(key => {
       if (updates[key] !== undefined) {
-        if (key === 'images') {
-          fields.push('images = ?')
+        if (key === 'images' || key === 'features' || key === 'tags' || key === 'seo_keywords') {
+          fields.push(`${key} = ?`)
           values.push(JSON.stringify(updates[key]))
         } else {
           fields.push(`${key} = ?`)

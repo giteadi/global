@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setProducts, setLoading } from '../store/slices/productsSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
+import { motion } from 'framer-motion'
 
 const Products = () => {
   const dispatch = useDispatch()
@@ -68,7 +69,12 @@ const Products = () => {
     <div className="min-h-screen py-20 px-4 bg-black/60">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
           <span className="text-sm uppercase tracking-wider" style={{ color: 'var(--gold-bright)' }}>Our Collections</span>
           <h1 className="text-4xl md:text-5xl font-serif mt-2 mb-4 text-with-shadow" style={{ color: 'var(--text-bright)' }}>
             Premium Indian Jewelry & Handicrafts
@@ -77,7 +83,7 @@ const Products = () => {
           <p className="max-w-2xl mx-auto text-with-shadow" style={{ color: 'var(--text-soft)' }}>
             Explore our exquisite collection of handcrafted jewelry and decorative items
           </p>
-        </div>
+        </motion.div>
 
         {/* Filters */}
         <div className="mb-12">
@@ -129,8 +135,16 @@ const Products = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="rounded-lg overflow-hidden transition-all transform hover:scale-105" style={{ background: 'rgba(27,158,155,0.5)', border: '1px solid rgba(37,204,200,0.12)' }}>
+            {filteredProducts.map((product, index) => (
+              <motion.div 
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="rounded-lg overflow-hidden transition-all" 
+                style={{ background: 'rgba(27,158,155,0.5)', border: '1px solid rgba(37,204,200,0.12)' }}
+              >
                 <div className="h-64 overflow-hidden">
                   {(() => {
                     let images = product.images
@@ -186,7 +200,7 @@ const Products = () => {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

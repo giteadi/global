@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
+import { motion } from 'framer-motion'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +34,12 @@ const Contact = () => {
     <div className="min-h-screen py-20 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <span className="text-yellow-400 text-sm uppercase tracking-wider">Get In Touch</span>
           <h1 className="text-4xl md:text-5xl font-serif text-white mt-2 mb-4">
             Contact Us
@@ -43,11 +49,16 @@ const Contact = () => {
             We'd love to hear from you. Whether you have a question about our products, 
             want to place a bulk order, or just want to connect with us.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid md:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8"
+          >
             <h2 className="text-2xl font-serif text-white mb-6">Send us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -126,10 +137,15 @@ const Contact = () => {
                 Send Message
               </button>
             </form>
-          </div>
+          </motion.div>
 
           {/* Contact Information */}
-          <div className="space-y-8">
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
+          >
             {/* Contact Details */}
             <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
               <h2 className="text-2xl font-serif text-white mb-6">Contact Information</h2>
@@ -215,7 +231,7 @@ const Contact = () => {
                 </a>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

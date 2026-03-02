@@ -5,6 +5,7 @@ import { setSingleProduct } from '../store/slices/productsSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+import API_BASE from '../api/config'
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -20,7 +21,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`http://localhost:4000/api/products/${id}`)
+        const response = await fetch(`${API_BASE}/api/products/${id}`)
         const data = await response.json()
         
         if (data.success && data.data) {
@@ -71,7 +72,7 @@ const ProductDetail = () => {
 
     try {
       // Create order
-      const response = await fetch('http://localhost:4000/api/payments/create-order', {
+      const response = await fetch(`${API_BASE}/api/payments/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +92,7 @@ const ProductDetail = () => {
         order_id: order.id,
         handler: async function (response) {
           // Verify payment
-          const verifyResponse = await fetch('http://localhost:4000/api/payments/verify-payment', {
+          const verifyResponse = await fetch(`${API_BASE}/api/payments/verify-payment`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

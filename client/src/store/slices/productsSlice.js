@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import API_BASE from '../../api/config'
 
 const initialState = {
   products: [],
@@ -14,7 +15,7 @@ export const getProducts = createAsyncThunk(
   'products/getProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/products')
+      const response = await fetch(`${API_BASE}/api/products`)
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch products')
       return data.data.products
@@ -28,7 +29,7 @@ export const getFeaturedProducts = createAsyncThunk(
   'products/getFeaturedProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/products/featured')
+      const response = await fetch(`${API_BASE}/api/products/featured`)
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch featured products')
       return data.data
@@ -42,7 +43,7 @@ export const createProduct = createAsyncThunk(
   'products/createProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/products', {
+      const response = await fetch(`${API_BASE}/api/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData)
@@ -60,7 +61,7 @@ export const updateProduct = createAsyncThunk(
   'products/updateProduct',
   async ({ id, updates }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+      const response = await fetch(`${API_BASE}/api/products/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
@@ -78,7 +79,7 @@ export const deleteProduct = createAsyncThunk(
   'products/deleteProduct',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+      const response = await fetch(`${API_BASE}/api/products/${id}`, {
         method: 'DELETE'
       })
       const data = await response.json()

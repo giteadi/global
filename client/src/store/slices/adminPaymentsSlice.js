@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import API_BASE from '../../api/config'
 
 const initialState = {
   payments: [],
@@ -18,7 +19,7 @@ export const getAdminPayments = createAsyncThunk(
   async (params = {}, { rejectWithValue }) => {
     try {
       const queryString = new URLSearchParams(params).toString()
-      const response = await fetch(`http://localhost:4000/api/admin/payments?${queryString}`, {
+      const response = await fetch(`${API_BASE}/api/admin/payments?${queryString}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -36,7 +37,7 @@ export const processRefund = createAsyncThunk(
   'adminPayments/processRefund',
   async ({ id, amount, reason }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/payments/${id}/refund`, {
+      const response = await fetch(`${API_BASE}/api/admin/payments/${id}/refund`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

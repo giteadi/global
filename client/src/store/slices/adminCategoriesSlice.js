@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import API_BASE from '../../api/config'
 
 const initialState = {
   categories: [],
@@ -11,7 +12,7 @@ export const getAdminCategories = createAsyncThunk(
   'adminCategories/getCategories',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/categories', {
+      const response = await fetch(`${API_BASE}/api/categories`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -29,7 +30,7 @@ export const createCategory = createAsyncThunk(
   'adminCategories/createCategory',
   async (categoryData, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/categories/admin', {
+      const response = await fetch(`${API_BASE}/api/categories/admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export const updateCategory = createAsyncThunk(
   'adminCategories/updateCategory',
   async ({ id, categoryData }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/categories/admin/${id}`, {
+      const response = await fetch(`${API_BASE}/api/categories/admin/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export const deleteCategory = createAsyncThunk(
   'adminCategories/deleteCategory',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/categories/admin/${id}`, {
+      const response = await fetch(`${API_BASE}/api/categories/admin/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

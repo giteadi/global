@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
+import API_BASE from '../api/config'
 import toast from 'react-hot-toast'
 
 const AdminContacts = () => {
@@ -14,7 +15,7 @@ const AdminContacts = () => {
 
   const fetchContacts = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/contacts/admin')
+      const response = await fetch(`${API_BASE}/api/contacts/admin`)
       const data = await response.json()
       if (data.success) {
         setContacts(data.data)
@@ -28,7 +29,7 @@ const AdminContacts = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/contacts/admin/${id}/status`, {
+      const response = await fetch(`${API_BASE}/api/contacts/admin/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -49,7 +50,7 @@ const AdminContacts = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
       try {
-        const response = await fetch(`http://localhost:4000/api/contacts/admin/${id}`, {
+        const response = await fetch(`${API_BASE}/api/contacts/admin/${id}`, {
           method: 'DELETE'
         })
 

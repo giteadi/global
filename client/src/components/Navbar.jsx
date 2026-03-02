@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleCart, closeCart } from '../store/slices/cartSlice'
 import { logout } from '../store/slices/authSlice'
+import API_BASE from '../api/config'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -17,7 +18,7 @@ const Navbar = () => {
   // Fetch categories function
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/products/categories')
+      const response = await fetch(`${API_BASE}/api/products/categories`)
       const data = await response.json()
       if (data.success) {
         setCategories(data.data)

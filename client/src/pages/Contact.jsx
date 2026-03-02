@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+import API_BASE from '../api/config'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch('http://localhost:4000/api/contacts', {
+      const response = await fetch(`${API_BASE}/api/contacts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

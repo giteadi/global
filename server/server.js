@@ -8,11 +8,22 @@ require('dotenv').config()
 const app = express()
 
 // Security middleware
-app.use(helmet())
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }))
+
+// CORS configuration - Allow all origins
+app.use(cors({
+  origin: '*', // Allow all origins
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // 24 hours
+}))
+
+// Handle preflight requests
+app.options('*', cors())
 
 // Rate limiting
 const limiter = rateLimit({

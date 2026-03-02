@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import API_BASE from '../../api/config'
 
 const initialState = {
   dashboardStats: null,
@@ -14,7 +15,7 @@ export const getDashboardStats = createAsyncThunk(
   'analytics/getDashboardStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/analytics/dashboard')
+      const response = await fetch(`${API_BASE}/api/analytics/dashboard`)
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch dashboard stats')
       return data.data
@@ -28,7 +29,7 @@ export const getSalesAnalytics = createAsyncThunk(
   'analytics/getSalesAnalytics',
   async (period = 'month', { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/analytics/sales?period=${period}`)
+      const response = await fetch(`${API_BASE}/api/analytics/sales?period=${period}`)
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch sales analytics')
       return data.data
@@ -42,7 +43,7 @@ export const getProductAnalytics = createAsyncThunk(
   'analytics/getProductAnalytics',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/analytics/products')
+      const response = await fetch(`${API_BASE}/api/analytics/products`)
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch product analytics')
       return data.data
@@ -56,7 +57,7 @@ export const getCustomerAnalytics = createAsyncThunk(
   'analytics/getCustomerAnalytics',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/analytics/customers')
+      const response = await fetch(`${API_BASE}/api/analytics/customers`)
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch customer analytics')
       return data.data

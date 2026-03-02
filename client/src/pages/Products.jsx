@@ -5,6 +5,7 @@ import { setProducts, setLoading } from '../store/slices/productsSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+import API_BASE from '../api/config'
 
 const Products = () => {
   const dispatch = useDispatch()
@@ -27,7 +28,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       dispatch(setLoading(true))
-      const response = await fetch('http://localhost:4000/api/products')
+      const response = await fetch(`${API_BASE}/api/products`)
       const data = await response.json()
       if (data.success) {
         dispatch(setProducts(data.data.products))
@@ -47,7 +48,7 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/categories')
+      const response = await fetch(`${API_BASE}/api/categories`)
       const data = await response.json()
       if (data.success) {
         setCategories(Array.isArray(data.data) ? data.data : [])

@@ -249,7 +249,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Product Details */}
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 mb-6">
+            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6">
               <h3 className="text-xl font-serif text-white mb-4 text-with-shadow">Product Details</h3>
               <div className="space-y-3">
                 {Object.entries(productDetails).map(([key, value]) => (
@@ -261,19 +261,6 @@ const ProductDetail = () => {
                   )
                 ))}
               </div>
-            </div>
-
-            {/* Features */}
-            <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6">
-              <h3 className="text-xl font-serif text-white mb-4 text-with-shadow">Key Features</h3>
-              <ul className="space-y-2">
-                {singleProduct.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-yellow-400 mt-1">◆</span>
-                    <span className="text-teal-200">{feature}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </motion.div>
         </div>

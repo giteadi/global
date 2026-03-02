@@ -14,21 +14,37 @@ const Navbar = () => {
   const { items, isOpen, total } = useSelector(state => state.cart)
   const { user, token, isAdmin } = useSelector(state => state.auth)
 
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/api/products/categories')
-        const data = await response.json()
-        if (data.success) {
-          setCategories(data.data)
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
+  // Fetch categories function
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/products/categories')
+      const data = await response.json()
+      if (data.success) {
+        setCategories(data.data)
       }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
     }
+  }
+
+  // Fetch categories on mount and periodically
+  useEffect(() => {
+    // Initial fetch
     fetchCategories()
+    
+    // Refetch every 10 seconds to keep categories updated
+    const interval = setInterval(fetchCategories, 10000)
+    
+    return () => clearInterval(interval)
   }, [])
+
+  // Refetch when dropdown opens
+  const handleCategoryDropdownToggle = () => {
+    if (!isCategoryOpen) {
+      fetchCategories() // Refresh categories when opening dropdown
+    }
+    setIsCategoryOpen(!isCategoryOpen)
+  }
 
   const handleLogout = () => {
     dispatch(logout())
@@ -76,7 +92,7 @@ const Navbar = () => {
               {/* Categories Dropdown */}
               <div className="relative">
                 <button
-                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  onClick={handleCategoryDropdownToggle}
                   className="nav-link flex items-center gap-1"
                 >
                   Categories
@@ -214,7 +230,7 @@ const Navbar = () => {
               {/* Mobile Categories */}
               <div>
                 <button
-                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  onClick={handleCategoryDropdownToggle}
                   className="nav-link w-full text-left flex items-center justify-between"
                 >
                   Categories

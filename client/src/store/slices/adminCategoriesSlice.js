@@ -11,7 +11,7 @@ export const getAdminCategories = createAsyncThunk(
   'adminCategories/getCategories',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/admin/categories', {
+      const response = await fetch('http://localhost:4000/api/categories', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -29,7 +29,7 @@ export const createCategory = createAsyncThunk(
   'adminCategories/createCategory',
   async (categoryData, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/admin/categories', {
+      const response = await fetch('http://localhost:4000/api/categories/admin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const updateCategory = createAsyncThunk(
   'adminCategories/updateCategory',
   async ({ id, categoryData }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/categories/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/categories/admin/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export const deleteCategory = createAsyncThunk(
   'adminCategories/deleteCategory',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/categories/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/categories/admin/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -129,7 +129,7 @@ const adminCategoriesSlice = createSlice({
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
         state.loading = false
-        const index = state.categories.findIndex(cat => cat._id === action.payload._id)
+        const index = state.categories.findIndex(cat => cat.id === action.payload.id || cat._id === action.payload._id)
         if (index !== -1) {
           state.categories[index] = action.payload
         }
@@ -145,7 +145,7 @@ const adminCategoriesSlice = createSlice({
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
         state.loading = false
-        state.categories = state.categories.filter(cat => cat._id !== action.payload)
+        state.categories = state.categories.filter(cat => cat.id !== action.payload && cat._id !== action.payload)
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.loading = false

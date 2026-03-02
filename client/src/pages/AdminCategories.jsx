@@ -1,16 +1,89 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAdminCategories, createCategory } from '../store/slices/adminCategoriesSlice'
+import { getAdminCategories, createCategory, updateCategory, deleteCategory } from '../store/slices/adminCategoriesSlice'
+import toast from 'react-hot-toast'
 
 const AdminCategories = () => {
   const dispatch = useDispatch()
   const { categories, loading, error } = useSelector(state => state.adminCategories)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingCategory, setEditingCategory] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    icon: '🏷️'
+  })
 
   useEffect(() => {
     dispatch(getAdminCategories())
   }, [dispatch])
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleAddCategory = () => {
+    setFormData({ name: '', description: '', icon: '🏷️' })
+    setShowAddModal(true)
+  }
+
+  const handleEditCategory = (category) => {
+    if (!category._id && !category.id) {
+      toast.error('Invalid category ID')
+      return
+    }
+    setEditingCategory(category)
+    setFormData({
+      name: category.name || '',
+      description: category.description || '',
+      icon: category.icon || '🏷️'
+    })
+    setShowEditModal(true)
+  }
+
+  const handleDeleteCategory = async (id, name) => {
+    if (!id) {
+      toast.error('Invalid category ID')
+      return
+    }
+    if (window.confirm(`Are you sure you want to delete "${name}" category?`)) {
+      try {
+        await dispatch(deleteCategory(id)).unwrap()
+        toast.success('Category deleted successfully')
+      } catch (error) {
+        toast.error('Failed to delete category: ' + error)
+      }
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      if (editingCategory) {
+        const categoryId = editingCategory._id || editingCategory.id
+        if (!categoryId) {
+          toast.error('Invalid category ID')
+          return
+        }
+        await dispatch(updateCategory({ id: categoryId, categoryData: formData })).unwrap()
+        toast.success('Category updated successfully')
+        setShowEditModal(false)
+      } else {
+        await dispatch(createCategory(formData)).unwrap()
+        toast.success('Category created successfully')
+        setShowAddModal(false)
+      }
+      setFormData({ name: '', description: '', icon: '🏷️' })
+    } catch (error) {
+      toast.error('Failed to save category: ' + error)
+    }
+  }
 
   return (
     <AdminLayout>
@@ -22,7 +95,7 @@ const AdminCategories = () => {
             <p style={{ color: 'var(--text-soft)' }}>Manage product categories and organization</p>
           </div>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={handleAddCategory}
             className="btn-primary"
           >
             Add New Category
@@ -48,7 +121,7 @@ const AdminCategories = () => {
         ) : categories && categories.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
-              <div key={category._id} style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6">
+              <div key={category._id || category.id || category.name} style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-semibold" style={{ color: 'var(--text-bright)' }}>{category.name}</h3>
@@ -65,10 +138,18 @@ const AdminCategories = () => {
                     {category.productCount || 0} products
                   </div>
                   <div className="flex space-x-2">
-                    <button style={{ color: 'var(--teal-bright)' }} className="text-sm hover:opacity-80">
+                    <button 
+                      onClick={() => handleEditCategory(category)}
+                      style={{ color: 'var(--teal-bright)' }} 
+                      className="text-sm hover:opacity-80"
+                    >
                       Edit
                     </button>
-                    <button style={{ color: 'var(--gold-bright)' }} className="text-sm hover:opacity-80">
+                    <button 
+                      onClick={() => handleDeleteCategory(category._id || category.id, category.name)}
+                      style={{ color: 'var(--gold-bright)' }} 
+                      className="text-sm hover:opacity-80"
+                    >
                       Delete
                     </button>
                   </div>
@@ -86,14 +167,19 @@ const AdminCategories = () => {
           </div>
         )}
 
-        {/* Add Category Modal */}
-        {showAddModal && (
+        {/* Add/Edit Category Modal */}
+        {(showAddModal || showEditModal) && (
           <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
             <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>Add New Category</h2>
+                <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
+                  {editingCategory ? 'Edit Category' : 'Add New Category'}
+                </h2>
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false)
+                    setShowEditModal(false)
+                  }}
                   style={{ color: 'var(--text-soft)' }}
                   className="hover:opacity-80"
                 >
@@ -103,11 +189,15 @@ const AdminCategories = () => {
                 </button>
               </div>
 
-              <form className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category Name</label>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category Name *</label>
                   <input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                     style={{
                       borderColor: 'var(--glass-border)',
@@ -122,6 +212,9 @@ const AdminCategories = () => {
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Description</label>
                   <textarea
                     rows="3"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleFormChange}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                     style={{
                       borderColor: 'var(--glass-border)',
@@ -132,11 +225,31 @@ const AdminCategories = () => {
                     placeholder="Enter category description"
                   ></textarea>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Icon</label>
+                  <input
+                    type="text"
+                    name="icon"
+                    value={formData.icon}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    placeholder="🏷️"
+                  />
+                </div>
 
                 <div className="flex justify-end space-x-3">
                   <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false)
+                      setShowEditModal(false)
+                    }}
                     className="px-4 py-2 rounded-lg transition-colors"
                     style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
                   >
@@ -147,7 +260,7 @@ const AdminCategories = () => {
                     className="px-4 py-2 rounded-lg transition-colors"
                     style={{ background: 'var(--teal)', color: 'var(--white)' }}
                   >
-                    Add Category
+                    {editingCategory ? 'Update Category' : 'Add Category'}
                   </button>
                 </div>
               </form>

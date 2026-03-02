@@ -47,6 +47,12 @@ const AdminLayout = ({ children }) => {
       description: 'Product categories'
     },
     {
+      title: 'Contacts',
+      icon: '📧',
+      path: '/admin/contacts',
+      description: 'Customer inquiries'
+    },
+    {
       title: 'Payments',
       icon: '💳',
       path: '/admin/payments',
@@ -57,12 +63,6 @@ const AdminLayout = ({ children }) => {
       icon: '📈',
       path: '/admin/analytics',
       description: 'Sales reports and insights'
-    },
-    {
-      title: 'Settings',
-      icon: '⚙️',
-      path: '/admin/settings',
-      description: 'System configuration'
     }
   ]
 

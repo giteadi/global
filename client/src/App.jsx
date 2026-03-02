@@ -19,6 +19,7 @@ import AdminProducts from './pages/AdminProducts'
 import AdminOrders from './pages/AdminOrders'
 import AdminUsers from './pages/AdminUsers'
 import AdminCategories from './pages/AdminCategories'
+import AdminContacts from './pages/AdminContacts'
 import AdminPayments from './pages/AdminPayments'
 import AdminAnalytics from './pages/AdminAnalytics'
 import AdminSettings from './pages/AdminSettings'
@@ -59,6 +60,7 @@ function App() {
               <Route path="/admin/orders" element={<AdminOrders />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/categories" element={<AdminCategories />} />
+              <Route path="/admin/contacts" element={<AdminContacts />} />
               <Route path="/admin/payments" element={<AdminPayments />} />
               <Route path="/admin/analytics" element={<AdminAnalytics />} />
               <Route path="/admin/settings" element={<AdminSettings />} />

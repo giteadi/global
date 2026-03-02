@@ -36,7 +36,7 @@ const AdminProducts = () => {
 
   const params = {
     page: 1,
-    limit: 20, // Reduced from 100 to prevent large data issues
+    limit: 15, // 15 products per page
     ...(filterCategory !== 'All' && { category: filterCategory }),
     ...(searchTerm && { search: searchTerm })
   }
@@ -201,9 +201,9 @@ const AdminProducts = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 min-h-[calc(100vh-280px)] flex flex-col">
+      <div className="space-y-6 flex flex-col h-full">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-shrink-0">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Product Management</h1>
             <p style={{ color: 'var(--text-soft)' }}>Manage your product catalog</p>
@@ -217,7 +217,7 @@ const AdminProducts = () => {
         </div>
 
         {/* Filters */}
-        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="p-4 rounded-lg">
+        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="p-4 rounded-lg flex-shrink-0">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Search</label>
@@ -262,8 +262,8 @@ const AdminProducts = () => {
         </div>
 
         {/* Products Table */}
-        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
+        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+          <div className="overflow-x-auto overflow-y-auto flex-1">
             <table className="min-w-full divide-y" style={{ borderColor: 'var(--glass-border)' }}>
               <thead style={{ background: 'var(--glass)' }}>
                 <tr>

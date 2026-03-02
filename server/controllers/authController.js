@@ -6,7 +6,11 @@ const crypto = require('crypto')
 
 // Generate JWT token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'your-secret-key', {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required')
+  }
+  return jwt.sign({ id }, secret, {
     expiresIn: '30d'
   })
 }
@@ -68,32 +72,6 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    // Special admin login
-    if (email === 'admin@globaleximtraders.com') {
-      if (password === 'admin123') {
-        const token = generateToken(1) // Admin ID
-        return res.json({
-          success: true,
-          data: {
-            user: {
-              id: 1,
-              name: 'Admin',
-              email: 'admin@globaleximtraders.com',
-              role: 'admin'
-            },
-            token
-          },
-          message: 'Admin login successful'
-        })
-      } else {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid admin credentials'
-        })
-      }
-    }
-
-    // Regular user login
     const user = await User.getByEmail(email)
     if (!user || password !== user.password) {
       return res.status(401).json({
@@ -140,8 +118,10 @@ exports.login = async (req, res) => {
 
 // Get current user profile
 exports.getProfile = async (req, res) => {
+  console.log("getProfile called for user:", req.user)
   try {
     const user = await User.getById(req.user.id)
+    console.log("User found:", user)
 
     res.json({
       success: true,
@@ -164,6 +144,7 @@ exports.getProfile = async (req, res) => {
       }
     })
   } catch (error) {
+    console.error("Profile fetch error:", error)
     res.status(500).json({
       success: false,
       message: 'Error fetching profile',

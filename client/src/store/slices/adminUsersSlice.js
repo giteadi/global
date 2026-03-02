@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import API_BASE from '../../api/config'
 
 const initialState = {
   users: [],
@@ -15,13 +16,16 @@ const initialState = {
 // Async thunks
 export const fetchUsers = createAsyncThunk(
   'adminUsers/fetchUsers',
-  async (params = {}, { rejectWithValue }) => {
+  async (params = {}, { getState, rejectWithValue }) => {
     try {
+      const { token } = getState().auth
       const { page = 1, limit = 10, role } = params
       const queryString = new URLSearchParams({ page: page.toString(), limit: limit.toString() })
       if (role) queryString.append('role', role)
       
-      const response = await fetch(`http://localhost:4000/api/auth/admin/users?${queryString}`)
+      const response = await fetch(`${API_BASE}/api/auth/admin/users?${queryString}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to fetch users')
       return data.data
@@ -33,12 +37,14 @@ export const fetchUsers = createAsyncThunk(
 
 export const createUser = createAsyncThunk(
   'adminUsers/createUser',
-  async (userData, { rejectWithValue }) => {
+  async (userData, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/auth/admin/users', {
+      const { token } = getState().auth
+      const response = await fetch(`${API_BASE}/api/auth/admin/users`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(userData)
       })
@@ -53,12 +59,14 @@ export const createUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'adminUsers/updateUser',
-  async ({ id, userData }, { rejectWithValue }) => {
+  async ({ id, userData }, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/auth/admin/users/${id}`, {
+      const { token } = getState().auth
+      const response = await fetch(`${API_BASE}/api/auth/admin/users/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(userData)
       })
@@ -73,10 +81,12 @@ export const updateUser = createAsyncThunk(
 
 export const deleteUser = createAsyncThunk(
   'adminUsers/deleteUser',
-  async (id, { rejectWithValue }) => {
+  async (id, { getState, rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/auth/admin/users/${id}`, {
-        method: 'DELETE'
+      const { token } = getState().auth
+      const response = await fetch(`${API_BASE}/api/auth/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.message || 'Failed to delete user')

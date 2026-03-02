@@ -1,11 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const location = useLocation()
-  const { user } = useSelector(state => state.auth)
+  const navigate = useNavigate()
+  const { user, isAdmin } = useSelector(state => state.auth)
+
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/')
+    }
+  }, [isAdmin, navigate])
 
   const menuItems = [
     {

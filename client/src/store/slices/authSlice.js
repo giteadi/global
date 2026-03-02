@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import API_BASE from '../../api/config'
 
 const initialState = {
   user: null,
@@ -13,7 +14,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
@@ -31,7 +32,7 @@ export const signupUser = createAsyncThunk(
   'auth/signupUser',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/auth/register', {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
@@ -49,7 +50,7 @@ export const forgetPassword = createAsyncThunk(
   'auth/forgetPassword',
   async (emailData, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:4000/api/auth/forget-password', {
+      const response = await fetch(`${API_BASE}/api/auth/forget-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(emailData)
@@ -68,7 +69,7 @@ export const getUserProfile = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth
-      const response = await fetch('http://localhost:4000/api/auth/profile', {
+      const response = await fetch(`${API_BASE}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await response.json()
@@ -85,7 +86,7 @@ export const updateUserProfile = createAsyncThunk(
   async (profileData, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth
-      const response = await fetch('http://localhost:4000/api/auth/profile', {
+      const response = await fetch(`${API_BASE}/api/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

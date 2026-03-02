@@ -10,7 +10,7 @@ const Navbar = () => {
   const location = useLocation()
   const dispatch = useDispatch()
   const { items, isOpen, total } = useSelector(state => state.cart)
-  const { user, isAdmin } = useSelector(state => state.auth)
+  const { user, token, isAdmin } = useSelector(state => state.auth)
 
   const handleLogout = () => {
     dispatch(logout())
@@ -84,11 +84,10 @@ const Navbar = () => {
                 )}
               </button>
 
-              {/* User Section */}
-              {user ? (
+              {token ? (
                 <div className="hidden md:flex items-center space-x-3">
                   <span style={{ color: 'var(--gold-bright)' }}>
-                    Hi, {user.name}
+                    Hi, {user?.name || 'User'}
                   </span>
                   <button
                     onClick={handleLogout}

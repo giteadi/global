@@ -85,6 +85,27 @@ const AdminProducts = () => {
     })
   }
 
+  const handleRemoveImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, idx) => idx !== index)
+    }))
+  }
+
+  const handleMoveImage = (index, direction) => {
+    const newImages = [...formData.images]
+    const newIndex = direction === 'left' ? index - 1 : index + 1
+    
+    if (newIndex < 0 || newIndex >= newImages.length) return
+    
+    [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]]
+    
+    setFormData(prev => ({
+      ...prev,
+      images: newImages
+    }))
+  }
+
   const handleCreateCategory = async (e) => {
     e.preventDefault()
     try {
@@ -645,12 +666,66 @@ const AdminProducts = () => {
                     }}
                   />
                   {formData.images && formData.images.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <div className="mt-3 grid grid-cols-4 gap-3">
                       {formData.images.map((img, idx) => (
-                        <img key={idx} src={img} alt="" className="w-16 h-16 object-cover rounded" />
+                        <div key={idx} className="relative group">
+                          <img 
+                            src={img} 
+                            alt={`Product ${idx + 1}`} 
+                            className="w-full h-24 object-cover rounded border"
+                            style={{ borderColor: 'var(--glass-border)' }}
+                          />
+                          {/* Image Controls Overlay */}
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center gap-1">
+                            {/* Move Left */}
+                            {idx > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => handleMoveImage(idx, 'left')}
+                                className="p-1.5 bg-teal-600 hover:bg-teal-500 rounded text-white transition-colors"
+                                title="Move left"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                              </button>
+                            )}
+                            {/* Remove */}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(idx)}
+                              className="p-1.5 bg-red-600 hover:bg-red-500 rounded text-white transition-colors"
+                              title="Remove image"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                            {/* Move Right */}
+                            {idx < formData.images.length - 1 && (
+                              <button
+                                type="button"
+                                onClick={() => handleMoveImage(idx, 'right')}
+                                className="p-1.5 bg-teal-600 hover:bg-teal-500 rounded text-white transition-colors"
+                                title="Move right"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          {/* Image Number Badge */}
+                          <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
+                            {idx + 1}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   )}
+                  <p className="mt-1 text-xs" style={{ color: 'var(--text-soft)' }}>
+                    Hover over images to reorder or remove. First image will be the main product image.
+                  </p>
                 </div>
                 
                 <div className="flex justify-end space-x-3">

@@ -94,7 +94,7 @@ exports.login = async (req, res) => {
     }
 
     // Regular user login
-    const user = await User.findByEmail(email)
+    const user = await User.getByEmail(email)
     if (!user || password !== user.password) {
       return res.status(401).json({
         success: false,
@@ -141,7 +141,7 @@ exports.login = async (req, res) => {
 // Get current user profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
+    const user = await User.getById(req.user.id)
 
     res.json({
       success: true,
@@ -179,7 +179,7 @@ exports.updateProfile = async (req, res) => {
     const userId = req.user.id
 
     // Update user
-    const updatedUser = await User.findByIdAndUpdate(userId, { name, phone })
+    const updatedUser = await User.updateById(userId, { name, phone })
 
     res.json({
       success: true,
@@ -215,7 +215,7 @@ exports.forgetPassword = async (req, res) => {
   try {
     const { email } = req.body
 
-    const user = await User.findByEmail(email)
+    const user = await User.getByEmail(email)
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -269,14 +269,14 @@ exports.getAllUsers = async (req, res) => {
 
     const filters = role ? { role } : {}
 
-    const users = await User.find({
+    const users = await User.getAll({
       ...filters,
       limit,
       skip: (page - 1) * limit,
       sort: 'created_at',
       order: 'desc'
     })
-    const total = await User.countDocuments(filters)
+    const total = await User.count(filters)
 
     res.json({
       success: true,
@@ -343,22 +343,17 @@ exports.createUser = async (req, res) => {
 
 // Admin: Update user
 exports.updateUser = async (req, res) => {
+  console.log("Update User called with ID:", req.params.id)
+  console.log("req.body:", req.body)
   try {
     const { name, email, password, role, status, phone, street, city, state, pincode, country } = req.body
 
-    const user = await User.findByIdAndUpdate(req.params.id, {
-      name,
-      email,
-      password,
-      role,
-      status,
-      phone,
-      street,
-      city,
-      state,
-      pincode,
-      country
-    })
+    const updates = { name, email, role, status, phone, street, city, state, pincode, country }
+    if (password) updates.password = password
+
+    console.log("Constructed updates:", updates)
+
+    const user = await User.updateById(req.params.id, updates)
 
     if (!user) {
       return res.status(404).json({
@@ -373,6 +368,7 @@ exports.updateUser = async (req, res) => {
       message: 'User updated successfully'
     })
   } catch (error) {
+    console.error("Update Error:", error)
     res.status(500).json({
       success: false,
       message: 'Error updating user',
@@ -384,7 +380,7 @@ exports.updateUser = async (req, res) => {
 // Admin: Delete user
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { status: 'Inactive' })
+    const user = await User.updateById(req.params.id, { status: 'Inactive' })
 
     if (!user) {
       return res.status(404).json({

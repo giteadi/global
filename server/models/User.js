@@ -15,7 +15,7 @@ class User {
   }
 
   // Find user by email
-  static async findByEmail(email) {
+  static async getByEmail(email) {
     const [rows] = await pool.query(
       'SELECT id, name, email, password, phone, role, status, street, city, state, pincode, country, is_active, last_login, created_at FROM users WHERE email = ?',
       [email]
@@ -24,7 +24,7 @@ class User {
   }
 
   // Find user by ID
-  static async findById(id) {
+  static async getById(id) {
     const [rows] = await pool.query(
       'SELECT id, name, email, phone, role, status, street, city, state, pincode, country, is_active, created_at FROM users WHERE id = ?',
       [id]
@@ -33,27 +33,35 @@ class User {
   }
 
   // Update user by ID
-  static async findByIdAndUpdate(id, updates) {
-    const fields = []
-    const values = []
+  static async updateById(id, updates) {
+    try {
+      const fields = []
+      const values = []
 
-    Object.keys(updates).forEach(key => {
-      if (updates[key] !== undefined) {
-        fields.push(`${key} = ?`)
-        values.push(updates[key])
+      Object.keys(updates).forEach(key => {
+        if (updates[key] !== undefined) {
+          fields.push(`${key} = ?`)
+          values.push(updates[key])
+        }
+      })
+
+      if (fields.length === 0) {
+        throw new Error("No fields provided for update")
       }
-    })
 
-    if (fields.length === 0) return null
+      values.push(id)
 
-    values.push(id)
+      const query = `UPDATE users SET ${fields.join(', ')} WHERE id = ?`
+      console.log('Update Query:', query)
+      console.log('Update Params:', values)
 
-    await pool.query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
-      values
-    )
+      await pool.query(query, values)
 
-    return this.findById(id)
+      return this.getById(id)
+    } catch (error) {
+      console.error('User.findByIdAndUpdate error:', error)
+      throw error
+    }
   }
 
   // Update last login
@@ -87,7 +95,7 @@ class User {
   }
 
   // Get all users with pagination and filtering (Admin)
-  static async find(options = {}) {
+  static async getAll(options = {}) {
     try {
       const { limit = 10, skip = 0, sort = 'created_at', order = 'desc', ...filters } = options
       
@@ -132,7 +140,7 @@ class User {
   }
 
   // Count users with filters (Admin)
-  static async countDocuments(filters = {}) {
+  static async count(filters = {}) {
     let query = 'SELECT COUNT(*) as count FROM users'
     const params = []
     

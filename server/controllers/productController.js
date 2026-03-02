@@ -37,8 +37,8 @@ exports.getProducts = async (req, res) => {
     options.limit = parseInt(limit)
     options.skip = (parseInt(page) - 1) * parseInt(limit)
 
-    const products = await Product.find(query, options)
-    const total = await Product.countDocuments(query)
+    const products = await Product.getAll(query, options)
+    const total = await Product.count(query)
 
     // Parse JSON fields for each product
     const parsedProducts = products.map(product => ({
@@ -73,7 +73,7 @@ exports.getProducts = async (req, res) => {
 // Get single product by ID
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id)
+    const product = await Product.getById(req.params.id)
 
     if (!product) {
       return res.status(404).json({
@@ -107,7 +107,7 @@ exports.getProduct = async (req, res) => {
 // Get featured products
 exports.getFeaturedProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isFeatured: true }, { limit: 8 })
+    const products = await Product.getAll({ isFeatured: true }, { limit: 8 })
 
     // Parse JSON fields for each product
     const parsedProducts = products.map(product => ({
@@ -134,7 +134,7 @@ exports.getFeaturedProducts = async (req, res) => {
 // Get product categories
 exports.getCategories = async (req, res) => {
   try {
-    const categories = await Product.distinct('category')
+    const categories = await Product.getDistinct('category')
 
     res.json({
       success: true,
@@ -171,7 +171,7 @@ exports.createProduct = async (req, res) => {
 // Admin: Update product
 exports.updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body)
+    const product = await Product.updateById(req.params.id, req.body)
 
     if (!product) {
       return res.status(404).json({
@@ -198,7 +198,7 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     // First check if product exists
-    const existingProduct = await Product.findById(req.params.id)
+    const existingProduct = await Product.getById(req.params.id)
 
     if (!existingProduct) {
       return res.status(404).json({
@@ -208,7 +208,7 @@ exports.deleteProduct = async (req, res) => {
     }
 
     // Perform soft delete
-    await Product.findByIdAndUpdate(req.params.id, { is_active: false })
+    await Product.updateById(req.params.id, { is_active: false })
 
     res.json({
       success: true,

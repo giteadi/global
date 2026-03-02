@@ -1,13 +1,13 @@
 const { pool } = require('../config/database')
 
 class Cart {
-  // Find cart by user ID (alias for findOne)
-  static async findByUser(userId) {
-    return await this.findOne({ user: userId })
+  // Get cart by user ID
+  static async getByUser(userId) {
+    return await this.getByUserId({ user: userId })
   }
 
-  // Find cart by user ID
-  static async findOne(query) {
+  // Get cart by user ID
+  static async getByUserId(query) {
     const [rows] = await pool.query(
       `SELECT c.*, JSON_ARRAYAGG(
         JSON_OBJECT(
@@ -40,7 +40,7 @@ class Cart {
     const { user, items = [] } = cartData
 
     // First, check if cart exists
-    let cart = await this.findOne({ user })
+    let cart = await this.getByUserId({ user })
 
     if (!cart) {
       // Create new cart
@@ -54,7 +54,7 @@ class Cart {
     // Update cart items
     await this.updateCartItems(cart.id, items)
 
-    return this.findOne({ user })
+    return this.getByUserId({ user })
   }
 
   // Update cart items
@@ -84,35 +84,9 @@ class Cart {
     }
   }
 
-  // Update cart (alias for findOneAndUpdate)
-  static async update(query, updates) {
-    return await this.findOneAndUpdate(query, updates)
-  }
-
-  // Update cart
-  static async findOneAndUpdate(query, updates, options = {}) {
-    const { user } = query
-
-    if (updates.items !== undefined) {
-      let cart = await this.findOne({ user })
-
-      if (!cart) {
-        cart = await this.create({ user, items: updates.items })
-      } else {
-        await this.updateCartItems(cart.id, updates.items)
-      }
-
-      if (options.new !== false) {
-        return this.findOne({ user })
-      }
-    }
-
-    return null
-  }
-
   // Clear cart
-  static async clearCart(userId) {
-    const cart = await this.findOne({ user: userId })
+  static async clearByUser(userId) {
+    const cart = await this.getByUserId({ user: userId })
     if (cart) {
       await pool.query('DELETE FROM cart_items WHERE cart_id = ?', [cart.id])
       await pool.query('UPDATE carts SET total = 0 WHERE id = ?', [cart.id])

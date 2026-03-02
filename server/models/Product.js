@@ -1,8 +1,8 @@
 const { pool } = require('../config/database')
 
 class Product {
-  // Find products with filters
-  static async find(query = {}, options = {}) {
+  // Get products with filters
+  static async getAll(query = {}, options = {}) {
     let sql = `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
     const params = []
 
@@ -44,7 +44,7 @@ class Product {
   }
 
   // Count products
-  static async countDocuments(query = {}) {
+  static async count(query = {}) {
     let sql = `SELECT COUNT(*) as count FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
     const params = []
 
@@ -68,8 +68,8 @@ class Product {
     return rows[0].count
   }
 
-  // Find product by ID
-  static async findById(id) {
+  // Get product by ID
+  static async getById(id) {
     const [rows] = await pool.query(
       'SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.id = ? AND p.is_active = 1',
       [id]
@@ -78,7 +78,7 @@ class Product {
   }
 
   // Get distinct categories
-  static async distinct(field) {
+  static async getDistinct(field) {
     if (field === 'category') {
       const [rows] = await pool.query(
         `SELECT DISTINCT c.name FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
@@ -113,7 +113,7 @@ class Product {
   }
 
   // Update product
-  static async findByIdAndUpdate(id, updates, options = {}) {
+  static async updateById(id, updates, options = {}) {
     const fields = []
     const values = []
 
@@ -140,7 +140,7 @@ class Product {
     )
 
     if (options.new !== false) {
-      return this.findById(id)
+      return this.getById(id)
     }
   }
 

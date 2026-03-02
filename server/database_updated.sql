@@ -1,14 +1,16 @@
 -- Updated Database initialization script for Global Exim Traders
 -- Run this script to create all necessary tables with modifications
 
--- Drop existing tables if needed (uncomment to recreate)
--- DROP TABLE IF EXISTS order_items;
--- DROP TABLE IF EXISTS orders;
--- DROP TABLE IF EXISTS cart_items;
--- DROP TABLE IF EXISTS carts;
--- DROP TABLE IF EXISTS products;
--- DROP TABLE IF EXISTS categories;
--- DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS payment_transactions;
+DROP TABLE IF EXISTS user_sessions;
+DROP TABLE IF EXISTS activity_logs;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS cart_items;
+DROP TABLE IF EXISTS carts;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
 
 -- Users table (updated)
 CREATE TABLE IF NOT EXISTS users (
@@ -220,13 +222,13 @@ INSERT IGNORE INTO categories (name, description, icon, status) VALUES
 
 -- Insert sample admin user (password: admin123)
 INSERT IGNORE INTO users (name, email, password, role, status) VALUES
-('Admin', 'admin@globaleximtraders.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'Active');
+('Admin', 'admin@globaleximtraders.com', 'admin123', 'admin', 'Active');
 
 -- Insert sample customers
 INSERT IGNORE INTO users (name, email, password, role, status, phone, city, state) VALUES
-('Rahul Sharma', 'rahul@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'customer', 'Active', '9876543210', 'Mumbai', 'Maharashtra'),
-('Priya Patel', 'priya@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'customer', 'Active', '9876543211', 'Delhi', 'Delhi'),
-('Amit Singh', 'amit@example.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'customer', 'Active', '9876543212', 'Jaipur', 'Rajasthan');
+('Rahul Sharma', 'rahul@example.com', 'password2', 'customer', 'Active', '9876543210', 'Mumbai', 'Maharashtra'),
+('Priya Patel', 'priya@example.com', 'password3', 'customer', 'Active', '9876543211', 'Delhi', 'Delhi'),
+('Amit Singh', 'amit@example.com', 'password4', 'customer', 'Active', '9876543212', 'Jaipur', 'Rajasthan');
 
 -- Insert sample products with category names
 INSERT IGNORE INTO products (name, description, category, price, icon, material, craftsmanship, stock, is_featured) VALUES

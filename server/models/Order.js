@@ -1,8 +1,8 @@
 const { pool } = require('../config/database')
 
 class Order {
-  // Find orders with filters
-  static async find(query = {}, options = {}) {
+  // Get orders with filters
+  static async getAll(query = {}, options = {}) {
     let sql = `SELECT o.*, u.name as user_name, u.email as user_email
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.id`
@@ -55,7 +55,7 @@ class Order {
   }
 
   // Count orders
-  static async countDocuments(query = {}) {
+  static async count(query = {}) {
     let sql = 'SELECT COUNT(DISTINCT o.id) as count FROM orders o'
     const params = []
     const conditions = []
@@ -102,8 +102,8 @@ class Order {
     return order
   }
 
-  // Find by ID (for admin)
-  static async findById(id) {
+  // Get order by ID (for admin)
+  static async getById(id) {
     const [rows] = await pool.query(
       `SELECT o.*, u.name as user_name, u.email as user_email
       FROM orders o
@@ -190,7 +190,7 @@ class Order {
   }
 
   // Update order
-  static async findByIdAndUpdate(id, updates, options = {}) {
+  static async updateById(id, updates, options = {}) {
     const fields = []
     const values = []
 
@@ -217,7 +217,7 @@ class Order {
     )
 
     if (options.new !== false) {
-      return this.findById(id)
+      return this.getById(id)
     }
   }
 
@@ -228,7 +228,7 @@ class Order {
       updates.tracking_number = trackingNumber
     }
 
-    return this.findByIdAndUpdate(id, updates)
+    return this.updateById(id, updates)
   }
 
   // Update payment status
@@ -241,7 +241,7 @@ class Order {
       updates.payment_date = new Date()
     }
 
-    return this.findByIdAndUpdate(id, updates)
+    return this.updateById(id, updates)
   }
 
   // Process refund
@@ -254,7 +254,7 @@ class Order {
       refund_transaction_id: `REF${Date.now()}`
     }
 
-    return this.findByIdAndUpdate(id, updates)
+    return this.updateById(id, updates)
   }
 
   // Cancel order

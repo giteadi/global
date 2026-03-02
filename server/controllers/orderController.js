@@ -8,11 +8,11 @@ exports.getOrders = async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 10
 
-    const orders = await Order.find(
+    const orders = await Order.getAll(
       { user: req.user.id },
       { limit, skip: (page - 1) * limit, sort: 'created_at', order: 'desc' }
     )
-    const total = await Order.countDocuments({ user: req.user.id })
+    const total = await Order.count({ user: req.user.id })
 
     res.json({
       success: true,
@@ -38,7 +38,7 @@ exports.getOrders = async (req, res) => {
 // Get single order
 exports.getOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
+    const order = await Order.getById(req.params.id)
 
     if (!order) {
       return res.status(404).json({
@@ -66,7 +66,7 @@ exports.createOrder = async (req, res) => {
     const { shippingAddress, paymentMethod, notes } = req.body
 
     // Get user's cart
-    const cart = await Cart.findByUser(req.user.id)
+    const cart = await Cart.getByUser(req.user.id)
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({
         success: false,
@@ -76,7 +76,7 @@ exports.createOrder = async (req, res) => {
 
     // Validate stock availability
     for (const item of cart.items) {
-      const product = await Product.findById(item.product)
+      const product = await Product.getById(item.product)
       if (!product || product.stock < item.quantity) {
         return res.status(400).json({
           success: false,
@@ -136,11 +136,11 @@ exports.getAllOrders = async (req, res) => {
 
     const query = status ? { orderStatus: status } : {}
 
-    const orders = await Order.find(
+    const orders = await Order.getAll(
       query,
       { limit, skip: (page - 1) * limit, sort: 'created_at', order: 'desc' }
     )
-    const total = await Order.countDocuments(query)
+    const total = await Order.count(query)
 
     res.json({
       success: true,
@@ -168,7 +168,7 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderStatus, trackingNumber } = req.body
 
-    const order = await Order.findByIdAndUpdate(req.params.id, {
+    const order = await Order.updateById(req.params.id, {
       order_status: orderStatus,
       tracking_number: trackingNumber
     })
@@ -197,7 +197,7 @@ exports.updateOrderStatus = async (req, res) => {
 // Cancel order (user)
 exports.cancelOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
+    const order = await Order.getById(req.params.id)
 
     if (!order) {
       return res.status(404).json({
@@ -213,7 +213,7 @@ exports.cancelOrder = async (req, res) => {
       })
     }
 
-    await Order.findByIdAndUpdate(req.params.id, { order_status: 'Cancelled' })
+    await Order.updateById(req.params.id, { order_status: 'Cancelled' })
 
     // Restore product stock
     for (const item of order.items) {

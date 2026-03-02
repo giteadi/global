@@ -4,7 +4,7 @@ const Product = require('../models/Product')
 // Get user's cart
 exports.getCart = async (req, res) => {
   try {
-    let cart = await Cart.findByUser(req.user.id)
+    let cart = await Cart.getByUser(req.user.id)
 
     if (!cart) {
       cart = await Cart.create({ user: req.user.id, items: [] })
@@ -29,7 +29,7 @@ exports.addToCart = async (req, res) => {
     const { productId, quantity = 1 } = req.body
 
     // Validate product exists and is active
-    const product = await Product.findById(productId)
+    const product = await Product.getById(productId)
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -37,22 +37,24 @@ exports.addToCart = async (req, res) => {
       })
     }
 
-    const cart = await Cart.findOneAndUpdate(
-      { user: req.user.id },
-      {
-        $push: {
-          items: {
-            product: productId,
-            name: product.name,
-            icon: product.icon,
-            price: product.price,
-            quantity: quantity,
-            category: product.category
-          }
-        }
-      },
-      { new: true }
-    )
+    // Get or create cart
+    let cart = await Cart.getByUser(req.user.id)
+    if (!cart) {
+      cart = await Cart.create({ user: req.user.id, items: [] })
+    }
+
+    // Add item to cart items array
+    cart.items.push({
+      product: productId,
+      name: product.name,
+      icon: product.icon,
+      price: product.price,
+      quantity: quantity,
+      category: product.category
+    })
+
+    // Update cart in database
+    await Cart.updateByUser({ user: req.user.id }, { items: cart.items })
 
     res.json({
       success: true,
@@ -73,7 +75,7 @@ exports.updateCartItem = async (req, res) => {
   try {
     const { productId, quantity } = req.body
 
-    const cart = await Cart.findByUser(req.user.id)
+    const cart = await Cart.getByUser(req.user.id)
     if (!cart) {
       return res.status(404).json({
         success: false,
@@ -99,7 +101,7 @@ exports.updateCartItem = async (req, res) => {
       cart.items[itemIndex].quantity = quantity
     }
 
-    await cart.update({ items: cart.items })
+    await Cart.updateByUser({ user: req.user.id }, { items: cart.items })
 
     res.json({
       success: true,
@@ -120,11 +122,7 @@ exports.removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params
 
-    const cart = await Cart.findOneAndUpdate(
-      { user: req.user.id },
-      { $pull: { items: { product: productId } } },
-      { new: true }
-    )
+    const cart = await Cart.getByUser(req.user.id)
 
     if (!cart) {
       return res.status(404).json({
@@ -132,6 +130,21 @@ exports.removeFromCart = async (req, res) => {
         message: 'Cart not found'
       })
     }
+
+    const itemIndex = cart.items.findIndex(
+      item => item.product.toString() === productId
+    )
+
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Item not found in cart'
+      })
+    }
+
+    cart.items.splice(itemIndex, 1)
+
+    await Cart.updateByUser({ user: req.user.id }, { items: cart.items })
 
     res.json({
       success: true,
@@ -150,7 +163,7 @@ exports.removeFromCart = async (req, res) => {
 // Clear cart
 exports.clearCart = async (req, res) => {
   try {
-    await Cart.clearCart(req.user.id)
+    await Cart.clearByUser(req.user.id)
 
     res.json({
       success: true,

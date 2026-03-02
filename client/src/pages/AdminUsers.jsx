@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAdminUsers } from '../store/slices/adminUsersSlice'
+import { getAdminUsers, updateUser } from '../store/slices/adminUsersSlice'
 
 const AdminUsers = () => {
   const dispatch = useDispatch()

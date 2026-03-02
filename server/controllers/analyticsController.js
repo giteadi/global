@@ -6,16 +6,19 @@ const User = require('../models/User')
 exports.getDashboardStats = async (req, res) => {
   try {
     // Get basic counts using simple queries
-    const totalOrders = await Order.countDocuments()
-    const totalProducts = await Product.countDocuments()
-    const totalUsers = await User.countDocuments()
+    const totalOrders = await Order.count()
+    const totalProducts = await Product.count()
+    const totalUsers = await User.count()
     
-    // Get revenue from completed orders
-    const completedOrders = await Order.find({ orderStatus: 'Delivered' })
-    const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total || 0), 0)
+    // Get revenue from completed orders using SQL aggregation
+    const { pool } = require('../config/database')
+    const [revenueResult] = await pool.query(
+      "SELECT SUM(total) as totalRevenue FROM orders WHERE order_status = 'Delivered'"
+    )
+    const totalRevenue = revenueResult[0].totalRevenue || 0
     
     // Get recent orders
-    const recentOrders = await Order.find({}, { limit: 5, sort: 'created_at', order: 'desc' })
+    const recentOrders = await Order.getAll({}, { limit: 5, sort: 'created_at', order: 'desc' })
     
     // Get top products (simplified)
     const topProducts = [
@@ -128,16 +131,16 @@ exports.getAnalytics = async (req, res) => {
 
     if (type === 'overview') {
       // Get basic counts
-      const totalOrders = await Order.countDocuments()
-      const totalProducts = await Product.countDocuments()
-      const totalUsers = await User.countDocuments()
+      const totalOrders = await Order.count()
+      const totalProducts = await Product.count()
+      const totalUsers = await User.count()
 
       // Get revenue from completed orders
-      const completedOrders = await Order.find({ orderStatus: 'Delivered' })
+      const completedOrders = await Order.getAll({ orderStatus: 'Delivered' })
       const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total || 0), 0)
 
       // Get recent orders
-      const recentOrders = await Order.find({}, { limit: 5, sort: 'created_at', order: 'desc' })
+      const recentOrders = await Order.getAll({}, { limit: 5, sort: 'created_at', order: 'desc' })
 
       // Get top categories using SQL query instead of aggregate
       const { pool } = require('../config/database')

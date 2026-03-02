@@ -22,7 +22,7 @@ const ProductDetail = () => {
         const response = await fetch(`http://localhost:4000/api/products/${id}`)
         const data = await response.json()
         
-        if (data.success) {
+        if (data.success && data.data) {
           dispatch(setSingleProduct(data.data))
         } else {
           toast.error('Product not found')
@@ -137,6 +137,15 @@ const ProductDetail = () => {
     )
   }
 
+  const productDetails = {
+    material: singleProduct.material || 'N/A',
+    craftsmanship: singleProduct.craftsmanship || 'N/A',
+    origin: singleProduct.origin || 'N/A',
+    weight: singleProduct.weight || 'N/A',
+    dimensions: singleProduct.dimensions || 'N/A',
+    care: singleProduct.care || 'N/A'
+  }
+
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
       <div className="max-w-7xl mx-auto">
@@ -147,7 +156,11 @@ const ProductDetail = () => {
           <div>
             <div className="bg-teal-800/50 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8 mb-4">
               <div className="h-96 flex items-center justify-center">
-                <span className="text-9xl">{singleProduct.images[selectedImage]}</span>
+                <img 
+                  src={singleProduct.images[selectedImage]} 
+                  alt={singleProduct.name} 
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
               </div>
             </div>
             <div className="grid grid-cols-4 gap-2">
@@ -155,13 +168,17 @@ const ProductDetail = () => {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`bg-teal-800/50 border rounded-lg p-4 transition-all ${
+                  className={`border rounded-lg p-2 transition-all ${
                     selectedImage === index 
                       ? 'border-yellow-400' 
                       : 'border-teal-600/30 hover:border-yellow-400/50'
                   }`}
                 >
-                  <span className="text-3xl">{image}</span>
+                  <img 
+                    src={image} 
+                    alt={`${singleProduct.name} ${index + 1}`} 
+                    className="w-full h-16 object-cover rounded"
+                  />
                 </button>
               ))}
             </div>
@@ -226,11 +243,13 @@ const ProductDetail = () => {
             <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 mb-6">
               <h3 className="text-xl font-serif text-white mb-4 text-with-shadow">Product Details</h3>
               <div className="space-y-3">
-                {Object.entries(singleProduct.details).map(([key, value]) => (
-                  <div key={key} className="flex justify-between">
-                    <span className="text-teal-200 capitalize">{key}:</span>
-                    <span className="text-white">{value}</span>
-                  </div>
+                {Object.entries(productDetails).map(([key, value]) => (
+                  value && (
+                    <div key={key} className="flex justify-between">
+                      <span className="text-teal-200 capitalize">{key.replace('_', ' ')}:</span>
+                      <span className="text-white">{value}</span>
+                    </div>
+                  )
                 ))}
               </div>
             </div>

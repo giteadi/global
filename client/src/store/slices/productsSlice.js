@@ -29,6 +29,20 @@ export const getProducts = createAsyncThunk(
   }
 )
 
+export const getFeaturedProducts = createAsyncThunk(
+  'products/getFeaturedProducts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/products/featured')
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch featured products')
+      return data.data
+    } catch (error) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
 export const createProduct = createAsyncThunk(
   'products/createProduct',
   async (productData, { rejectWithValue }) => {
@@ -124,6 +138,18 @@ const productsSlice = createSlice({
         state.products = action.payload
       })
       .addCase(getProducts.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      .addCase(getFeaturedProducts.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(getFeaturedProducts.fulfilled, (state, action) => {
+        state.loading = false
+        state.featuredProducts = action.payload
+      })
+      .addCase(getFeaturedProducts.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

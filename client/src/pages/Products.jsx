@@ -122,8 +122,33 @@ const Products = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
               <div key={product.id} className="rounded-lg overflow-hidden transition-all transform hover:scale-105" style={{ background: 'rgba(27,158,155,0.5)', border: '1px solid rgba(37,204,200,0.12)' }}>
-                <div className="h-64 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0D6E6C, #1B9E9B)' }}>
-                  <span className="text-6xl">{product.icon}</span>
+                <div className="h-64 overflow-hidden">
+                  {(() => {
+                    let images = product.images
+                    
+                    if (typeof images === "string") {
+                      try {
+                        images = JSON.parse(images)
+                      } catch {
+                        images = []
+                      }
+                    }
+                    
+                    return images && images.length > 0 ? (
+                      <img
+                        src={images[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div
+                        className="h-full flex items-center justify-center"
+                        style={{ background: 'linear-gradient(135deg, #0D6E6C, #1B9E9B)' }}
+                      >
+                        <span className="text-6xl">{product.icon}</span>
+                      </div>
+                    )
+                  })()}
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { user, isAdmin } = useSelector(state => state.auth)
@@ -69,8 +70,25 @@ const AdminLayout = ({ children }) => {
 
   return (
     <div className="h-screen flex" style={{ background: 'transparent' }}>
+      {/* Mobile Backdrop */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 ease-in-out`} style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }}>
+      <div className={`${
+        // Desktop: relative, mobile: fixed
+        'md:relative fixed inset-y-0 left-0 z-50 md:z-auto'
+      } ${
+        // Width based on state
+        sidebarOpen ? 'w-64' : 'w-20 md:w-20'
+      } ${
+        // Mobile transform
+        mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      } transition-all duration-300 ease-in-out`} style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }}>
         <div className="p-4 border-b" style={{ borderColor: 'var(--glass-border)' }}>
           <div className="flex items-center justify-between">
             <h1 className={`font-bold text-xl ${!sidebarOpen && 'hidden'}`} style={{ color: 'var(--text-bright)' }}>
@@ -99,6 +117,7 @@ const AdminLayout = ({ children }) => {
               <li key={item.path}>
                 <Link
                   to={item.path}
+                  onClick={() => setMobileSidebarOpen(false)}
                   className={`flex items-center p-3 rounded-lg transition-all duration-200 ${
                     isActive(item.path)
                       ? 'border-l-4'
@@ -143,13 +162,25 @@ const AdminLayout = ({ children }) => {
         {/* Top Bar */}
         <header style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--glass-border)' }}>
           <div className="px-6 py-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-bright)' }}>
-                {menuItems.find(item => item.path === location.pathname)?.title || 'Admin Dashboard'}
-              </h2>
-              <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
-                {menuItems.find(item => item.path === location.pathname)?.description || 'Manage your business'}
-              </p>
+            <div className="flex items-center space-x-4">
+              {/* Mobile Hamburger */}
+              <button
+                onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+                className="md:hidden p-2 rounded-lg transition-colors"
+                style={{ background: 'rgba(27,158,155,0.1)', color: 'var(--text-bright)' }}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <div>
+                <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-bright)' }}>
+                  {menuItems.find(item => item.path === location.pathname)?.title || 'Admin Dashboard'}
+                </h2>
+                <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
+                  {menuItems.find(item => item.path === location.pathname)?.description || 'Manage your business'}
+                </p>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-right">

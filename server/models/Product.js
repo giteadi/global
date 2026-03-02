@@ -3,44 +3,64 @@ const { pool } = require('../config/database')
 class Product {
   // Get products with filters
   static async getAll(query = {}, options = {}) {
-    let sql = `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
-    const params = []
+    try {
+      let sql = `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
+      const params = []
 
-    // Add filters
-    if (query.category && query.category !== 'All') {
-      sql += ` AND c.name = ?`
-      params.push(query.category)
+      // Add filters
+      if (query.category && query.category !== 'All') {
+        sql += ` AND c.name = ?`
+        params.push(query.category)
+      }
+
+      if (query.isFeatured !== undefined) {
+        sql += ` AND p.is_featured = ?`
+        params.push(query.isFeatured)
+      }
+
+      // Add search
+      if (query.$text) {
+        sql += ` AND MATCH(p.name, p.description) AGAINST(? IN NATURAL LANGUAGE MODE)`
+        params.push(query.$text.$search)
+      }
+
+      // Add sorting
+      const sortField = options.sortBy || 'created_at'
+      const sortOrder = options.sortOrder === 'asc' ? 'ASC' : 'DESC'
+      sql += ` ORDER BY ${sortField} ${sortOrder}`
+
+      // Add pagination
+      if (options.limit) {
+        sql += ` LIMIT ?`
+        params.push(options.limit)
+      }
+
+      if (options.skip) {
+        sql += ` OFFSET ?`
+        params.push(options.skip)
+      }
+
+      console.log('Product.getAll SQL:', sql)
+      console.log('Product.getAll params:', params)
+
+      const [rows] = await pool.query(sql, params)
+      console.log('Product.getAll rows length:', rows.length)
+
+      return rows.map(row => {
+        if (row.images && typeof row.images === 'string' && row.images.trim() !== '') {
+          try {
+            row.images = JSON.parse(row.images)
+          } catch (e) {
+            console.log('Error parsing images for product:', row.id, row.images, e.message)
+            row.images = []
+          }
+        }
+        return row
+      })
+    } catch (error) {
+      console.error('Product.getAll error:', error)
+      throw error
     }
-
-    if (query.isFeatured !== undefined) {
-      sql += ` AND p.is_featured = ?`
-      params.push(query.isFeatured)
-    }
-
-    // Add search
-    if (query.$text) {
-      sql += ` AND MATCH(p.name, p.description) AGAINST(? IN NATURAL LANGUAGE MODE)`
-      params.push(query.$text.$search)
-    }
-
-    // Add sorting
-    const sortField = `p.${options.sortBy || 'created_at'}`
-    const sortOrder = options.sortOrder === 'asc' ? 'ASC' : 'DESC'
-    sql += ` ORDER BY ${sortField} ${sortOrder}`
-
-    // Add pagination
-    if (options.limit) {
-      sql += ` LIMIT ?`
-      params.push(options.limit)
-    }
-
-    if (options.skip) {
-      sql += ` OFFSET ?`
-      params.push(options.skip)
-    }
-
-    const [rows] = await pool.query(sql, params)
-    return rows
   }
 
   // Count products
@@ -70,11 +90,24 @@ class Product {
 
   // Get product by ID
   static async getById(id) {
-    const [rows] = await pool.query(
-      'SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.id = ? AND p.is_active = 1',
-      [id]
-    )
-    return rows[0]
+    try {
+      const [rows] = await pool.query(
+        'SELECT * FROM products WHERE id = ? AND is_active = true',
+        [id]
+      )
+      if (rows.length === 0) return null
+      const product = rows[0]
+      if (product.images && typeof product.images === 'string' && product.images.trim() !== '') {
+        try {
+          product.images = JSON.parse(product.images)
+        } catch (e) {
+          product.images = []
+        }
+      }
+      return product
+    } catch (error) {
+      throw new Error('Error fetching product: ' + error.message)
+    }
   }
 
   // Get distinct categories
@@ -93,23 +126,20 @@ class Product {
 
   // Create new product
   static async create(productData) {
-    const fields = Object.keys(productData)
-    const placeholders = fields.map(() => '?').join(', ')
-    const values = fields.map(field => {
-      const value = productData[field]
-      // Handle JSON fields
-      if (['images', 'features', 'tags', 'seo_keywords'].includes(field)) {
-        return JSON.stringify(value || [])
-      }
-      return value
-    })
+    try {
+      const { name, description, category, price, original_price, discount, icon = '🏛️', material, craftsmanship, origin, weight, dimensions, care, stock = 10, is_featured = false, is_active = true, images = [] } = productData
+      
+      const [result] = await pool.query(
+        `INSERT INTO products (name, description, category, price, original_price, discount, icon, material, craftsmanship, origin, weight, dimensions, care, stock, is_featured, is_active, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [name, description, category, price, original_price || null, discount || null, icon, material || null, craftsmanship || null, origin || null, weight || null, dimensions || null, care || null, stock, is_featured, is_active, JSON.stringify(images)]
+      )
 
-    const [result] = await pool.query(
-      `INSERT INTO products (${fields.join(', ')}) VALUES (${placeholders})`,
-      values
-    )
+      console.log('Product inserted with ID:', result.insertId)
 
-    return { id: result.insertId, ...productData }
+      return { id: result.insertId, ...productData }
+    } catch (error) {
+      throw new Error('Error creating product: ' + error.message)
+    }
   }
 
   // Update product
@@ -119,13 +149,12 @@ class Product {
 
     Object.keys(updates).forEach(key => {
       if (updates[key] !== undefined) {
-        fields.push(`${key} = ?`)
-        const value = updates[key]
-        // Handle JSON fields
-        if (['images', 'features', 'tags', 'seo_keywords'].includes(key)) {
-          values.push(JSON.stringify(value || []))
+        if (key === 'images') {
+          fields.push('images = ?')
+          values.push(JSON.stringify(updates[key]))
         } else {
-          values.push(value)
+          fields.push(`${key} = ?`)
+          values.push(updates[key])
         }
       }
     })

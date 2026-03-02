@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer style={{ background: 'rgba(8,30,35,0.92)', borderTop: '1px solid rgba(37,204,200,0.25)' }}>
+    <footer className="overflow-x-hidden" style={{ background: 'rgba(8,30,35,0.92)', borderTop: '1px solid rgba(37,204,200,0.25)' }}>
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -118,7 +118,7 @@ const Footer = () => {
           <div className="text-center mb-4">
             <span className="text-sm uppercase tracking-wider" style={{ color: 'var(--gold-bright)' }}>Certifications & Compliance</span>
           </div>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             <div className="rounded-lg px-4 py-2" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
               <span className="text-xs font-semibold" style={{ color: 'var(--gold-bright)' }}>GSTIN Registered</span>
             </div>

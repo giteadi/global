@@ -30,12 +30,13 @@ const AdminProducts = () => {
     care: '',
     icon: '🏛️',
     is_featured: false,
-    is_active: true
+    is_active: true,
+    images: []
   })
 
   const params = {
     page: 1,
-    limit: 100, // Assuming admin wants to see all or many products
+    limit: 20, // Reduced from 100 to prevent large data issues
     ...(filterCategory !== 'All' && { category: filterCategory }),
     ...(searchTerm && { search: searchTerm })
   }
@@ -67,6 +68,23 @@ const AdminProducts = () => {
     }))
   }
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files)
+    const promises = files.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.readAsDataURL(file)
+      })
+    })
+    Promise.all(promises).then(base64Images => {
+      setFormData(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...base64Images]
+      }))
+    })
+  }
+
   const handleCreateCategory = async (e) => {
     e.preventDefault()
     try {
@@ -96,7 +114,8 @@ const AdminProducts = () => {
       care: '',
       icon: '🏛️',
       is_featured: false,
-      is_active: true
+      is_active: true,
+      images: []
     })
     setShowAddModal(true)
   }
@@ -117,7 +136,8 @@ const AdminProducts = () => {
       care: product.care || '',
       icon: product.icon || '🏛️',
       is_featured: product.is_featured || false,
-      is_active: product.is_active !== false
+      is_active: product.is_active !== false,
+      images: product.images || []
     })
     setShowEditModal(true)
   }
@@ -272,7 +292,11 @@ const AdminProducts = () => {
                     <tr key={product.id} className="hover:opacity-80">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="text-2xl mr-3">{product.icon}</div>
+                          {product.images && product.images.length > 0 ? (
+                            <img src={product.images[0]} alt="" className="w-10 h-10 object-cover mr-3 rounded" />
+                          ) : (
+                            <div className="text-2xl mr-3">{product.icon}</div>
+                          )}
                           <div>
                             <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>{product.name}</div>
                             <div className="text-sm" style={{ color: 'var(--text-soft)' }}>{product.material}</div>
@@ -444,6 +468,30 @@ const AdminProducts = () => {
                     }}
                     placeholder="Enter product description"
                   ></textarea>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Images</label>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                  />
+                  {formData.images && formData.images.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {formData.images.map((img, idx) => (
+                        <img key={idx} src={img} alt="" className="w-16 h-16 object-cover rounded" />
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex justify-end space-x-3">

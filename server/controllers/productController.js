@@ -43,11 +43,13 @@ exports.getProducts = async (req, res) => {
     // Parse JSON fields for each product
     const parsedProducts = products.map(product => ({
       ...product,
-      images: product.images ? JSON.parse(product.images) : [],
-      features: product.features ? JSON.parse(product.features) : [],
-      tags: product.tags ? JSON.parse(product.tags) : [],
-      seo_keywords: product.seo_keywords ? JSON.parse(product.seo_keywords) : []
+      images: Array.isArray(product.images) ? product.images : (product.images ? JSON.parse(product.images) : []),
+      features: Array.isArray(product.features) ? product.features : (product.features ? JSON.parse(product.features) : []),
+      tags: Array.isArray(product.tags) ? product.tags : (product.tags ? JSON.parse(product.tags) : []),
+      seo_keywords: Array.isArray(product.seo_keywords) ? product.seo_keywords : (product.seo_keywords ? JSON.parse(product.seo_keywords) : [])
     }))
+
+    console.log('Returning products count:', parsedProducts.length)
 
     res.json({
       success: true,
@@ -85,10 +87,10 @@ exports.getProduct = async (req, res) => {
     // Parse JSON fields
     const parsedProduct = {
       ...product,
-      images: product.images ? JSON.parse(product.images) : [],
-      features: product.features ? JSON.parse(product.features) : [],
-      tags: product.tags ? JSON.parse(product.tags) : [],
-      seo_keywords: product.seo_keywords ? JSON.parse(product.seo_keywords) : []
+      images: Array.isArray(product.images) ? product.images : (product.images ? JSON.parse(product.images) : []),
+      features: Array.isArray(product.features) ? product.features : (product.features ? JSON.parse(product.features) : []),
+      tags: Array.isArray(product.tags) ? product.tags : (product.tags ? JSON.parse(product.tags) : []),
+      seo_keywords: Array.isArray(product.seo_keywords) ? product.seo_keywords : (product.seo_keywords ? JSON.parse(product.seo_keywords) : [])
     }
 
     res.json({
@@ -112,10 +114,10 @@ exports.getFeaturedProducts = async (req, res) => {
     // Parse JSON fields for each product
     const parsedProducts = products.map(product => ({
       ...product,
-      images: product.images ? JSON.parse(product.images) : [],
-      features: product.features ? JSON.parse(product.features) : [],
-      tags: product.tags ? JSON.parse(product.tags) : [],
-      seo_keywords: product.seo_keywords ? JSON.parse(product.seo_keywords) : []
+      images: Array.isArray(product.images) ? product.images : (product.images ? JSON.parse(product.images) : []),
+      features: Array.isArray(product.features) ? product.features : (product.features ? JSON.parse(product.features) : []),
+      tags: Array.isArray(product.tags) ? product.tags : (product.tags ? JSON.parse(product.tags) : []),
+      seo_keywords: Array.isArray(product.seo_keywords) ? product.seo_keywords : (product.seo_keywords ? JSON.parse(product.seo_keywords) : [])
     }))
 
     res.json({
@@ -152,6 +154,7 @@ exports.getCategories = async (req, res) => {
 // Admin: Create new product
 exports.createProduct = async (req, res) => {
   try {
+    console.log('createProduct called with req.body:', req.body)
     const product = await Product.create(req.body)
 
     res.status(201).json({

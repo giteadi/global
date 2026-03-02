@@ -59,6 +59,14 @@ const AdminProducts = () => {
     }))
   }
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
   const handleCreateCategory = async (e) => {
     e.preventDefault()
     try {

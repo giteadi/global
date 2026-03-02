@@ -9,7 +9,7 @@ exports.getCategories = async (req, res) => {
     // Add product count to each category
     const categoriesWithCount = await Promise.all(
       categories.map(async (category) => {
-        const productCount = await Product.countDocuments({ category: category.name })
+        const productCount = await Product.count({ category: category.name })
         return {
           ...category,
           productCount
@@ -45,7 +45,7 @@ exports.getCategory = async (req, res) => {
     }
 
     // Add product count
-    const productCount = await Product.countDocuments({ category: category.name })
+    const productCount = await Product.count({ category: category.name })
 
     res.json({
       success: true,
@@ -117,10 +117,8 @@ exports.updateCategory = async (req, res) => {
 
     // Update all products with this category name
     if (name && name !== category.name) {
-      await Product.updateMany(
-        { category: category.name },
-        { category: name }
-      )
+      const { pool } = require('../config/database')
+      await pool.query('UPDATE products SET category = ? WHERE category = ?', [name, category.name])
     }
 
     res.json({
@@ -150,7 +148,7 @@ exports.deleteCategory = async (req, res) => {
     }
 
     // Check if category has products
-    const productCount = await Product.countDocuments({ category: category.name })
+    const productCount = await Product.count({ category: category.name })
     if (productCount > 0) {
       return res.status(400).json({
         success: false,
@@ -179,8 +177,8 @@ exports.getCategoryStats = async (req, res) => {
     const categories = await Category.find()
     const stats = await Promise.all(
       categories.map(async (category) => {
-        const productCount = await Product.countDocuments({ category: category.name })
-        const activeProducts = await Product.countDocuments({ 
+        const productCount = await Product.count({ category: category.name })
+        const activeProducts = await Product.count({ 
           category: category.name, 
           is_active: true 
         })

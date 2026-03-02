@@ -369,12 +369,13 @@ const AdminProducts = () => {
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Product Name</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Product Name *</label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleFormChange}
+                      required
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--glass-border)',
@@ -386,12 +387,13 @@ const AdminProducts = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category *</label>
                     <div className="flex gap-2">
                       <select 
                         name="category"
                         value={formData.category}
                         onChange={handleFormChange}
+                        required
                         className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" 
                         style={{
                           borderColor: 'var(--glass-border)',
@@ -417,12 +419,14 @@ const AdminProducts = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Price</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Price *</label>
                     <input
                       type="number"
                       name="price"
                       value={formData.price}
                       onChange={handleFormChange}
+                      required
+                      step="0.01"
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--glass-border)',
@@ -434,12 +438,13 @@ const AdminProducts = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Stock</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Stock *</label>
                     <input
                       type="number"
                       name="stock"
                       value={formData.stock}
                       onChange={handleFormChange}
+                      required
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--glass-border)',
@@ -450,15 +455,118 @@ const AdminProducts = () => {
                       placeholder="0"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Material</label>
+                    <input
+                      type="text"
+                      name="material"
+                      value={formData.material}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                      placeholder="e.g., Gold Plated Brass"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Craftsmanship</label>
+                    <input
+                      type="text"
+                      name="craftsmanship"
+                      value={formData.craftsmanship}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                      placeholder="e.g., Handcrafted"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Origin</label>
+                    <input
+                      type="text"
+                      name="origin"
+                      value={formData.origin}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                      placeholder="e.g., Rajasthan, India"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Weight</label>
+                    <input
+                      type="text"
+                      name="weight"
+                      value={formData.weight}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                      placeholder="e.g., 50g"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Dimensions</label>
+                    <input
+                      type="text"
+                      name="dimensions"
+                      value={formData.dimensions}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                      placeholder="e.g., 10cm x 5cm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Icon</label>
+                    <input
+                      type="text"
+                      name="icon"
+                      value={formData.icon}
+                      onChange={handleFormChange}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        color: 'var(--text-bright)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                      placeholder="🏛️"
+                    />
+                  </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Description</label>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Description *</label>
                   <textarea
                     rows="3"
                     name="description"
                     value={formData.description}
                     onChange={handleFormChange}
+                    required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
                     style={{
                       borderColor: 'var(--glass-border)',
@@ -468,6 +576,57 @@ const AdminProducts = () => {
                     }}
                     placeholder="Enter product description"
                   ></textarea>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Care Instructions</label>
+                  <textarea
+                    rows="2"
+                    name="care"
+                    value={formData.care}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    placeholder="e.g., Keep away from water and perfume"
+                  ></textarea>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="is_featured"
+                      checked={formData.is_featured}
+                      onChange={(e) => setFormData(prev => ({ ...prev, is_featured: e.target.checked }))}
+                      className="w-4 h-4 rounded focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                    />
+                    <label className="ml-2 text-sm" style={{ color: 'var(--text-bright)' }}>Featured Product</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="is_active"
+                      checked={formData.is_active}
+                      onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+                      className="w-4 h-4 rounded focus:ring-2"
+                      style={{
+                        borderColor: 'var(--glass-border)',
+                        background: 'var(--glass-light)',
+                        '--tw-ring-color': 'var(--teal-bright)'
+                      }}
+                    />
+                    <label className="ml-2 text-sm" style={{ color: 'var(--text-bright)' }}>Active Product</label>
+                  </div>
                 </div>
                 
                 <div>

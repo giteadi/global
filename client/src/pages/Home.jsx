@@ -141,7 +141,7 @@ const Home = () => {
     <div className="min-h-screen py-20 px-4">
       
       {/* HERO */}
-      <section className="relative h-screen flex items-center justify-center">
+      <section className="relative py-16 flex items-center justify-center">
         <div className="text-center max-w-4xl">
           <h1 className="text-6xl font-serif mb-6 text-yellow-400">
             Global Exim Traders
@@ -149,13 +149,32 @@ const Home = () => {
           <p className="text-xl text-gray-300 mb-8">
             Where Heritage Meets Global Elegance
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 mb-8">
             <Link to="/products" className="btn-primary">
               Explore Collections
             </Link>
             <Link to="/about" className="btn-secondary">
               Our Story
             </Link>
+          </div>
+          
+          {/* Additional Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 text-center">
+            <div className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50">
+              <div className="text-4xl mb-3">🏛️</div>
+              <h3 className="text-lg font-semibold text-yellow-400 mb-2">Traditional Heritage</h3>
+              <p className="text-sm text-gray-300">Authentic Indian craftsmanship passed through generations</p>
+            </div>
+            <div className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50">
+              <div className="text-4xl mb-3">🌍</div>
+              <h3 className="text-lg font-semibold text-yellow-400 mb-2">Global Quality</h3>
+              <p className="text-sm text-gray-300">Export-grade products meeting international standards</p>
+            </div>
+            <div className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50">
+              <div className="text-4xl mb-3">✨</div>
+              <h3 className="text-lg font-semibold text-yellow-400 mb-2">Premium Collection</h3>
+              <p className="text-sm text-gray-300">Curated selection of finest jewelry and handicrafts</p>
+            </div>
           </div>
         </div>
       </section>

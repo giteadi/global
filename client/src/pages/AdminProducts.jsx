@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetProductsQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../store/slices/adminApi'
+import { useGetCategoriesQuery, useCreateCategoryMutation } from '../store/slices/adminApi'
 import toast from 'react-hot-toast'
 
 const AdminProducts = () => {
@@ -8,7 +9,13 @@ const AdminProducts = () => {
   const [filterCategory, setFilterCategory] = useState('All')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    description: '',
+    icon: '🏷️'
+  })
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -37,22 +44,32 @@ const AdminProducts = () => {
   const [updateProduct] = useUpdateProductMutation()
   const [deleteProduct] = useDeleteProductMutation()
 
+  // Category hooks
+  const { data: categoriesData, refetch: refetchCategories } = useGetCategoriesQuery()
+  const [createCategory] = useCreateCategoryMutation()
+
   const products = productsData?.data?.products || []
+  const categories = categoriesData?.data?.categories || []
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = filterCategory === 'All' || product.category === filterCategory
-    return matchesSearch && matchesCategory
-  })
-
-  const categories = ['All', 'Temple Heritage', 'Contemporary Ethnic', 'Handcrafted Decor', 'Export Grade']
-
-  const handleFormChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
+  const handleCategoryFormChange = (e) => {
+    const { name, value } = e.target
+    setCategoryFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }))
+  }
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault()
+    try {
+      await createCategory(categoryFormData).unwrap()
+      toast.success('Category created successfully')
+      setShowCategoryModal(false)
+      setCategoryFormData({ name: '', description: '', icon: '🏷️' })
+      refetchCategories()
+    } catch (error) {
+      toast.error('Failed to create category')
+    }
   }
 
   const handleAddProduct = () => {
@@ -60,7 +77,7 @@ const AdminProducts = () => {
     setFormData({
       name: '',
       description: '',
-      category: 'Temple Heritage',
+      category: categories.length > 0 ? categories[0].name : 'Temple Heritage',
       price: '',
       stock: '',
       material: '',
@@ -338,22 +355,34 @@ const AdminProducts = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category</label>
-                    <select 
-                      name="category"
-                      value={formData.category}
-                      onChange={handleFormChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" 
-                      style={{
-                        borderColor: 'var(--glass-border)',
-                        background: 'var(--glass-light)',
-                        color: 'var(--text-bright)',
-                        '--tw-ring-color': 'var(--teal-bright)'
-                      }}
-                    >
-                      {categories.filter(cat => cat !== 'All').map(cat => (
-                        <option key={cat} value={cat} style={{ background: 'var(--glass)', color: 'var(--text-bright)' }}>{cat}</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select 
+                        name="category"
+                        value={formData.category}
+                        onChange={handleFormChange}
+                        className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" 
+                        style={{
+                          borderColor: 'var(--glass-border)',
+                          background: 'var(--glass-light)',
+                          color: 'var(--text-bright)',
+                          '--tw-ring-color': 'var(--teal-bright)'
+                        }}
+                      >
+                        {categories.map(cat => (
+                          <option key={cat.id} value={cat.name} style={{ background: 'var(--glass)', color: 'var(--text-bright)' }}>{cat.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => setShowCategoryModal(true)}
+                        className="px-3 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors flex items-center justify-center"
+                        title="Create new category"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Price</label>
@@ -433,6 +462,102 @@ const AdminProducts = () => {
             </div>
           </div>
         )}
+
+        <div>
+          {showCategoryModal && (
+          <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
+            <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
+                  Create New Category
+                </h2>
+                <button
+                  onClick={() => setShowCategoryModal(false)}
+                  style={{ color: 'var(--text-soft)' }}
+                  className="hover:opacity-80"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateCategory} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Category Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={categoryFormData.name}
+                    onChange={handleCategoryFormChange}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    placeholder="Enter category name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Description</label>
+                  <textarea
+                    rows="3"
+                    name="description"
+                    value={categoryFormData.description}
+                    onChange={handleCategoryFormChange}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    placeholder="Enter category description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Icon</label>
+                  <input
+                    type="text"
+                    name="icon"
+                    value={categoryFormData.icon}
+                    onChange={handleCategoryFormChange}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: 'var(--glass-border)',
+                      background: 'var(--glass-light)',
+                      color: 'var(--text-bright)',
+                      '--tw-ring-color': 'var(--teal-bright)'
+                    }}
+                    placeholder="🏷️"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCategoryModal(false)}
+                    className="px-4 py-2 rounded-lg transition-colors"
+                    style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-lg transition-colors"
+                    style={{ background: 'var(--teal)', color: 'var(--white)' }}
+                  >
+                    Create Category
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        </div>
       </div>
     </AdminLayout>
   )

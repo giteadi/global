@@ -5,7 +5,9 @@ const {
   createCategory,
   updateCategory,
   deleteCategory,
-  getCategoryStats
+  getCategoryStats,
+  createCategoryAdmin,
+  updateCategoryAdmin
 } = require('../controllers/categoryController')
 
 const router = express.Router()
@@ -16,8 +18,8 @@ router.get('/:id', getCategory)
 
 // Admin routes (without auth middleware for now)
 router.get('/admin/stats', getCategoryStats)
-router.post('/admin', createCategory)
-router.put('/admin/:id', updateCategory)
+router.post('/admin', createCategoryAdmin)
+router.put('/admin/:id', updateCategoryAdmin)
 router.delete('/admin/:id', deleteCategory)
 
 module.exports = router

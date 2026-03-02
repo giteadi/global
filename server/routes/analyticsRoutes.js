@@ -14,6 +14,6 @@ router.get('/', getAnalytics)
 router.get('/dashboard', getDashboardStats)
 router.get('/sales', getSalesAnalytics)
 router.get('/products', getProductAnalytics)
-router.get('/customers', getCustomerAnalytics)
+// router.get('/customers', getCustomerAnalytics) // Temporarily commented out
 
 module.exports = router

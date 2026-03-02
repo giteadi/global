@@ -15,7 +15,7 @@ exports.getDashboardStats = async (req, res) => {
     const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total || 0), 0)
     
     // Get recent orders
-    const recentOrders = await Order.find({}, { limit: 5, sort: 'created_at', order: 'desc' })
+    const recentOrders = await Order.find().sort({ created_at: -1 }).limit(5)
     
     // Get top products (simplified)
     const topProducts = [

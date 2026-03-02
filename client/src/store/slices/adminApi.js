@@ -99,7 +99,7 @@ export const adminApi = createApi({
     }),
     createCategory: builder.mutation({
       query: (categoryData) => ({
-        url: 'categories',
+        url: 'categories/admin',
         method: 'POST',
         body: categoryData
       }),
@@ -107,7 +107,7 @@ export const adminApi = createApi({
     }),
     updateCategory: builder.mutation({
       query: ({ id, ...categoryData }) => ({
-        url: `categories/${id}`,
+        url: `categories/admin/${id}`,
         method: 'PUT',
         body: categoryData
       }),
@@ -115,7 +115,7 @@ export const adminApi = createApi({
     }),
     deleteCategory: builder.mutation({
       query: (id) => ({
-        url: `categories/${id}`,
+        url: `categories/admin/${id}`,
         method: 'DELETE'
       }),
       invalidatesTags: ['Categories']

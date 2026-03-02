@@ -1,5 +1,5 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import AppInitializer from './components/AppInitializer'
 import Navbar from './components/Navbar'
@@ -24,10 +24,22 @@ import AdminAnalytics from './pages/AdminAnalytics'
 import AdminSettings from './pages/AdminSettings'
 import './styles.css'
 
+// Scroll to top component
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
+
 function App() {
   return (
     <AppInitializer>
       <Router>
+        <ScrollToTop />
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-1 pt-16">

@@ -244,7 +244,29 @@ const Home = () => {
             No products available
           </div>
         ) : (
-          <div className="relative max-w-7xl mx-auto px-4">
+          <div className="relative max-w-7xl mx-auto px-16">
+            {/* Left Arrow */}
+            {allProducts.length > 4 && (
+              <button
+                onClick={prevSlide}
+                className="absolute left-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-3 rounded-full text-black text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-12 h-12 flex items-center justify-center"
+                aria-label="Previous"
+              >
+                ←
+              </button>
+            )}
+
+            {/* Right Arrow */}
+            {allProducts.length > 4 && (
+              <button
+                onClick={nextSlide}
+                className="absolute right-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-3 rounded-full text-black text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-12 h-12 flex items-center justify-center"
+                aria-label="Next"
+              >
+                →
+              </button>
+            )}
+
             <div className="overflow-hidden">
               <div
                 className="flex gap-6 transition-transform duration-500 ease-in-out"
@@ -266,38 +288,20 @@ const Home = () => {
             </div>
 
             {allProducts.length > 4 && (
-              <>
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
-                  aria-label="Previous"
-                >
-                  ‹
-                </button>
-
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
-                  aria-label="Next"
-                >
-                  ›
-                </button>
-
-                <div className="flex justify-center mt-8 gap-2">
-                  {Array.from({ length: Math.ceil(allProducts.length / 4) }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToSlide(index)}
-                      className={`w-3 h-3 rounded-full transition-colors ${
-                        currentSlide === index
-                          ? 'bg-yellow-400'
-                          : 'bg-gray-500 hover:bg-gray-400'
-                      }`}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
+              <div className="flex justify-center mt-8 gap-2">
+                {Array.from({ length: Math.ceil(allProducts.length / 4) }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      currentSlide === index
+                        ? 'bg-yellow-400'
+                        : 'bg-gray-500 hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             )}
           </div>
         )}
@@ -337,7 +341,29 @@ const Home = () => {
             No featured products available
           </div>
         ) : (
-          <div className="relative max-w-7xl mx-auto px-4">
+          <div className="relative max-w-7xl mx-auto px-16">
+            {/* Left Arrow */}
+            {featuredProducts.length > 4 && (
+              <button
+                onClick={prevFeaturedSlide}
+                className="absolute left-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-3 rounded-full text-black text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-12 h-12 flex items-center justify-center"
+                aria-label="Previous"
+              >
+                ←
+              </button>
+            )}
+
+            {/* Right Arrow */}
+            {featuredProducts.length > 4 && (
+              <button
+                onClick={nextFeaturedSlide}
+                className="absolute right-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-3 rounded-full text-black text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-12 h-12 flex items-center justify-center"
+                aria-label="Next"
+              >
+                →
+              </button>
+            )}
+
             <div className="overflow-hidden">
               <div
                 className="flex gap-6 transition-transform duration-500 ease-in-out"
@@ -359,38 +385,20 @@ const Home = () => {
             </div>
 
             {featuredProducts.length > 4 && (
-              <>
-                <button
-                  onClick={prevFeaturedSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
-                  aria-label="Previous"
-                >
-                  ‹
-                </button>
-
-                <button
-                  onClick={nextFeaturedSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
-                  aria-label="Next"
-                >
-                  ›
-                </button>
-
-                <div className="flex justify-center mt-8 gap-2">
-                  {Array.from({ length: Math.ceil(featuredProducts.length / 4) }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToFeaturedSlide(index)}
-                      className={`w-3 h-3 rounded-full transition-colors ${
-                        currentFeaturedSlide === index
-                          ? 'bg-yellow-400'
-                          : 'bg-gray-500 hover:bg-gray-400'
-                      }`}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
+              <div className="flex justify-center mt-8 gap-2">
+                {Array.from({ length: Math.ceil(featuredProducts.length / 4) }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToFeaturedSlide(index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      currentFeaturedSlide === index
+                        ? 'bg-yellow-400'
+                        : 'bg-gray-500 hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             )}
           </div>
         )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleCart, closeCart } from '../store/slices/cartSlice'
@@ -6,15 +6,39 @@ import { logout } from '../store/slices/authSlice'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false)
+  const [categories, setCategories] = useState([])
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const { items, isOpen, total } = useSelector(state => state.cart)
   const { user, token, isAdmin } = useSelector(state => state.auth)
 
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:4000/api/products/categories')
+        const data = await response.json()
+        if (data.success) {
+          setCategories(data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
   const handleLogout = () => {
     dispatch(logout())
     navigate('/')
+  }
+
+  const handleCategoryClick = (category) => {
+    setIsCategoryOpen(false)
+    setIsMobileMenuOpen(false)
+    navigate(`/products?category=${encodeURIComponent(category)}`)
   }
 
   const isActive = (path) => location.pathname === path
@@ -48,9 +72,51 @@ const Navbar = () => {
               <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>
                 Home
               </Link>
-              <Link to="/products" className={isActive('/products') ? 'nav-link active' : 'nav-link'}>
-                Products
-              </Link>
+              
+              {/* Categories Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  className="nav-link flex items-center gap-1"
+                >
+                  Categories
+                  <span className="text-xs">{isCategoryOpen ? '▲' : '▼'}</span>
+                </button>
+                
+                {isCategoryOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsCategoryOpen(false)}
+                    ></div>
+                    <div
+                      className="absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-20 py-2"
+                      style={{
+                        background: '#0a2830',
+                        border: '1px solid rgba(37,204,200,0.25)'
+                      }}
+                    >
+                      <button
+                        onClick={() => handleCategoryClick('All')}
+                        className="w-full text-left px-4 py-2 hover:bg-teal-700/30 transition-colors"
+                        style={{ color: 'var(--gold-bright)' }}
+                      >
+                        All Products
+                      </button>
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => handleCategoryClick(category)}
+                          className="w-full text-left px-4 py-2 hover:bg-teal-700/30 transition-colors"
+                          style={{ color: 'var(--text-soft)' }}
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
               <Link to="/about" className={isActive('/about') ? 'nav-link active' : 'nav-link'}>
                 About
               </Link>
@@ -144,9 +210,36 @@ const Navbar = () => {
               <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="nav-link">
                 Home
               </Link>
-              <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="nav-link">
-                Products
-              </Link>
+              
+              {/* Mobile Categories */}
+              <div>
+                <button
+                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  className="nav-link w-full text-left flex items-center justify-between"
+                >
+                  Categories
+                  <span className="text-xs">{isCategoryOpen ? '▲' : '▼'}</span>
+                </button>
+                {isCategoryOpen && (
+                  <div className="pl-4 mt-2 space-y-2">
+                    <button
+                      onClick={() => handleCategoryClick('All')}
+                      className="nav-link w-full text-left text-sm"
+                    >
+                      All Products
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => handleCategoryClick(category)}
+                        className="nav-link w-full text-left text-sm"
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="nav-link">
                 About
               </Link>

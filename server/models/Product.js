@@ -4,28 +4,28 @@ class Product {
   // Get products with filters
   static async getAll(query = {}, options = {}) {
     try {
-      let sql = `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
+      let sql = `SELECT * FROM products WHERE is_active = 1`
       const params = []
 
       // Add filters
       if (query.category && query.category !== 'All') {
-        sql += ` AND c.name = ?`
+        sql += ` AND category = ?`
         params.push(query.category)
       }
 
       if (query.isFeatured !== undefined) {
-        sql += ` AND p.is_featured = ?`
+        sql += ` AND is_featured = ?`
         params.push(query.isFeatured)
       }
 
       // Add search
       if (query.$text) {
-        sql += ` AND MATCH(p.name, p.description) AGAINST(? IN NATURAL LANGUAGE MODE)`
+        sql += ` AND MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)`
         params.push(query.$text.$search)
       }
 
       // Add sorting
-      const sortField = options.sortBy || 'created_at'
+      const sortField = options.sortBy || 'id'
       const sortOrder = options.sortOrder === 'asc' ? 'ASC' : 'DESC'
       sql += ` ORDER BY ${sortField} ${sortOrder}`
 
@@ -65,22 +65,22 @@ class Product {
 
   // Count products
   static async count(query = {}) {
-    let sql = `SELECT COUNT(*) as count FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
+    let sql = `SELECT COUNT(*) as count FROM products WHERE is_active = 1`
     const params = []
 
     if (query.category && query.category !== 'All') {
-      sql += ` AND c.name = ?`
+      sql += ` AND category = ?`
       params.push(query.category)
     }
 
     if (query.isFeatured !== undefined) {
-      sql += ` AND p.is_featured = ?`
+      sql += ` AND is_featured = ?`
       params.push(query.isFeatured)
     }
 
     // Add search
     if (query.$text) {
-      sql += ` AND MATCH(p.name, p.description) AGAINST(? IN NATURAL LANGUAGE MODE)`
+      sql += ` AND MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)`
       params.push(query.$text.$search)
     }
 
@@ -112,12 +112,6 @@ class Product {
 
   // Get distinct categories
   static async getDistinct(field) {
-    if (field === 'category') {
-      const [rows] = await pool.query(
-        `SELECT DISTINCT c.name FROM products p LEFT JOIN categories c ON p.category = c.name WHERE p.is_active = 1`
-      )
-      return rows.map(row => row.name)
-    }
     const [rows] = await pool.query(
       `SELECT DISTINCT ${field} FROM products WHERE is_active = 1`
     )

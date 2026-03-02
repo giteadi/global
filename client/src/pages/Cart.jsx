@@ -71,51 +71,80 @@ const Cart = () => {
               </div>
               
               <div className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.id} className="bg-teal-900/30 border border-teal-600/20 rounded-lg p-4">
-                    <div className="flex gap-4">
-                      <div className="w-20 h-20 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-3xl">{item.icon}</span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h3 className="text-white font-semibold">{item.name}</h3>
-                            <p className="text-yellow-400 text-sm">{item.category}</p>
-                          </div>
-                          <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            className="text-red-400 hover:text-red-300 transition-colors"
-                          >
-                            ✕
-                          </button>
+                {items.map((item) => {
+                  // Parse images if they're in string format
+                  let images = item.images
+                  if (typeof images === 'string') {
+                    try {
+                      images = JSON.parse(images)
+                    } catch {
+                      images = []
+                    }
+                  }
+                  const imageUrl = images && images.length > 0 ? images[0] : null
+
+                  return (
+                    <div key={item.id} className="bg-teal-900/30 border border-teal-600/20 rounded-lg p-4">
+                      <div className="flex gap-4">
+                        <div 
+                          onClick={() => navigate(`/product/${item.id}`)}
+                          className="w-20 h-20 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer hover:ring-2 hover:ring-yellow-400 transition-all"
+                        >
+                          {imageUrl ? (
+                            <img
+                              src={imageUrl}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-3xl">{item.icon || '📦'}</span>
+                          )}
                         </div>
-                        
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h3 
+                                onClick={() => navigate(`/product/${item.id}`)}
+                                className="text-white font-semibold cursor-pointer hover:text-yellow-400 transition-colors"
+                              >
+                                {item.name}
+                              </h3>
+                              <p className="text-yellow-400 text-sm">{item.category}</p>
+                            </div>
                             <button
-                              onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                              className="w-8 h-8 bg-teal-700 hover:bg-teal-600 text-white rounded flex items-center justify-center transition-colors"
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-red-400 hover:text-red-300 transition-colors"
                             >
-                              -
-                            </button>
-                            <span className="text-white w-12 text-center">{item.quantity}</span>
-                            <button
-                              onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                              className="w-8 h-8 bg-teal-700 hover:bg-teal-600 text-white rounded flex items-center justify-center transition-colors"
-                            >
-                              +
+                              ✕
                             </button>
                           </div>
-                          <div className="text-right">
-                            <p className="text-yellow-400 font-semibold">₹{item.price}</p>
-                            <p className="text-white text-sm">₹{(item.price * item.quantity).toFixed(2)}</p>
+                          
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                className="w-8 h-8 bg-teal-700 hover:bg-teal-600 text-white rounded flex items-center justify-center transition-colors"
+                              >
+                                -
+                              </button>
+                              <span className="text-white w-12 text-center">{item.quantity}</span>
+                              <button
+                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                className="w-8 h-8 bg-teal-700 hover:bg-teal-600 text-white rounded flex items-center justify-center transition-colors"
+                              >
+                                +
+                              </button>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-yellow-400 font-semibold">₹{item.price}</p>
+                              <p className="text-white text-sm">₹{(item.price * item.quantity).toFixed(2)}</p>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>

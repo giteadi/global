@@ -82,7 +82,7 @@ const ProductDetail = () => {
 
       // Razorpay options
       const options = {
-        key: 'YOUR_RAZORPAY_KEY_ID', // Replace with actual key
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_XXXXXXXXXXXX',
         amount: order.amount,
         currency: order.currency,
         name: 'Global Exim Traders',

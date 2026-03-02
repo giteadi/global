@@ -1,177 +1,313 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { getFeaturedProducts } from '../store/slices/productsSlice'
+import { getProducts, getFeaturedProducts } from '../store/slices/productsSlice'
 
 const Home = () => {
-  const { featuredProducts } = useSelector(state => state.products)
   const dispatch = useDispatch()
+  const featuredProducts = useSelector(
+    state => state.products.featuredProducts || []
+  )
+  const allProducts = useSelector(
+    state => state.products.products || []
+  )
 
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+
+  // Fetch all products and featured products
   useEffect(() => {
-    dispatch(getFeaturedProducts()).then((action) => {
-      console.log('Featured products from API:', action.payload)
-    })
+    dispatch(getProducts())
+    dispatch(getFeaturedProducts())
   }, [dispatch])
+
+  // Auto Slide for All Products
+  useEffect(() => {
+    if (!isAutoPlaying || allProducts.length <= 4) return
+
+    const maxSlides = Math.ceil(allProducts.length / 4) - 1
+
+    const interval = setInterval(() => {
+      setCurrentSlide(prev =>
+        prev >= maxSlides ? 0 : prev + 1
+      )
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, allProducts])
+
+  // Auto Slide for Featured Products
+  useEffect(() => {
+    if (!isAutoPlaying || featuredProducts.length <= 4) return
+
+    const maxSlides = Math.ceil(featuredProducts.length / 4) - 1
+
+    const interval = setInterval(() => {
+      setCurrentFeaturedSlide(prev =>
+        prev >= maxSlides ? 0 : prev + 1
+      )
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, featuredProducts])
+
+  const nextSlide = () => {
+    if (allProducts.length <= 4) return
+    const maxSlides = Math.ceil(allProducts.length / 4) - 1
+    setCurrentSlide(prev =>
+      prev >= maxSlides ? 0 : prev + 1
+    )
+  }
+
+  const prevSlide = () => {
+    if (allProducts.length <= 4) return
+    const maxSlides = Math.ceil(allProducts.length / 4) - 1
+    setCurrentSlide(prev =>
+      prev === 0 ? maxSlides : prev - 1
+    )
+  }
+
+  const nextFeaturedSlide = () => {
+    if (featuredProducts.length <= 4) return
+    const maxSlides = Math.ceil(featuredProducts.length / 4) - 1
+    setCurrentFeaturedSlide(prev =>
+      prev >= maxSlides ? 0 : prev + 1
+    )
+  }
+
+  const prevFeaturedSlide = () => {
+    if (featuredProducts.length <= 4) return
+    const maxSlides = Math.ceil(featuredProducts.length / 4) - 1
+    setCurrentFeaturedSlide(prev =>
+      prev === 0 ? maxSlides : prev - 1
+    )
+  }
+
+  const goToSlide = index => {
+    setCurrentSlide(index)
+  }
+
+  const goToFeaturedSlide = index => {
+    setCurrentFeaturedSlide(index)
+  }
+
+  const renderProduct = (product) => {
+    let images = product.images
+
+    if (typeof images === 'string') {
+      try {
+        images = JSON.parse(images)
+      } catch {
+        images = []
+      }
+    }
+
+    const imageUrl = images && images.length > 0 ? images[0] : null
+
+    return (
+      <Link
+        to={`/product/${product.id}`}
+        className="block bg-teal-900/40 rounded-lg overflow-hidden border border-teal-700 hover:border-yellow-400 transition-all hover:shadow-lg hover:shadow-yellow-400/20"
+      >
+        <div className="h-48 overflow-hidden bg-teal-800">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <span className="text-5xl">
+                {product.icon || '📦'}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="p-4">
+          <h3 className="text-lg text-yellow-400 font-serif mb-2 truncate">
+            {product.name}
+          </h3>
+          <span className="text-xl text-yellow-400 font-bold">
+            ₹{product.price}
+          </span>
+        </div>
+      </Link>
+    )
+  }
 
   return (
     <div className="min-h-screen py-20 px-4">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-serif mb-6 animate-pulse text-with-shadow" style={{ color: 'var(--gold-bright)' }}>
+      
+      {/* HERO */}
+      <section className="relative h-screen flex items-center justify-center">
+        <div className="text-center max-w-4xl">
+          <h1 className="text-6xl font-serif mb-6 text-yellow-400">
             Global Exim Traders
           </h1>
-          <p className="text-xl md:text-2xl mb-8 font-light text-with-shadow" style={{ color: 'var(--text-soft)' }}>
+          <p className="text-xl text-gray-300 mb-8">
             Where Heritage Meets Global Elegance
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/products" 
-              className="btn-primary"
-            >
+          <div className="flex justify-center gap-4">
+            <Link to="/products" className="btn-primary">
               Explore Collections
             </Link>
-            <Link 
-              to="/about" 
-              className="btn-secondary"
-            >
+            <Link to="/about" className="btn-secondary">
               Our Story
             </Link>
           </div>
         </div>
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="text-3xl" style={{ color: 'var(--gold-bright)' }}>↓</div>
-        </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-sm uppercase tracking-wider" style={{ color: 'var(--gold-bright)' }}>Featured Collections</span>
-            <h2 className="text-4xl md:text-5xl font-serif mt-2 mb-4" style={{ color: 'var(--text-bright)' }}>
-              Exquisite Indian Heritage
-            </h2>
-            <div className="w-24 h-1 mx-auto mb-6" style={{ background: 'var(--gold)' }}></div>
-            <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-soft)' }}>
-              Discover our curated selection of premium jewelry and handicrafts that showcase India's rich artistic heritage
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => {
-              console.log('Rendering product:', product.name, 'Images:', product.images)
-              return (
-              <div key={product.id} className="rounded-lg overflow-hidden transition-all" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
-                <div className="h-64 overflow-hidden">
-                  {(() => {
-                    let images = product.images
-                    
-                    if (typeof images === "string") {
-                      try {
-                        images = JSON.parse(images)
-                      } catch {
-                        images = []
-                      }
-                    }
-                    
-                    return images && images.length > 0 ? (
-                      <img 
-                        src={images[0]} 
-                        alt={product.name} 
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0D6E6C, #1B9E9B)' }}>
-                        <span className="text-6xl">{product.icon}</span>
-                      </div>
-                    )
-                  })()}
-                </div>
-                <div className="p-6">
-                  <span className="text-sm" style={{ color: 'var(--gold-bright)' }}>{product.category}</span>
-                  <h3 className="text-xl font-serif mt-2 mb-3" style={{ color: 'var(--text-bright)' }}>{product.name}</h3>
-                  <p className="text-sm mb-4" style={{ color: 'var(--text-soft)' }}>{product.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold" style={{ color: 'var(--gold-bright)' }}>₹{product.price}</span>
-                    <Link 
-                      to={`/product/${product.id}`}
-                      className="btn-primary text-sm"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )})}
-          </div>
+      {/* ALL PRODUCTS CAROUSEL */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto text-center mb-12">
+          <h2 className="text-4xl font-serif text-yellow-400 mb-4">
+            Top Products
+          </h2>
+          <p className="text-gray-400">
+            Explore our complete collection from all categories
+          </p>
         </div>
-      </section>
 
-      {/* About Preview */}
-      <section className="py-20 px-4" style={{ background: 'rgba(0,0,0,0.2)' }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="text-sm uppercase tracking-wider" style={{ color: 'var(--gold-bright)' }}>Our Excellence</span>
-              <h2 className="text-4xl font-serif mt-2 mb-6" style={{ color: 'var(--text-bright)' }}>
-                Certified & Trusted Exporter
-              </h2>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <span className="text-xl" style={{ color: 'var(--gold-bright)' }}>◆</span>
-                  <div>
-                    <h4 className="font-semibold" style={{ color: 'var(--text-bright)' }}>GSTIN Registered</h4>
-                    <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Fully compliant with all tax regulations</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <span className="text-xl" style={{ color: 'var(--gold-bright)' }}>◆</span>
-                  <div>
-                    <h4 className="font-semibold" style={{ color: 'var(--text-bright)' }}>IEC Code Holder</h4>
-                    <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Authorized for international trade</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <span className="text-xl" style={{ color: 'var(--gold-bright)' }}>◆</span>
-                  <div>
-                    <h4 className="font-semibold" style={{ color: 'var(--text-bright)' }}>Premium Quality</h4>
-                    <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Export-grade craftsmanship guaranteed</p>
-                  </div>
-                </div>
-              </div>
-              <Link 
-                to="/about" 
-                className="btn-secondary mt-8"
+        {allProducts.length === 0 ? (
+          <div className="text-center text-gray-400">
+            No products available
+          </div>
+        ) : (
+          <div className="relative max-w-7xl mx-auto px-4">
+            <div className="overflow-hidden">
+              <div
+                className="flex gap-6 transition-transform duration-500 ease-in-out"
+                style={{
+                  transform: allProducts.length > 4 
+                    ? `translateX(-${currentSlide * 25}%)` 
+                    : 'none'
+                }}
               >
-                Learn More About Us
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-6 rounded-lg" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
-                <span className="text-3xl">🏛️</span>
-                <h4 className="font-semibold mt-2" style={{ color: 'var(--text-bright)' }}>Temple Jewelry</h4>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-soft)' }}>Traditional designs</p>
-              </div>
-              <div className="p-6 rounded-lg" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
-                <span className="text-3xl">💎</span>
-                <h4 className="font-semibold mt-2" style={{ color: 'var(--text-bright)' }}>Ethnic Fashion</h4>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-soft)' }}>Modern elegance</p>
-              </div>
-              <div className="p-6 rounded-lg" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
-                <span className="text-3xl">🏺</span>
-                <h4 className="font-semibold mt-2" style={{ color: 'var(--text-bright)' }}>Artisan Décor</h4>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-soft)' }}>Handcrafted pieces</p>
-              </div>
-              <div className="p-6 rounded-lg" style={{ background: 'rgba(27,158,155,0.1)', border: '1px solid rgba(37,204,200,0.12)' }}>
-                <span className="text-3xl">📦</span>
-                <h4 className="font-semibold mt-2" style={{ color: 'var(--text-bright)' }}>Export Grade</h4>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-soft)' }}>Global standards</p>
+                {allProducts.map(product => (
+                  <div
+                    key={product.id}
+                    className="flex-shrink-0 w-64"
+                  >
+                    {renderProduct(product)}
+                  </div>
+                ))}
               </div>
             </div>
+
+            {allProducts.length > 4 && (
+              <>
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
+                  aria-label="Previous"
+                >
+                  ‹
+                </button>
+
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
+                  aria-label="Next"
+                >
+                  ›
+                </button>
+
+                <div className="flex justify-center mt-8 gap-2">
+                  {Array.from({ length: Math.ceil(allProducts.length / 4) }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-colors ${
+                        currentSlide === index
+                          ? 'bg-yellow-400'
+                          : 'bg-gray-500 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
+        )}
+      </section>
+
+      {/* FEATURED SECTION */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto text-center mb-12">
+          <h2 className="text-4xl font-serif text-yellow-400 mb-4">
+            Featured Collections
+          </h2>
+          <p className="text-gray-400">
+            Discover our curated selection of premium jewelry & handicrafts
+          </p>
         </div>
+
+        {featuredProducts.length === 0 ? (
+          <div className="text-center text-gray-400">
+            No featured products available
+          </div>
+        ) : (
+          <div className="relative max-w-7xl mx-auto px-4">
+            <div className="overflow-hidden">
+              <div
+                className="flex gap-6 transition-transform duration-500 ease-in-out"
+                style={{
+                  transform: featuredProducts.length > 4 
+                    ? `translateX(-${currentFeaturedSlide * 25}%)` 
+                    : 'none'
+                }}
+              >
+                {featuredProducts.map(product => (
+                  <div
+                    key={product.id}
+                    className="flex-shrink-0 w-64"
+                  >
+                    {renderProduct(product)}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {featuredProducts.length > 4 && (
+              <>
+                <button
+                  onClick={prevFeaturedSlide}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
+                  aria-label="Previous"
+                >
+                  ‹
+                </button>
+
+                <button
+                  onClick={nextFeaturedSlide}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-teal-700/80 hover:bg-teal-600 p-3 rounded-full text-white text-2xl transition-colors z-10"
+                  aria-label="Next"
+                >
+                  ›
+                </button>
+
+                <div className="flex justify-center mt-8 gap-2">
+                  {Array.from({ length: Math.ceil(featuredProducts.length / 4) }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToFeaturedSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-colors ${
+                        currentFeaturedSlide === index
+                          ? 'bg-yellow-400'
+                          : 'bg-gray-500 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </section>
     </div>
   )

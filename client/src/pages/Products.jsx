@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setProducts, setLoading } from '../store/slices/productsSlice'
 import { addToCart } from '../store/slices/cartSlice'
@@ -8,11 +8,20 @@ import toast from 'react-hot-toast'
 const Products = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { products, loading } = useSelector(state => state.products)
   const { user } = useSelector(state => state.auth)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [categories, setCategories] = useState([])
+
+  // Read category from URL on mount
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category')
+    if (categoryFromUrl && categoryFromUrl !== 'All') {
+      setSelectedCategory(decodeURIComponent(categoryFromUrl))
+    }
+  }, [searchParams])
 
   const fetchProducts = async () => {
     try {

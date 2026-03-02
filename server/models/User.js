@@ -96,7 +96,7 @@ class User {
       const validSort = allowedSortFields.includes(sort) ? sort : 'created_at'
       const validOrder = order === 'asc' ? 'ASC' : 'DESC'
       
-      let query = 'SELECT id, name, email, phone, role, status, is_active, created_at FROM users'
+      let query = 'SELECT id, name, email, phone, role, status, is_active, created_at, password FROM users'
       const params = []
       
       // Add filters

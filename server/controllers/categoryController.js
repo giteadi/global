@@ -4,7 +4,7 @@ const Product = require('../models/Product')
 // Get all categories
 exports.getCategories = async (req, res) => {
   try {
-    const categories = await Category.find({ sort: 'name', order: 'asc' })
+    const categories = await Category.findAll()
 
     // Add product count to each category
     const categoriesWithCount = await Promise.all(

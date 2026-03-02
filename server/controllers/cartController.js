@@ -4,7 +4,7 @@ const Product = require('../models/Product')
 // Get user's cart
 exports.getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user.id })
+    let cart = await Cart.findByUser(req.user.id)
 
     if (!cart) {
       cart = await Cart.create({ user: req.user.id, items: [] })
@@ -73,7 +73,7 @@ exports.updateCartItem = async (req, res) => {
   try {
     const { productId, quantity } = req.body
 
-    const cart = await Cart.findOne({ user: req.user.id })
+    const cart = await Cart.findByUser(req.user.id)
     if (!cart) {
       return res.status(404).json({
         success: false,
@@ -99,7 +99,7 @@ exports.updateCartItem = async (req, res) => {
       cart.items[itemIndex].quantity = quantity
     }
 
-    await cart.save()
+    await cart.update({ items: cart.items })
 
     res.json({
       success: true,

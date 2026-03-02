@@ -15,7 +15,7 @@ exports.getDashboardStats = async (req, res) => {
     const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total || 0), 0)
     
     // Get recent orders
-    const recentOrders = await Order.find().sort({ created_at: -1 }).limit(5)
+    const recentOrders = await Order.find({}, { limit: 5, sort: 'created_at', order: 'desc' })
     
     // Get top products (simplified)
     const topProducts = [
@@ -137,18 +137,23 @@ exports.getAnalytics = async (req, res) => {
       const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total || 0), 0)
 
       // Get recent orders
-      const recentOrders = await Order.find().sort({ created_at: -1 }).limit(5)
+      const recentOrders = await Order.find({}, { limit: 5, sort: 'created_at', order: 'desc' })
 
-      // Get top categories (simplified aggregation)
-      const categoryData = await Product.aggregate([
-        { $group: { _id: '$category', count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 5 }
-      ])
+      // Get top categories using SQL query instead of aggregate
+      const { pool } = require('../config/database')
+      const [categoryData] = await pool.query(`
+        SELECT c.name as category_name, COUNT(p.id) as product_count 
+        FROM categories c 
+        LEFT JOIN products p ON c.name = p.category 
+        WHERE p.is_active = 1 OR p.is_active IS NULL
+        GROUP BY c.name 
+        ORDER BY product_count DESC 
+        LIMIT 5
+      `)
 
       const topCategories = categoryData.map(cat => ({
-        name: cat._id,
-        products_count: cat.count,
+        name: cat.category_name,
+        products_count: cat.product_count,
         percentage: 0 // Would need more complex calculation
       }))
 

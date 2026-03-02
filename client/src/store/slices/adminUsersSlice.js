@@ -148,4 +148,7 @@ const adminUsersSlice = createSlice({
 })
 
 export const { clearUsers, setUserFilter } = adminUsersSlice.actions
+export const getAdminUsers = (params) => async (dispatch) => {
+  await dispatch(fetchUsers(params))
+}
 export default adminUsersSlice.reducer

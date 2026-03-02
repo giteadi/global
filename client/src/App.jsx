@@ -1,8 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Provider } from 'react-redux'
 import { Toaster } from 'react-hot-toast'
-import { store } from './store/store'
+import AppInitializer from './components/AppInitializer'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -27,7 +26,7 @@ import './styles.css'
 
 function App() {
   return (
-    <Provider store={store}>
+    <AppInitializer>
       <Router>
         <div className="min-h-screen">
           <Navbar />
@@ -78,7 +77,7 @@ function App() {
           }}
         />
       </Router>
-    </Provider>
+    </AppInitializer>
   )
 }
 

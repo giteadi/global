@@ -22,7 +22,7 @@ const auth = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key')
 
       // Get user from token
-      const user = await User.findById(decoded.id).select('-password')
+      const user = await User.findById(decoded.id)
 
       if (!user || !user.is_active) {
         return res.status(401).json({

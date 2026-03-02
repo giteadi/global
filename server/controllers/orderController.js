@@ -38,10 +38,7 @@ exports.getOrders = async (req, res) => {
 // Get single order
 exports.getOrder = async (req, res) => {
   try {
-    const order = await Order.findOne({
-      _id: req.params.id,
-      user: req.user.id
-    })
+    const order = await Order.findById(req.params.id)
 
     if (!order) {
       return res.status(404).json({
@@ -69,7 +66,7 @@ exports.createOrder = async (req, res) => {
     const { shippingAddress, paymentMethod, notes } = req.body
 
     // Get user's cart
-    const cart = await Cart.findOne({ user: req.user.id })
+    const cart = await Cart.findByUser(req.user.id)
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({
         success: false,
@@ -200,10 +197,7 @@ exports.updateOrderStatus = async (req, res) => {
 // Cancel order (user)
 exports.cancelOrder = async (req, res) => {
   try {
-    const order = await Order.findOne({
-      _id: req.params.id,
-      user: req.user.id
-    })
+    const order = await Order.findById(req.params.id)
 
     if (!order) {
       return res.status(404).json({

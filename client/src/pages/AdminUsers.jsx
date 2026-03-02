@@ -1,78 +1,55 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useGetUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation } from '../store/slices/adminApi'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAdminUsers } from '../store/slices/adminUsersSlice'
 
 const AdminUsers = () => {
+  const dispatch = useDispatch()
+  const { users, loading, error } = useSelector(state => state.adminUsers)
   const [roleFilter, setRoleFilter] = useState('All')
-  const params = roleFilter !== 'All' ? { role: roleFilter } : {}
-  const { data: usersData, isLoading: loading, error, refetch } = useGetUsersQuery(params)
-  const [createUser] = useCreateUserMutation()
-  const [updateUser] = useUpdateUserMutation()
-  const [deleteUser] = useDeleteUserMutation()
 
+  useEffect(() => {
+    const params = roleFilter !== 'All' ? { role: roleFilter } : {}
+    dispatch(getAdminUsers(params))
+  }, [dispatch, roleFilter])
+
+  const filteredUsers = roleFilter === 'All' ? users : users.filter(user => user.role === roleFilter)
+  const roles = ['All', 'customer', 'admin']
+
+  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     role: 'customer',
     status: 'Active'
   })
-
-  const users = usersData?.data?.users || []
-  const filteredUsers = roleFilter === 'All' ? users : users.filter(user => user.role === roleFilter)
-  const roles = ['All', 'customer', 'admin']
-
-  const handleAddUser = () => {
-    setEditingUser(null)
-    setFormData({ name: '', email: '', role: 'customer', status: 'Active' })
-    setIsModalOpen(true)
-  }
 
   const handleEditUser = (user) => {
     setEditingUser(user)
     setFormData({
       name: user.name || '',
       email: user.email || '',
+      password: user.password || '',
       role: user.role || 'customer',
       status: user.status || 'Active'
     })
     setIsModalOpen(true)
   }
 
-  const handleSubmit = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault()
     try {
       if (editingUser) {
-        await updateUser({ id: editingUser._id, ...formData }).unwrap()
-      } else {
-        await createUser(formData).unwrap()
+        await dispatch(updateUser({ id: editingUser.id, userData: formData })).unwrap()
+        alert('User updated successfully')
+        setIsModalOpen(false)
+        dispatch(getAdminUsers(roleFilter !== 'All' ? { role: roleFilter } : {}))
       }
-      setIsModalOpen(false)
-      refetch()
-    } catch (err) {
-      console.error('Error saving user:', err)
-    }
-  }
-
-  const handleToggleStatus = async (user) => {
-    try {
-      const newStatus = user.status === 'Active' ? 'Inactive' : 'Active'
-      await updateUser({ id: user._id, status: newStatus }).unwrap()
-      refetch()
-    } catch (err) {
-      console.error('Error updating status:', err)
-    }
-  }
-
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await deleteUser(userId).unwrap()
-        refetch()
-      } catch (err) {
-        console.error('Error deleting user:', err)
-      }
+    } catch (error) {
+      alert('Failed to update user')
     }
   }
 
@@ -87,7 +64,6 @@ const AdminUsers = () => {
           </div>
           <button
             className="btn-primary"
-            onClick={handleAddUser}
           >
             Add New User
           </button>
@@ -184,7 +160,7 @@ const AdminUsers = () => {
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
-                    <tr key={user._id} className="hover:opacity-80">
+                    <tr key={user.id} className="hover:opacity-80">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style={{ background: 'var(--teal)' }}>
@@ -220,11 +196,8 @@ const AdminUsers = () => {
                         <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80" onClick={() => handleEditUser(user)}>
                           Edit
                         </button>
-                        <button style={{ color: 'var(--gold-bright)' }} className="mr-3 hover:opacity-80" onClick={() => handleToggleStatus(user)}>
+                        <button style={{ color: 'var(--gold-bright)' }} className="hover:opacity-80">
                           {user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                        </button>
-                        <button style={{ color: 'var(--red)' }} className="hover:opacity-80" onClick={() => handleDeleteUser(user._id)}>
-                          Delete
                         </button>
                       </td>
                     </tr>
@@ -234,103 +207,129 @@ const AdminUsers = () => {
             </table>
           </div>
         </div>
+      </div>
 
-        {/* Modal for Add/Edit User */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="p-6 rounded-lg w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-bright)' }}>
+      {/* Edit User Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
+          <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
                 {editingUser ? 'Edit User' : 'Add New User'}
               </h2>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Name</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: 'var(--glass-border)',
-                      background: 'var(--glass-light)',
-                      color: 'var(--text-bright)',
-                      '--tw-ring-color': 'var(--teal-bright)'
-                    }}
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: 'var(--glass-border)',
-                      background: 'var(--glass-light)',
-                      color: 'var(--text-bright)',
-                      '--tw-ring-color': 'var(--teal-bright)'
-                    }}
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Role</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: 'var(--glass-border)',
-                      background: 'var(--glass-light)',
-                      color: 'var(--text-bright)',
-                      '--tw-ring-color': 'var(--teal-bright)'
-                    }}
-                  >
-                    <option value="customer">Customer</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: 'var(--glass-border)',
-                      background: 'var(--glass-light)',
-                      color: 'var(--text-bright)',
-                      '--tw-ring-color': 'var(--teal-bright)'
-                    }}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 rounded-lg"
-                    style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-lg"
-                    style={{ background: 'var(--teal)', color: 'white' }}
-                  >
-                    {editingUser ? 'Update' : 'Create'}
-                  </button>
-                </div>
-              </form>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                style={{ color: 'var(--text-soft)' }}
+                className="hover:opacity-80"
+              >
+                ✕
+              </button>
             </div>
+
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--glass-border)',
+                    background: 'var(--glass-light)',
+                    color: 'var(--text-bright)',
+                    '--tw-ring-color': 'var(--teal-bright)'
+                  }}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--glass-border)',
+                    background: 'var(--glass-light)',
+                    color: 'var(--text-bright)',
+                    '--tw-ring-color': 'var(--teal-bright)'
+                  }}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Password</label>
+                <input
+                  type="text"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--glass-border)',
+                    background: 'var(--glass-light)',
+                    color: 'var(--text-bright)',
+                    '--tw-ring-color': 'var(--teal-bright)'
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Role</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--glass-border)',
+                    background: 'var(--glass-light)',
+                    color: 'var(--text-bright)',
+                    '--tw-ring-color': 'var(--teal-bright)'
+                  }}
+                >
+                  <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--glass-border)',
+                    background: 'var(--glass-light)',
+                    color: 'var(--text-bright)',
+                    '--tw-ring-color': 'var(--teal-bright)'
+                  }}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 rounded-lg transition-colors"
+                  style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg transition-colors"
+                  style={{ background: 'var(--teal)', color: 'var(--white)' }}
+                >
+                  {editingUser ? 'Update User' : 'Add User'}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </AdminLayout>
   )
 }

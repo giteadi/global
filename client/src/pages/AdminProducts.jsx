@@ -200,7 +200,7 @@ const AdminProducts = () => {
                 }}
               >
                 {categories.map(cat => (
-                  <option key={cat} value={cat} style={{ background: 'var(--glass)', color: 'var(--text-bright)' }}>{cat}</option>
+                  <option key={cat.id} value={cat.name} style={{ background: 'var(--glass)', color: 'var(--text-bright)' }}>{cat.name}</option>
                 ))}
               </select>
             </div>
@@ -245,7 +245,7 @@ const AdminProducts = () => {
                       Loading products...
                     </td>
                   </tr>
-                ) : filteredProducts.length === 0 ? (
+                ) : products.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-12">
                       <div className="text-center">
@@ -260,7 +260,7 @@ const AdminProducts = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((product) => (
+                  products.map((product) => (
                     <tr key={product.id} className="hover:opacity-80">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">

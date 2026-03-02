@@ -1,6 +1,11 @@
 const { pool } = require('../config/database')
 
 class Cart {
+  // Find cart by user ID (alias for findOne)
+  static async findByUser(userId) {
+    return await this.findOne({ user: userId })
+  }
+
   // Find cart by user ID
   static async findOne(query) {
     const [rows] = await pool.query(
@@ -77,6 +82,11 @@ class Cart {
         flattenedValues
       )
     }
+  }
+
+  // Update cart (alias for findOneAndUpdate)
+  static async update(query, updates) {
+    return await this.findOneAndUpdate(query, updates)
   }
 
   // Update cart

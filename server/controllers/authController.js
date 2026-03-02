@@ -344,11 +344,12 @@ exports.createUser = async (req, res) => {
 // Admin: Update user
 exports.updateUser = async (req, res) => {
   try {
-    const { name, email, role, status, phone, street, city, state, pincode, country } = req.body
+    const { name, email, password, role, status, phone, street, city, state, pincode, country } = req.body
 
     const user = await User.findByIdAndUpdate(req.params.id, {
       name,
       email,
+      password,
       role,
       status,
       phone,
@@ -400,6 +401,29 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error deleting user',
+      error: error.message
+    })
+  }
+}
+
+// Admin: Reset all user passwords to plain text (Development only)
+exports.resetAllPasswords = async (req, res) => {
+  try {
+    // This is for development only - resets all passwords to plain text format
+    const { pool } = require('../config/database')
+
+    // Reset all passwords to 'password{user_id}' format
+    await pool.query('UPDATE users SET password = CONCAT("password", id)')
+
+    res.json({
+      success: true,
+      message: 'All user passwords reset to plain text',
+      example: 'User ID 1 password: password1, User ID 2 password: password2, etc.'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error resetting passwords',
       error: error.message
     })
   }

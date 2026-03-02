@@ -98,7 +98,7 @@ const AdminOrders = () => {
                 </tr>
               </thead>
               <tbody style={{ background: 'var(--glass-light)', borderColor: 'var(--glass-border)' }} className="divide-y">
-                {loading ? (
+                {isLoading ? (
                   <tr>
                     <td colSpan="7" className="px-6 py-12 text-center" style={{ color: 'var(--text-soft)' }}>
                       <div className="text-6xl mb-4">⏳</div>
@@ -113,7 +113,7 @@ const AdminOrders = () => {
                         Error loading orders
                       </div>
                       <div className="text-sm" style={{ color: 'var(--text-soft)' }}>
-                        {error}
+                        {error?.message || error?.data?.message || 'An error occurred'}
                       </div>
                     </td>
                   </tr>

@@ -383,6 +383,35 @@ const Home = () => {
         pointerEvents: 'none'
       }}></div>
       
+      {/* Bubbles Animation */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        pointerEvents: 'none'
+      }}>
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              bottom: '-20px',
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 20 + 5}px`,
+              height: `${Math.random() * 20 + 5}px`,
+              background: `rgba(${Math.random() * 50 + 200}, ${Math.random() * 50 + 50}, ${Math.random() * 50 + 150}, ${Math.random() * 0.3 + 0.2})`,
+              borderRadius: '50%',
+              animation: `bubbleRise ${Math.random() * 8 + 6}s linear infinite`,
+              animationDelay: `${Math.random() * 10}s`,
+              filter: 'blur(1px)'
+            }}
+          />
+        ))}
+      </div>
+      
       {/* HERO */}
       <section className="relative py-24 flex items-center justify-center" style={{
         backgroundImage: 'linear-gradient(to bottom, rgba(8,25,30,0.65) 0%, rgba(8,25,30,0.3) 35%, rgba(8,25,30,0.7) 100%)',

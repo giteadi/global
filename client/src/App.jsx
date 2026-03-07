@@ -95,7 +95,7 @@ function App() {
       <AppInitializer>
         <Router>
           <ScrollToTop />
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen relative">
             <Navbar />
             <main className="flex-1 pt-16">
               <Suspense fallback={<PageLoader />}>
@@ -123,6 +123,11 @@ function App() {
               </Suspense>
             </main>
             <Footer />
+          </div>
+          <div className="bubbles-container">
+            {Array.from({length: 10}, (_, i) => (
+              <div key={i} className="bubble"></div>
+            ))}
           </div>
           <Toaster
             position="top-right"

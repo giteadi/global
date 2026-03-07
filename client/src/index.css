@@ -42,7 +42,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 20, 50, 0.3);
   z-index: -1;
   background-image: url('/src/assets/buddha-image.jpg');
   background-attachment: fixed;
@@ -145,6 +145,23 @@ nav {
   75% { 
     transform: scale(1.1) rotate(270deg);
     opacity: 0.2;
+  }
+}
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
   }
 }
 

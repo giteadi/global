@@ -314,7 +314,7 @@ const AdminProducts = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {product.images && product.images.length > 0 ? (
-                            <img src={product.images[0]} alt="" className="w-10 h-10 object-cover mr-3 rounded" />
+                        <img src={product.images[0]} alt="" loading="lazy" className="w-10 h-10 object-cover mr-3 rounded" />
                           ) : (
                             <div className="text-2xl mr-3">{product.icon}</div>
                           )}
@@ -672,6 +672,7 @@ const AdminProducts = () => {
                           <img 
                             src={img} 
                             alt={`Product ${idx + 1}`} 
+                            loading="lazy"
                             className="w-full h-24 object-cover rounded border"
                             style={{ borderColor: 'var(--glass-border)' }}
                           />

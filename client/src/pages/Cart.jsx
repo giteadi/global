@@ -105,6 +105,7 @@ const Cart = () => {
                         <img
                           src={imageUrl}
                           alt={item.name}
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                       ) : (

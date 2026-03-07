@@ -109,102 +109,414 @@ const Home = () => {
     return (
       <Link
         to={`/product/${product.id}`}
-        className="block bg-teal-900/40 rounded-lg overflow-hidden border border-teal-700 hover:border-yellow-400 transition-all hover:shadow-lg hover:shadow-yellow-400/20"
+        className="block overflow-hidden transition-all hover:shadow-xl hover:shadow-teal-400/20"
+        style={{
+          background: 'var(--glass-card)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '12px',
+          backdropFilter: 'blur(8px)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
       >
-        <div className="h-48 overflow-hidden bg-teal-800">
+        <div className="h-56 overflow-hidden" style={{
+          background: 'linear-gradient(135deg, rgba(10,40,45,0.8), rgba(10,50,55,0.6))'
+        }}>
           {imageUrl ? (
             <img
               src={imageUrl}
               alt={product.name}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              style={{
+                filter: 'brightness(0.9) contrast(1.1)'
+              }}
             />
           ) : (
             <div className="h-full flex items-center justify-center">
-              <span className="text-5xl">
+              <span className="text-6xl opacity-60">
                 {product.icon || '📦'}
               </span>
             </div>
           )}
         </div>
-        <div className="p-4">
-          <h3 className="text-lg text-yellow-400 font-serif mb-2 truncate">
+        <div className="p-6" style={{
+          background: 'linear-gradient(to bottom, rgba(10,40,45,0.9), rgba(8,30,35,0.95))'
+        }}>
+          <h3 style={{
+            fontFamily: 'Playfair Display, serif',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            color: 'var(--gold-bright)',
+            marginBottom: '0.75rem',
+            lineHeight: '1.3'
+          }}>
             {product.name}
           </h3>
-          <span className="text-xl text-yellow-400 font-bold">
-            ₹{product.price}
-          </span>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: '1rem'
+          }}>
+            <span style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: 'var(--teal-bright)',
+              letterSpacing: '0.02em'
+            }}>
+              ₹{product.price}
+            </span>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              background: 'var(--gold-bright)',
+              borderRadius: '50%',
+              boxShadow: '0 0 12px rgba(224,194,128,0.6)'
+            }}></div>
+          </div>
         </div>
       </Link>
     )
   }
 
   return (
-    <div className="min-h-screen py-20 px-4">
+    <div className="min-h-screen" style={{
+      background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
+      backdropFilter: 'blur(2px)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'radial-gradient(ellipse at center, rgba(37,204,200,0.1) 0%, transparent 70%)',
+        animation: 'waterWave 8s ease-in-out infinite',
+        pointerEvents: 'none'
+      }}></div>
       
       {/* HERO */}
-      <section className="relative py-16 flex items-center justify-center">
-        <div className="text-center max-w-4xl">
+      <section className="relative py-24 flex items-center justify-center" style={{
+        backgroundImage: 'linear-gradient(to bottom, rgba(8,25,30,0.65) 0%, rgba(8,25,30,0.3) 35%, rgba(8,25,30,0.7) 100%)',
+        backgroundAttachment: 'fixed'
+      }}>
+        <div className="text-center max-w-6xl px-6">
+          <div className="hero-eyebrow" style={{
+            fontFamily: 'Raleway, sans-serif',
+            fontSize: '0.65rem',
+            fontWeight: '700',
+            letterSpacing: '0.65em',
+            color: 'var(--teal-bright)',
+            textTransform: 'uppercase',
+            marginBottom: '2rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <span style={{
+              display: 'inline-block',
+              width: '35px',
+              height: '1px',
+              background: 'var(--teal)'
+            }}></span>
+            WELCOME TO
+            <span style={{
+              display: 'inline-block',
+              width: '35px',
+              height: '1px',
+              background: 'var(--teal)'
+            }}></span>
+          </div>
           <motion.h1 
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-6xl font-serif mb-6 text-yellow-400"
+            className="hero-title"
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(3.5rem,8vw,7.5rem)',
+              fontWeight: '900',
+              lineHeight: '0.93',
+              letterSpacing: '-0.02em',
+              color: '#FFFFFF',
+              textShadow: '4px 4px 12px rgba(0,0,0,0.8)',
+              marginBottom: '0.5rem'
+            }}
           >
             Global Exim Traders
+            <span className="brand-exim" style={{
+              display: 'block',
+              fontStyle: 'italic',
+              color: 'var(--gold-bright)',
+              fontFamily: 'Lora, serif',
+              fontSize: 'clamp(1.1rem,2vw,1.6rem)'
+            }}>
+              Where Heritage Meets Global Elegance
+            </span>
           </motion.h1>
+          
+          <div className="lotus-divider" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            margin: '2rem 0'
+          }}>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '100px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+            <div className="lotus-gem" style={{
+              width: '9px',
+              height: '9px',
+              background: 'var(--teal-bright)',
+              transform: 'rotate(45deg)',
+              animation: 'floatLotus 4s ease-in-out infinite'
+            }}></div>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '100px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+          </div>
+          
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl text-gray-300 mb-8"
+            className="hero-tagline"
+            style={{
+              fontFamily: 'Lora, serif',
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.1rem,2vw,1.6rem)',
+              color: 'var(--text-soft)',
+              marginBottom: '1rem'
+            }}
           >
-            Where Heritage Meets Global Elegance
+            Discover authentic Indian craftsmanship & premium export-quality collections
           </motion.p>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="hero-subtitle"
+            style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.88rem',
+              fontWeight: '300',
+              letterSpacing: '0.06em',
+              color: 'var(--text-muted)',
+              lineHeight: '1.9',
+              marginBottom: '3rem'
+            }}
+          >
+            Curated selection of finest jewelry and handicrafts from traditional artisans
+          </motion.p>
+          
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex justify-center gap-4 mb-8"
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex justify-center gap-6 mb-12"
           >
-            <Link to="/products" className="btn-primary">
+            <Link to="/products" className="btn-primary" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.7rem',
+              fontWeight: '700',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              color: '#071e24',
+              background: 'var(--teal-bright)',
+              padding: '1rem 2.4rem',
+              textDecoration: 'none',
+              display: 'inline-block',
+              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 0.3s'
+            }}>
               Explore Collections
             </Link>
-            <Link to="/about" className="btn-secondary">
+            <Link to="/about" className="btn-secondary" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.7rem',
+              fontWeight: '600',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: 'var(--gold-bright)',
+              background: 'rgba(10,40,45,0.5)',
+              padding: '1rem 2.4rem',
+              border: '1px solid rgba(200,162,110,0.45)',
+              textDecoration: 'none',
+              display: 'inline-block',
+              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
+              backdropFilter: 'blur(8px)',
+              transition: 'all 0.35s'
+            }}>
               Our Story
             </Link>
           </motion.div>
           
+          {/* Trust Badges */}
+          <div className="trust-row" style={{
+            position: 'relative',
+            zIndex: '10',
+            width: '100%',
+            background: 'rgba(8,30,35,0.82)',
+            backdropFilter: 'blur(16px)',
+            borderTop: '1px solid var(--glass-border)',
+            padding: '1.3rem 4%',
+            marginTop: '4rem',
+            borderRadius: '8px'
+          }}>
+            <div className="trust-label-v" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.58rem',
+              fontWeight: '700',
+              letterSpacing: '0.4em',
+              color: 'var(--teal)',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              marginBottom: '1rem'
+            }}>
+              TRUSTED BY GLOBAL CLIENTS
+            </div>
+            <div className="trust-badges-v" style={{
+              display: 'flex',
+              gap: '1.8rem',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
+            }}>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ EXPORT QUALITY
+              </div>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ AUTHENTIC HANDICRAFTS
+              </div>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ PREMIUM JEWELRY
+              </div>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ GLOBAL SHIPPING
+              </div>
+            </div>
+          </div>
+          
           {/* Additional Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 text-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50"
+              className="p-8 rounded-lg"
+              style={{
+                background: 'var(--glass-card)',
+                border: '1px solid var(--glass-border)',
+                backdropFilter: 'blur(8px)'
+              }}
             >
-              <div className="text-4xl mb-3">🏛️</div>
-              <h3 className="text-lg font-semibold text-yellow-400 mb-2">Traditional Heritage</h3>
-              <p className="text-sm text-gray-300">Authentic Indian craftsmanship passed through generations</p>
+              <div className="text-5xl mb-4">🏛️</div>
+              <h3 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: 'var(--gold-bright)',
+                marginBottom: '1rem'
+              }}>Traditional Heritage</h3>
+              <p style={{
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: 'var(--text-soft)',
+                lineHeight: '1.6'
+              }}>Authentic Indian craftsmanship passed through generations</p>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 }}
-              className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50"
+              className="p-8 rounded-lg"
+              style={{
+                background: 'var(--glass-card)',
+                border: '1px solid var(--glass-border)',
+                backdropFilter: 'blur(8px)'
+              }}
             >
-              <div className="text-4xl mb-3">🌍</div>
-              <h3 className="text-lg font-semibold text-yellow-400 mb-2">Global Quality</h3>
-              <p className="text-sm text-gray-300">Export-grade products meeting international standards</p>
+              <div className="text-5xl mb-4">🌍</div>
+              <h3 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: 'var(--gold-bright)',
+                marginBottom: '1rem'
+              }}>Global Quality</h3>
+              <p style={{
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: 'var(--text-soft)',
+                lineHeight: '1.6'
+              }}>Export-grade products meeting international standards</p>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.0 }}
-              className="p-6 rounded-lg bg-teal-900/30 border border-teal-700/50"
+              className="p-8 rounded-lg"
+              style={{
+                background: 'var(--glass-card)',
+                border: '1px solid var(--glass-border)',
+                backdropFilter: 'blur(8px)'
+              }}
             >
-              <div className="text-4xl mb-3">✨</div>
-              <h3 className="text-lg font-semibold text-yellow-400 mb-2">Premium Collection</h3>
-              <p className="text-sm text-gray-300">Curated selection of finest jewelry and handicrafts</p>
+              <div className="text-5xl mb-4">✨</div>
+              <h3 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: 'var(--gold-bright)',
+                marginBottom: '1rem'
+              }}>Premium Collection</h3>
+              <p style={{
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: 'var(--text-soft)',
+                lineHeight: '1.6'
+              }}>Curated selection of finest jewelry and handicrafts</p>
             </motion.div>
           </div>
         </div>
@@ -216,40 +528,118 @@ const Home = () => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="py-20"
+        className="py-24"
+        style={{
+          background: 'linear-gradient(to bottom, transparent, rgba(8,30,35,0.4))'
+        }}
       >
-        <div className="max-w-7xl mx-auto text-center mb-12">
+        <div className="max-w-7xl mx-auto text-center mb-16 px-6">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-4xl font-serif text-yellow-400 mb-4"
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(2.5rem,5vw,4rem)',
+              fontWeight: '700',
+              color: 'var(--text-bright)',
+              marginBottom: '1rem',
+              letterSpacing: '-0.01em'
+            }}
           >
             Top Products
           </motion.h2>
+          <div className="lotus-divider" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            margin: '1.5rem auto'
+          }}>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '80px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+            <div className="lotus-gem" style={{
+              width: '9px',
+              height: '9px',
+              background: 'var(--teal-bright)',
+              transform: 'rotate(45deg)',
+              animation: 'floatLotus 4s ease-in-out infinite'
+            }}></div>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '80px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+          </div>
           <motion.p 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-400"
+            style={{
+              fontFamily: 'Lora, serif',
+              fontSize: '1.1rem',
+              color: 'var(--text-soft)',
+              lineHeight: '1.6',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}
           >
             Explore our complete collection from all categories
           </motion.p>
         </div>
 
         {allProducts.length === 0 ? (
-          <div className="text-center text-gray-400">
+          <div className="text-center py-16" style={{
+            color: 'var(--text-muted)',
+            fontFamily: 'Lora, serif',
+            fontSize: '1.1rem'
+          }}>
             No products available
           </div>
         ) : (
-          <div className="relative max-w-7xl mx-auto px-16">
+          <div className="relative max-w-7xl mx-auto px-8">
             {/* Left Arrow */}
             {allProducts.length > 1 && (
               <button
                 onClick={prevSlide}
-                className="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-2 md:p-3 rounded-full text-black text-xl md:text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"
+                style={{
+                  position: 'absolute',
+                  left: '0',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'var(--teal-bright)',
+                  color: '#071e24',
+                  border: 'none',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  zIndex: '20',
+                  boxShadow: '0 8px 32px rgba(37,204,200,0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'var(--teal-light)'
+                  e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                  e.target.style.boxShadow = '0 12px 40px rgba(37,204,200,0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'var(--teal-bright)'
+                  e.target.style.transform = 'translateY(-50%) scale(1)'
+                  e.target.style.boxShadow = '0 8px 32px rgba(37,204,200,0.3)'
+                }}
                 aria-label="Previous"
               >
                 ←
@@ -260,7 +650,37 @@ const Home = () => {
             {allProducts.length > 1 && (
               <button
                 onClick={nextSlide}
-                className="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-2 md:p-3 rounded-full text-black text-xl md:text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"
+                style={{
+                  position: 'absolute',
+                  right: '0',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'var(--teal-bright)',
+                  color: '#071e24',
+                  border: 'none',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  zIndex: '20',
+                  boxShadow: '0 8px 32px rgba(37,204,200,0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'var(--teal-light)'
+                  e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                  e.target.style.boxShadow = '0 12px 40px rgba(37,204,200,0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'var(--teal-bright)'
+                  e.target.style.transform = 'translateY(-50%) scale(1)'
+                  e.target.style.boxShadow = '0 8px 32px rgba(37,204,200,0.3)'
+                }}
                 aria-label="Next"
               >
                 →
@@ -288,16 +708,33 @@ const Home = () => {
             </div>
 
             {allProducts.length > 1 && (
-              <div className="flex justify-center mt-8 gap-2">
+              <div className="flex justify-center mt-12 gap-3">
                 {allProducts.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-colors ${
-                      currentSlide === index
-                        ? 'bg-yellow-400'
-                        : 'bg-gray-500 hover:bg-gray-400'
-                    }`}
+                    style={{
+                      width: currentSlide === index ? '12px' : '8px',
+                      height: currentSlide === index ? '12px' : '8px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: currentSlide === index ? 'var(--teal-bright)' : 'var(--text-muted)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      boxShadow: currentSlide === index ? '0 0 16px rgba(37,204,200,0.6)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentSlide !== index) {
+                        e.target.style.background = 'var(--text-soft)'
+                        e.target.style.transform = 'scale(1.2)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentSlide !== index) {
+                        e.target.style.background = 'var(--text-muted)'
+                        e.target.style.transform = 'scale(1)'
+                      }
+                    }}
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
@@ -313,40 +750,118 @@ const Home = () => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="py-20"
+        className="py-24"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(8,30,35,0.4), rgba(8,30,35,0.6))'
+        }}
       >
-        <div className="max-w-7xl mx-auto text-center mb-12">
+        <div className="max-w-7xl mx-auto text-center mb-16 px-6">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-4xl font-serif text-yellow-400 mb-4"
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(2.5rem,5vw,4rem)',
+              fontWeight: '700',
+              color: 'var(--text-bright)',
+              marginBottom: '1rem',
+              letterSpacing: '-0.01em'
+            }}
           >
             Featured Collections
           </motion.h2>
+          <div className="lotus-divider" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            margin: '1.5rem auto'
+          }}>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '80px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+            <div className="lotus-gem" style={{
+              width: '9px',
+              height: '9px',
+              background: 'var(--teal-bright)',
+              transform: 'rotate(45deg)',
+              animation: 'floatLotus 4s ease-in-out infinite'
+            }}></div>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '80px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+          </div>
           <motion.p 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-400"
+            style={{
+              fontFamily: 'Lora, serif',
+              fontSize: '1.1rem',
+              color: 'var(--text-soft)',
+              lineHeight: '1.6',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}
           >
             Discover our curated selection of premium jewelry & handicrafts
           </motion.p>
         </div>
 
         {featuredProducts.length === 0 ? (
-          <div className="text-center text-gray-400">
+          <div className="text-center py-16" style={{
+            color: 'var(--text-muted)',
+            fontFamily: 'Lora, serif',
+            fontSize: '1.1rem'
+          }}>
             No featured products available
           </div>
         ) : (
-          <div className="relative max-w-7xl mx-auto px-16">
+          <div className="relative max-w-7xl mx-auto px-8">
             {/* Left Arrow */}
             {featuredProducts.length > 1 && (
               <button
                 onClick={prevFeaturedSlide}
-                className="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-2 md:p-3 rounded-full text-black text-xl md:text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"
+                style={{
+                  position: 'absolute',
+                  left: '0',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'var(--teal-bright)',
+                  color: '#071e24',
+                  border: 'none',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  zIndex: '20',
+                  boxShadow: '0 8px 32px rgba(37,204,200,0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'var(--teal-light)'
+                  e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                  e.target.style.boxShadow = '0 12px 40px rgba(37,204,200,0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'var(--teal-bright)'
+                  e.target.style.transform = 'translateY(-50%) scale(1)'
+                  e.target.style.boxShadow = '0 8px 32px rgba(37,204,200,0.3)'
+                }}
                 aria-label="Previous"
               >
                 ←
@@ -357,7 +872,37 @@ const Home = () => {
             {featuredProducts.length > 1 && (
               <button
                 onClick={nextFeaturedSlide}
-                className="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 p-2 md:p-3 rounded-full text-black text-xl md:text-2xl font-bold transition-all shadow-lg hover:shadow-xl z-20 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center"
+                style={{
+                  position: 'absolute',
+                  right: '0',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'var(--teal-bright)',
+                  color: '#071e24',
+                  border: 'none',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  zIndex: '20',
+                  boxShadow: '0 8px 32px rgba(37,204,200,0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'var(--teal-light)'
+                  e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                  e.target.style.boxShadow = '0 12px 40px rgba(37,204,200,0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'var(--teal-bright)'
+                  e.target.style.transform = 'translateY(-50%) scale(1)'
+                  e.target.style.boxShadow = '0 8px 32px rgba(37,204,200,0.3)'
+                }}
                 aria-label="Next"
               >
                 →
@@ -385,16 +930,33 @@ const Home = () => {
             </div>
 
             {featuredProducts.length > 1 && (
-              <div className="flex justify-center mt-8 gap-2">
+              <div className="flex justify-center mt-12 gap-3">
                 {featuredProducts.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToFeaturedSlide(index)}
-                    className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-colors ${
-                      currentFeaturedSlide === index
-                        ? 'bg-yellow-400'
-                        : 'bg-gray-500 hover:bg-gray-400'
-                    }`}
+                    style={{
+                      width: currentFeaturedSlide === index ? '12px' : '8px',
+                      height: currentFeaturedSlide === index ? '12px' : '8px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: currentFeaturedSlide === index ? 'var(--teal-bright)' : 'var(--text-muted)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      boxShadow: currentFeaturedSlide === index ? '0 0 16px rgba(37,204,200,0.6)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentFeaturedSlide !== index) {
+                        e.target.style.background = 'var(--text-soft)'
+                        e.target.style.transform = 'scale(1.2)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentFeaturedSlide !== index) {
+                        e.target.style.background = 'var(--text-muted)'
+                        e.target.style.transform = 'scale(1)'
+                      }
+                    }}
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}

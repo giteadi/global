@@ -1,8 +1,97 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { getProducts, getFeaturedProducts } from '../store/slices/productsSlice'
 import { motion } from 'framer-motion'
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Homepage Error:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a2830' }}>
+          <div className="text-center">
+            <h1 style={{ color: 'var(--text-bright)', marginBottom: '1rem' }}>Something went wrong</h1>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ 
+                background: 'var(--teal-bright)', 
+                color: '#071e24', 
+                padding: '0.5rem 1rem', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+
+const ProductImage = ({ src, alt, className, style, onLoad, onError, sizes }) => {
+  const [imageSrc, setImageSrc] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    if (!src) return
+
+    const img = new Image()
+    img.onload = () => {
+      setImageSrc(src)
+      setLoading(false)
+      onLoad?.()
+    }
+    img.onerror = () => {
+      setError(true)
+      setLoading(false)
+      onError?.()
+    }
+    img.src = src
+  }, [src, onLoad, onError])
+
+  if (error || !src) {
+    return null
+  }
+
+  if (loading) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-bright"></div>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={alt}
+      loading="lazy"
+      className={className}
+      style={style}
+      sizes={sizes}
+    />
+  )
+}
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -12,20 +101,41 @@ const Home = () => {
   const allProducts = useSelector(
     state => state.products.products || []
   )
+  const productsLoading = useSelector(
+    state => state.products.loading
+  )
+  const productsError = useSelector(
+    state => state.products.error
+  )
 
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [loadedImages, setLoadedImages] = useState({})
+  const [imageErrors, setImageErrors] = useState({})
+  const [componentMounted, setComponentMounted] = useState(false)
 
   // Fetch all products and featured products
   useEffect(() => {
-    dispatch(getProducts())
-    dispatch(getFeaturedProducts())
+    setComponentMounted(true)
+    try {
+      dispatch(getProducts())
+      dispatch(getFeaturedProducts())
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    }
   }, [dispatch])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      setComponentMounted(false)
+    }
+  }, [])
 
   // Auto Slide for All Products
   useEffect(() => {
-    if (!isAutoPlaying || allProducts.length <= 1) return
+    if (!componentMounted || !isAutoPlaying || allProducts.length <= 1) return
 
     const maxSlides = allProducts.length - 1
 
@@ -36,11 +146,11 @@ const Home = () => {
     }, 4000)
 
     return () => clearInterval(interval)
-  }, [isAutoPlaying, allProducts])
+  }, [isAutoPlaying, allProducts, componentMounted])
 
   // Auto Slide for Featured Products
   useEffect(() => {
-    if (!isAutoPlaying || featuredProducts.length <= 1) return
+    if (!componentMounted || !isAutoPlaying || featuredProducts.length <= 1) return
 
     const maxSlides = featuredProducts.length - 1
 
@@ -51,7 +161,7 @@ const Home = () => {
     }, 4000)
 
     return () => clearInterval(interval)
-  }, [isAutoPlaying, featuredProducts])
+  }, [isAutoPlaying, featuredProducts, componentMounted])
 
   const nextSlide = () => {
     if (allProducts.length <= 1) return
@@ -94,6 +204,8 @@ const Home = () => {
   }
 
   const renderProduct = (product) => {
+    if (!product || !product.id) return null
+
     let images = product.images
 
     if (typeof images === 'string') {
@@ -105,6 +217,20 @@ const Home = () => {
     }
 
     const imageUrl = images && images.length > 0 ? images[0] : null
+    const imageLoaded = loadedImages[product.id]
+    const imageError = imageErrors[product.id]
+
+    const handleImageLoad = () => {
+      if (componentMounted) {
+        setLoadedImages(prev => ({ ...prev, [product.id]: true }))
+      }
+    }
+
+    const handleImageError = () => {
+      if (componentMounted) {
+        setImageErrors(prev => ({ ...prev, [product.id]: true }))
+      }
+    }
 
     return (
       <Link
@@ -119,19 +245,30 @@ const Home = () => {
           overflow: 'hidden'
         }}
       >
-        <div className="h-56 overflow-hidden" style={{
+        <div className="h-56 overflow-hidden relative" style={{
           background: 'linear-gradient(135deg, rgba(10,40,45,0.8), rgba(10,50,55,0.6))'
         }}>
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={product.name}
-              loading="lazy"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              style={{
-                filter: 'brightness(0.9) contrast(1.1)'
-              }}
-            />
+          {imageUrl && !imageError ? (
+            <>
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-bright"></div>
+                </div>
+              )}
+              <img
+                src={imageUrl}
+                alt={product.name || 'Product'}
+                loading="lazy"
+                className={`w-full h-full object-cover hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{
+                  filter: 'brightness(0.9) contrast(1.1)',
+                  transition: 'opacity 0.3s ease'
+                }}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                sizes="(max-width: 768px) 100vw, 256px"
+              />
+            </>
           ) : (
             <div className="h-full flex items-center justify-center">
               <span className="text-6xl opacity-60">
@@ -181,8 +318,55 @@ const Home = () => {
     )
   }
 
+  // Loading state
+  if (productsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{
+        background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
+        backdropFilter: 'blur(2px)'
+      }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-bright mx-auto mb-4"></div>
+          <p style={{ color: 'var(--text-bright)' }}>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (productsError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{
+        background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
+        backdropFilter: 'blur(2px)'
+      }}>
+        <div className="text-center">
+          <h1 style={{ color: 'var(--text-bright)', marginBottom: '1rem' }}>Unable to load products</h1>
+          <button 
+            onClick={() => {
+              dispatch(getProducts())
+              dispatch(getFeaturedProducts())
+            }} 
+            style={{ 
+              background: 'var(--teal-bright)', 
+              color: '#071e24', 
+              padding: '0.5rem 1rem', 
+              border: 'none', 
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginRight: '0.5rem'
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen" style={{
+    <ErrorBoundary>
+      <div className="min-h-screen" style={{
       background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
       backdropFilter: 'blur(2px)',
       position: 'relative',
@@ -966,6 +1150,7 @@ const Home = () => {
         )}
       </motion.section>
     </div>
+    </ErrorBoundary>
   )
 }
 

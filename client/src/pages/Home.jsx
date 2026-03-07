@@ -110,7 +110,7 @@ const Home = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false)
   const [loadedImages, setLoadedImages] = useState({})
   const [imageErrors, setImageErrors] = useState({})
   const [componentMounted, setComponentMounted] = useState(false)

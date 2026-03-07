@@ -102,7 +102,7 @@ const Home = () => {
     state => state.products.products || []
   )
   const productsLoading = useSelector(
-    state => state.products.loading
+    state => state.products.loadingProducts || state.products.loadingFeatured
   )
   const productsError = useSelector(
     state => state.products.error
@@ -259,7 +259,7 @@ const Home = () => {
                 src={imageUrl}
                 alt={product.name || 'Product'}
                 loading="lazy"
-                className={`w-full h-full object-cover hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`w-full h-full object-contain md:object-cover hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 style={{
                   filter: 'brightness(0.9) contrast(1.1)',
                   transition: 'opacity 0.3s ease'

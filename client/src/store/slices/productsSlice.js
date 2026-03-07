@@ -5,7 +5,8 @@ const initialState = {
   products: [],
   featuredProducts: [],
   categories: ['Temple Heritage', 'Contemporary Ethnic', 'Handcrafted Decor', 'Export Grade'],
-  loading: false,
+  loadingProducts: false,
+  loadingFeatured: false,
   error: null,
   singleProduct: null,
 }
@@ -126,27 +127,27 @@ const productsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getProducts.pending, (state) => {
-        state.loading = true
+        state.loadingProducts = true
         state.error = null
       })
       .addCase(getProducts.fulfilled, (state, action) => {
-        state.loading = false
+        state.loadingProducts = false
         state.products = action.payload
       })
       .addCase(getProducts.rejected, (state, action) => {
-        state.loading = false
+        state.loadingProducts = false
         state.error = action.payload
       })
       .addCase(getFeaturedProducts.pending, (state) => {
-        state.loading = true
+        state.loadingFeatured = true
         state.error = null
       })
       .addCase(getFeaturedProducts.fulfilled, (state, action) => {
-        state.loading = false
+        state.loadingFeatured = false
         state.featuredProducts = action.payload
       })
       .addCase(getFeaturedProducts.rejected, (state, action) => {
-        state.loading = false
+        state.loadingFeatured = false
         state.error = action.payload
       })
       .addCase(createProduct.pending, (state) => {

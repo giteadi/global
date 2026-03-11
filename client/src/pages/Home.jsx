@@ -114,6 +114,44 @@ const Home = () => {
   const [loadedImages, setLoadedImages] = useState({})
   const [imageErrors, setImageErrors] = useState({})
   const [componentMounted, setComponentMounted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = React.useRef(null)
+
+  // Autoplay trick: browsers allow muted autoplay, then we unmute
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.volume = 0.4
+    audio.muted = true // Start muted to allow autoplay
+    audio.play().then(() => {
+      setIsPlaying(true)
+      // Unmute after a short delay or on interaction
+      setTimeout(() => {
+        audio.muted = false
+      }, 1000) // Unmute after 1 second
+    }).catch(() => {
+      // fallback: play on first user interaction
+      const onInteract = () => {
+        audio.muted = false
+        audio.play().then(() => setIsPlaying(true)).catch(() => {})
+        document.removeEventListener('click', onInteract)
+        document.removeEventListener('touchstart', onInteract)
+      }
+      document.addEventListener('click', onInteract)
+      document.addEventListener('touchstart', onInteract)
+    })
+  }, [])
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
+      }
+    }
+  }
 
   // Fetch all products and featured products
   useEffect(() => {
@@ -325,51 +363,22 @@ const Home = () => {
     )
   }
 
-  // Loading state
-  if (productsLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{
-        background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
-        backdropFilter: 'blur(2px)'
-      }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-bright mx-auto mb-4"></div>
-          <p style={{ color: 'var(--text-bright)' }}>Loading...</p>
-        </div>
+  // Skeleton card component
+  const SkeletonCard = () => (
+    <div style={{
+      background: 'var(--glass-card)',
+      border: '1px solid var(--glass-border)',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      animation: 'pulse 1.5s ease-in-out infinite'
+    }}>
+      <div style={{ height: '224px', background: 'rgba(37,204,200,0.08)' }} />
+      <div style={{ padding: '1.5rem' }}>
+        <div style={{ height: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '12px', width: '70%' }} />
+        <div style={{ height: '24px', background: 'rgba(37,204,200,0.12)', borderRadius: '4px', width: '40%' }} />
       </div>
-    )
-  }
-
-  // Error state
-  if (productsError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{
-        background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
-        backdropFilter: 'blur(2px)'
-      }}>
-        <div className="text-center">
-          <h1 style={{ color: 'var(--text-bright)', marginBottom: '1rem' }}>Unable to load products</h1>
-          <button 
-            onClick={() => {
-              dispatch(getProducts())
-              dispatch(getFeaturedProducts())
-            }} 
-            style={{ 
-              background: 'var(--teal-bright)', 
-              color: '#071e24', 
-              padding: '0.5rem 1rem', 
-              border: 'none', 
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '0.5rem'
-            }}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    )
-  }
+    </div>
+  )
 
   return (
     <ErrorBoundary>
@@ -389,6 +398,55 @@ const Home = () => {
         animation: 'waterWave 8s ease-in-out infinite',
         pointerEvents: 'none'
       }}></div>
+      
+      {/* Audio Element */}
+      <audio
+        ref={audioRef}
+        src="/src/assets/Celion_Dion_-_My_Heart_Will_Go_On_OST_Titanic_(mp3.pm).mp3"
+        loop
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        style={{ display: 'none' }}
+      />
+      
+      {/* Audio Controls */}
+      <button
+        onClick={toggleAudio}
+        style={{
+          position: 'fixed',
+          top: '80px',
+          right: '20px',
+          zIndex: '1000',
+          background: isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)',
+          color: '#071e24',
+          border: 'none',
+          borderRadius: '50%',
+          width: '52px',
+          height: '52px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.3rem',
+          cursor: 'pointer',
+          boxShadow: isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)',
+          backdropFilter: 'blur(10px)',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(37,204,200,1)'
+          e.currentTarget.style.transform = 'scale(1.1)'
+          e.currentTarget.style.boxShadow = '0 6px 30px rgba(37,204,200,0.6)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)'
+          e.currentTarget.style.transform = 'scale(1)'
+          e.currentTarget.style.boxShadow = isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)'
+        }}
+        title={isPlaying ? 'Pause Music' : 'Play Music'}
+        aria-label={isPlaying ? 'Pause Music' : 'Play Music'}
+      >
+        {isPlaying ? '⏸️' : '▶️'}
+      </button>
       
       {/* Bubbles Animation */}
       <div style={{
@@ -899,7 +957,16 @@ const Home = () => {
           </motion.p>
         </div>
 
-        {allProducts.length === 0 ? (
+        {productsLoading ? (
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : productsError ? (
+          <div className="text-center py-16">
+            <p style={{ color: 'var(--text-muted)', fontFamily: 'Lora, serif', marginBottom: '1rem' }}>Unable to load products</p>
+            <button onClick={() => dispatch(getProducts())} style={{ background: 'var(--teal-bright)', color: '#071e24', padding: '0.5rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Retry</button>
+          </div>
+        ) : allProducts.length === 0 ? (
           <div className="text-center py-16" style={{
             color: 'var(--text-muted)',
             fontFamily: 'Lora, serif',
@@ -1121,7 +1188,11 @@ const Home = () => {
           </motion.p>
         </div>
 
-        {featuredProducts.length === 0 ? (
+        {productsLoading ? (
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : featuredProducts.length === 0 ? (
           <div className="text-center py-16" style={{
             color: 'var(--text-muted)',
             fontFamily: 'Lora, serif',

@@ -559,7 +559,7 @@ const Home = () => {
               letterSpacing: '0.1em',
               fontWeight: '600'
             }}>
-              where elegance meet global luxury
+              where elegance meets global luxury
             </span>
           </motion.h1>
           

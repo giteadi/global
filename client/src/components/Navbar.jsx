@@ -18,10 +18,12 @@ const Navbar = () => {
   // Fetch categories function
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/products/categories`)
+      const response = await fetch(`${API_BASE}/api/categories`, {
+        cache: 'no-store' // Prevent browser caching
+      })
       const data = await response.json()
       if (data.success) {
-        setCategories(data.data)
+        setCategories(data.data.categories || data.data)
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
@@ -36,8 +38,15 @@ const Navbar = () => {
     // Refetch every 10 seconds to keep categories updated
     const interval = setInterval(fetchCategories, 10000)
     
-    return () => clearInterval(interval)
-  }, [])
+    // Listen for custom category update events
+    const handleCategoryUpdate = () => fetchCategories()
+    window.addEventListener('categories-updated', handleCategoryUpdate)
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('categories-updated', handleCategoryUpdate)
+    }
+  }, [location.pathname]) // Depend on location to refetch on route changes
 
   // Refetch when dropdown opens
   const handleCategoryDropdownToggle = () => {
@@ -122,12 +131,12 @@ const Navbar = () => {
                       </button>
                       {categories.map((category) => (
                         <button
-                          key={category}
-                          onClick={() => handleCategoryClick(category)}
+                          key={category.id || category._id || category.name}
+                          onClick={() => handleCategoryClick(category.name)}
                           className="w-full text-left px-4 py-2 hover:bg-teal-700/30 transition-colors"
                           style={{ color: 'var(--text-soft)' }}
                         >
-                          {category}
+                          {category.name}
                         </button>
                       ))}
                     </div>

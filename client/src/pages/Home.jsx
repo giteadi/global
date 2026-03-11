@@ -622,7 +622,7 @@ const Home = () => {
               marginBottom: '3rem'
             }}
           >
-            Curated selection of finest jewelry and handicrafts from traditional artisans
+            Curated selection of finest jewellery and handicrafts from traditional artisans
           </motion.p>
           
           <motion.div 

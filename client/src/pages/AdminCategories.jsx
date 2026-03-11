@@ -56,6 +56,7 @@ const AdminCategories = () => {
       try {
         await dispatch(deleteCategory(id)).unwrap()
         toast.success('Category deleted successfully')
+        window.dispatchEvent(new Event('categories-updated'))
       } catch (error) {
         toast.error('Failed to delete category: ' + error)
       }
@@ -73,10 +74,12 @@ const AdminCategories = () => {
         }
         await dispatch(updateCategory({ id: categoryId, categoryData: formData })).unwrap()
         toast.success('Category updated successfully')
+        window.dispatchEvent(new Event('categories-updated'))
         setShowEditModal(false)
       } else {
         await dispatch(createCategory(formData)).unwrap()
         toast.success('Category created successfully')
+        window.dispatchEvent(new Event('categories-updated'))
         setShowAddModal(false)
       }
       setFormData({ name: '', description: '', icon: '🏷️' })

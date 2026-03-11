@@ -116,8 +116,16 @@ const Home = () => {
   const [componentMounted, setComponentMounted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = React.useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Autoplay trick: browsers allow muted autoplay, then we unmute
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -525,12 +533,8 @@ const Home = () => {
               marginBottom: '0.5rem'
             }}
           >
-            <span style={{
+            <span className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl flex flex-wrap font-semibold font-serif text-white' style={{
               display: 'block',
-              fontSize: 'clamp(1.2rem,3vw,2rem)',
-              fontWeight: '600',
-              fontFamily: 'Cinzel, serif',
-              color: 'var(--gold-bright)',
               textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
               letterSpacing: '0.1em',
               marginBottom: '0.5rem'
@@ -540,7 +544,8 @@ const Home = () => {
             <span style={{
               display: 'block',
               marginBottom: '0.5rem',
-              padding: '0.5rem 0'
+              padding: '0.5rem 0',
+              fontSize: 'clamp(1.2rem, 4vw, 2.2rem)'
             }}>
               Global Exim Traders
             </span>
@@ -554,7 +559,7 @@ const Home = () => {
               letterSpacing: '0.1em',
               fontWeight: '600'
             }}>
-              where elegance begins to meet global luxury
+              where elegance meet global luxury
             </span>
           </motion.h1>
           

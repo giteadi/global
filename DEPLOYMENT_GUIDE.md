@@ -529,6 +529,24 @@ find dist -name "._*" -delete
 systemctl reload nginx
 ```
 
+### Actual Frontend Deployment Commands Used
+
+```bash
+# Build frontend locally
+cd client
+npm run build
+
+# Create tar.gz archive
+cd client/dist
+tar -czf frontend-build.tar.gz .
+
+# Upload to server
+scp frontend-build.tar.gz root@195.35.45.17:/home/global_exim_trader/
+
+# SSH to server and deploy
+ssh root@195.35.45.17 'cd /home/global_exim_trader && mkdir -p dist_temp && tar -xzf frontend-build.tar.gz -C dist_temp && rm -rf dist && mv dist_temp dist && rm frontend-build.tar.gz'
+```
+
 ## Backend Deployment
 
 ### Deploy Backend Code

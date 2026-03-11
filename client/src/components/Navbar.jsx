@@ -80,7 +80,7 @@ const Navbar = () => {
                   fontFamily: "'Playfair Display', serif"
                 }}
               >
-                Global Exim Traders
+                Global Exim Traders™
               </span>
             </Link>
 

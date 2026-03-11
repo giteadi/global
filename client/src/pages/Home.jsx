@@ -458,7 +458,7 @@ const Home = () => {
             className="hero-title"
             style={{
               fontFamily: 'Playfair Display, serif',
-              fontSize: 'clamp(3.5rem,8vw,7.5rem)',
+              fontSize: 'clamp(2.8rem,6vw,5.5rem)',
               fontWeight: '900',
               lineHeight: '0.93',
               letterSpacing: '-0.02em',
@@ -467,7 +467,25 @@ const Home = () => {
               marginBottom: '0.5rem'
             }}
           >
-            Global Exim Traders
+            <span style={{
+              display: 'block',
+              fontSize: 'clamp(1.2rem,3vw,2rem)',
+              fontWeight: '600',
+              fontFamily: 'Cinzel, serif',
+              color: 'var(--gold-bright)',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
+              letterSpacing: '0.1em',
+              marginBottom: '0.5rem'
+            }}>
+              GET Ashokaaz™
+            </span>
+            <span style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              padding: '0.5rem 0'
+            }}>
+              Global Exim Traders
+            </span>
             <span className="brand-exim" style={{
               display: 'block',
               fontStyle: 'italic',
@@ -478,7 +496,7 @@ const Home = () => {
               letterSpacing: '0.1em',
               fontWeight: '600'
             }}>
-              where elegance begins to meets global
+              where elegance begins to meet global luxury
             </span>
           </motion.h1>
           

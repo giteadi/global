@@ -148,6 +148,12 @@ const ProductDetail = () => {
     care: singleProduct.care || 'N/A'
   }
 
+  let parsedImages = singleProduct.images
+  if (typeof parsedImages === 'string') {
+    try { parsedImages = JSON.parse(parsedImages) } catch { parsedImages = [] }
+  }
+  if (!Array.isArray(parsedImages)) parsedImages = []
+
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
       <div className="max-w-7xl mx-auto">
@@ -163,33 +169,35 @@ const ProductDetail = () => {
             <div className="bg-teal-800/50 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8 mb-4">
               <div className="h-96 flex items-center justify-center">
                 <img 
-                  src={singleProduct.images[selectedImage]} 
+                  src={parsedImages[selectedImage] || '/placeholder.jpg'} 
                   alt={singleProduct.name} 
                   loading="lazy"
                   className="max-w-full max-h-full object-contain rounded-lg"
                 />
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-2">
-              {singleProduct.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`border rounded-lg p-2 transition-all ${
-                    selectedImage === index 
-                      ? 'border-yellow-400' 
-                      : 'border-teal-600/30 hover:border-yellow-400/50'
-                  }`}
-                >
-                  <img 
-                    src={image} 
-                    alt={`${singleProduct.name} ${index + 1}`} 
-                    loading="lazy"
-                    className="w-full h-16 object-cover rounded"
-                  />
-                </button>
-              ))}
-            </div>
+            {parsedImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {parsedImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`border rounded-lg p-2 transition-all ${
+                      selectedImage === index 
+                        ? 'border-yellow-400' 
+                        : 'border-teal-600/30 hover:border-yellow-400/50'
+                    }`}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`${singleProduct.name} ${index + 1}`} 
+                      loading="lazy"
+                      className="w-full h-16 object-cover rounded"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Product Info */}

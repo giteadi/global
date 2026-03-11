@@ -127,6 +127,7 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
+    if (isMobile) return  // mobile pe skip karo
     const audio = audioRef.current
     if (!audio) return
     audio.volume = 0.4
@@ -148,7 +149,7 @@ const Home = () => {
       document.addEventListener('click', onInteract)
       document.addEventListener('touchstart', onInteract)
     })
-  }, [])
+  }, [isMobile])
 
   const toggleAudio = () => {
     if (audioRef.current) {
@@ -255,6 +256,13 @@ const Home = () => {
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg'
   ]
+
+  const getOptimizedUrl = (url) => {
+    // Cloudinary URL mein w_400,q_auto,f_auto add karo
+    return url.replace('/upload/', '/upload/w_400,q_auto,f_auto/')
+  }
+
+  const visibleImages = isMobile ? modelImages.slice(0, 4) : modelImages
 
   const renderProduct = (product) => {
     if (!product || !product.id) return null
@@ -418,77 +426,85 @@ const Home = () => {
       />
       
       {/* Audio Controls */}
-      <button
-        onClick={toggleAudio}
-        style={{
-          position: 'fixed',
-          top: '80px',
-          right: '20px',
-          zIndex: '1000',
-          background: isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)',
-          color: '#071e24',
-          border: 'none',
-          borderRadius: '50%',
-          width: '52px',
-          height: '52px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.3rem',
-          cursor: 'pointer',
-          boxShadow: isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)',
-          backdropFilter: 'blur(10px)',
-          transition: 'all 0.3s ease'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(37,204,200,1)'
-          e.currentTarget.style.transform = 'scale(1.1)'
-          e.currentTarget.style.boxShadow = '0 6px 30px rgba(37,204,200,0.6)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)'
-          e.currentTarget.style.transform = 'scale(1)'
-          e.currentTarget.style.boxShadow = isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)'
-        }}
-        title={isPlaying ? 'Pause Music' : 'Play Music'}
-        aria-label={isPlaying ? 'Pause Music' : 'Play Music'}
-      >
-        {isPlaying ? '⏸️' : '▶️'}
-      </button>
+      {!isMobile && (
+        <button
+          onClick={toggleAudio}
+          style={{
+            position: 'fixed',
+            top: '80px',
+            right: '20px',
+            zIndex: '1000',
+            background: isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)',
+            color: '#071e24',
+            border: 'none',
+            borderRadius: '50%',
+            width: '52px',
+            height: '52px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.3rem',
+            cursor: 'pointer',
+            boxShadow: isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(37,204,200,1)'
+            e.currentTarget.style.transform = 'scale(1.1)'
+            e.currentTarget.style.boxShadow = '0 6px 30px rgba(37,204,200,0.6)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)'
+            e.currentTarget.style.transform = 'scale(1)'
+            e.currentTarget.style.boxShadow = isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)'
+          }}
+          title={isPlaying ? 'Pause Music' : 'Play Music'}
+          aria-label={isPlaying ? 'Pause Music' : 'Play Music'}
+        >
+          {isPlaying ? '⏸️' : '▶️'}
+        </button>
+      )}
       
       {/* Bubbles Animation */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-        pointerEvents: 'none'
-      }}>
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              bottom: '-20px',
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 20 + 5}px`,
-              height: `${Math.random() * 20 + 5}px`,
-              background: `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.2})`,
-              borderRadius: '50%',
-              animation: `bubbleRise ${Math.random() * 8 + 6}s linear infinite`,
-              animationDelay: `${Math.random() * 10}s`,
-              filter: 'blur(1px)'
-            }}
-          />
-        ))}
-      </div>
+      {!isMobile && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          pointerEvents: 'none'
+        }}>
+          {[...Array(5)].map((_, i) => {
+            const sizes = [8, 12, 6, 15, 10]
+            const lefts = [10, 25, 50, 70, 85]
+            const durations = [8, 10, 7, 12, 9]
+            return (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  bottom: '-20px',
+                  left: `${lefts[i]}%`,
+                  width: `${sizes[i]}px`,
+                  height: `${sizes[i]}px`,
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: '50%',
+                  animation: `bubbleRise ${durations[i]}s linear infinite`,
+                  animationDelay: `${i * 2}s`
+                }}
+              />
+            )
+          })}
+        </div>
+      )}
       
       {/* HERO */}
       <section className="relative py-24 flex items-center justify-center" style={{
         backgroundImage: 'linear-gradient(to bottom, rgba(8,25,30,0.65) 0%, rgba(8,25,30,0.3) 35%, rgba(8,25,30,0.7) 100%)',
-        backgroundAttachment: 'fixed'
+        backgroundAttachment: 'scroll'
       }}>
         <div className="text-center max-w-6xl px-6">
           <div className="hero-eyebrow" style={{
@@ -519,7 +535,8 @@ const Home = () => {
           </div>
           <motion.h1 
             initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="hero-title"
             style={{
@@ -593,7 +610,8 @@ const Home = () => {
           
           <motion.p 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="hero-tagline"
             style={{
@@ -609,7 +627,8 @@ const Home = () => {
           
           <motion.p 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="hero-subtitle"
             style={{
@@ -627,7 +646,8 @@ const Home = () => {
           
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex justify-center gap-6 mb-12"
           >
@@ -674,8 +694,7 @@ const Home = () => {
             position: 'relative',
             zIndex: '10',
             width: '100%',
-            background: 'rgba(8,30,35,0.82)',
-            backdropFilter: 'blur(16px)',
+            background: 'rgba(8,30,35,0.92)',
             borderTop: '1px solid var(--glass-border)',
             padding: '1.3rem 4%',
             marginTop: '4rem',
@@ -746,13 +765,13 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 text-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.6 }}
               className="p-8 rounded-lg"
               style={{
-                background: 'var(--glass-card)',
-                border: '1px solid var(--glass-border)',
-                backdropFilter: 'blur(8px)'
+                background: 'rgba(8,30,35,0.95)',
+                border: '1px solid var(--glass-border)'
               }}
             >
               <div className="text-5xl mb-4">🏛️</div>
@@ -772,13 +791,13 @@ const Home = () => {
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.8 }}
               className="p-8 rounded-lg"
               style={{
-                background: 'var(--glass-card)',
-                border: '1px solid var(--glass-border)',
-                backdropFilter: 'blur(8px)'
+                background: 'rgba(8,30,35,0.95)',
+                border: '1px solid var(--glass-border)'
               }}
             >
               <div className="text-5xl mb-4">🌍</div>
@@ -798,13 +817,13 @@ const Home = () => {
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 1.0 }}
               className="p-8 rounded-lg"
               style={{
-                background: 'var(--glass-card)',
-                border: '1px solid var(--glass-border)',
-                backdropFilter: 'blur(8px)'
+                background: 'rgba(8,30,35,0.95)',
+                border: '1px solid var(--glass-border)'
               }}
             >
               <div className="text-5xl mb-4">✨</div>
@@ -839,7 +858,7 @@ const Home = () => {
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {modelImages.map((image, index) => (
+            {visibleImages.map((image, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -855,12 +874,12 @@ const Home = () => {
                 }}
               >
                 <img
-                  src={image}
+                  src={getOptimizedUrl(image)}
                   alt={`Model ${index + 1}`}
                   className="w-full object-cover hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                   style={{
-                    height: '280px',
+                    height: isMobile ? '200px' : '280px',
                     filter: 'brightness(0.9) contrast(1.1)',
                     display: 'block'
                   }}

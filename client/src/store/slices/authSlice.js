@@ -7,6 +7,7 @@ const initialState = {
   isAdmin: false,
   loading: false,
   error: null,
+  profileFetchAttempted: false,
 }
 
 // Async thunks
@@ -111,6 +112,7 @@ const authSlice = createSlice({
       state.user = null
       state.token = null
       state.isAdmin = false
+      state.profileFetchAttempted = false
       localStorage.removeItem('token')
     },
     setLoading: (state, action) => {
@@ -134,6 +136,7 @@ const authSlice = createSlice({
         state.user = action.payload.user
         state.token = action.payload.token
         state.isAdmin = action.payload.user.role === 'admin'
+        state.profileFetchAttempted = false
         localStorage.setItem('token', action.payload.token)
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -177,6 +180,7 @@ const authSlice = createSlice({
       .addCase(getUserProfile.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
+        state.profileFetchAttempted = true
       })
       .addCase(updateUserProfile.pending, (state) => {
         state.loading = true

@@ -402,7 +402,7 @@ const Home = () => {
               left: `${Math.random() * 100}%`,
               width: `${Math.random() * 20 + 5}px`,
               height: `${Math.random() * 20 + 5}px`,
-              background: `rgba(${Math.random() * 50 + 200}, ${Math.random() * 50 + 50}, ${Math.random() * 50 + 150}, ${Math.random() * 0.3 + 0.2})`,
+              background: `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.2})`,
               borderRadius: '50%',
               animation: `bubbleRise ${Math.random() * 8 + 6}s linear infinite`,
               animationDelay: `${Math.random() * 10}s`,
@@ -465,10 +465,13 @@ const Home = () => {
               display: 'block',
               fontStyle: 'italic',
               color: 'var(--gold-bright)',
-              fontFamily: 'Lora, serif',
-              fontSize: 'clamp(1.1rem,2vw,1.6rem)'
+              fontFamily: 'Cinzel, serif',
+              fontSize: 'clamp(1.1rem,2vw,1.6rem)',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
+              letterSpacing: '0.1em',
+              fontWeight: '600'
             }}>
-              Where Heritage Meets Global Elegance
+              where elegance begins to meets global
             </span>
           </motion.h1>
           
@@ -509,7 +512,7 @@ const Home = () => {
               fontFamily: 'Lora, serif',
               fontStyle: 'italic',
               fontSize: 'clamp(1.1rem,2vw,1.6rem)',
-              color: 'var(--text-soft)',
+              color: '#FFFFFF',
               marginBottom: '1rem'
             }}
           >
@@ -523,10 +526,10 @@ const Home = () => {
             className="hero-subtitle"
             style={{
               fontFamily: 'Raleway, sans-serif',
-              fontSize: '0.88rem',
-              fontWeight: '300',
+              fontSize: '1.2rem',
+              fontWeight: 'bold',
               letterSpacing: '0.06em',
-              color: 'var(--text-muted)',
+              color: '#FFFFFF',
               lineHeight: '1.9',
               marginBottom: '3rem'
             }}

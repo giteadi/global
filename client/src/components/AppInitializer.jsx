@@ -4,21 +4,21 @@ import { getUserProfile } from '../store/slices/authSlice'
 
 const AppInitializer = ({ children }) => {
   const dispatch = useDispatch()
-  const { token, user, loading, error } = useSelector(state => state.auth)
+  const { token, user, loading, error, profileFetchAttempted } = useSelector(state => state.auth)
 
   useEffect(() => {
     // If we have a token but no user data, fetch the profile
-    // Only fetch if not currently loading and no previous error
-    if (token && !user && !loading && !error) {
+    // Only fetch if not currently loading, no previous error, and profile not already attempted
+    if (token && !user && !loading && !error && !profileFetchAttempted) {
       console.log('AppInitializer: Fetching user profile')
       dispatch(getUserProfile())
-    } else if (error) {
+    } else if (error && profileFetchAttempted) {
       console.log('AppInitializer: Auth error detected, clearing token')
       // Clear invalid token
       dispatch({ type: 'auth/clearError' })
       localStorage.removeItem('token')
     }
-  }, [token, user, loading, error, dispatch])
+  }, [token, user, loading, error, profileFetchAttempted, dispatch])
 
   return children
 }

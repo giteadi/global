@@ -16,6 +16,16 @@
 - **Server File**: `/home/global_exim_trader/server.js`
 - **Environment File**: `/home/global_exim_trader/.env`
 - **Database Config**: `/home/global_exim_trader/config/database.js`
+- **Frontend Build**: `/home/global_exim_trader/dist/` (for getashokaazjewels.shop)
+- **Nginx Config**: `/etc/nginx/sites-available/getashokaazjewels.shop`
+
+## Database Configuration
+- **Database Type**: MySQL
+- **Database Name**: global_exim
+- **Host**: 127.0.0.1
+- **Port**: 3306
+- **Username**: root
+- **Password**: Tiger@123
 
 ## Database Configuration
 - **Database Type**: MySQL

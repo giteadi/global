@@ -199,9 +199,16 @@ const Home = () => {
     setCurrentSlide(index)
   }
 
-  const goToFeaturedSlide = index => {
-    setCurrentFeaturedSlide(index)
-  }
+  const modelImages = [
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206791/img2_wb4n3k.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img3_xffkyd.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img5_nv7b5y.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img8_ezrlde.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg'
+  ]
 
   const renderProduct = (product) => {
     if (!product || !product.id) return null
@@ -737,6 +744,69 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* MODEL IMAGES GRID */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="py-16"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(8,30,35,0.6), rgba(8,30,35,0.4))'
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {modelImages.map((image, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                className="relative overflow-hidden rounded-lg shadow-lg"
+                style={{
+                  background: 'var(--glass-card)',
+                  border: '1px solid var(--glass-border)',
+                  backdropFilter: 'blur(8px)',
+                  cursor: 'pointer'
+                }}
+              >
+                <img
+                  src={image}
+                  alt={`Model ${index + 1}`}
+                  className="w-full object-cover hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                  style={{
+                    height: '280px',
+                    filter: 'brightness(0.9) contrast(1.1)',
+                    display: 'block'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent)',
+                  padding: '1rem',
+                  color: '#FFFFFF'
+                }}>
+                  <p style={{
+                    fontFamily: 'Lora, serif',
+                    fontSize: '0.85rem',
+                    opacity: '0.9',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Elegance Personified
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
 
       {/* ALL PRODUCTS CAROUSEL */}
       <motion.section 

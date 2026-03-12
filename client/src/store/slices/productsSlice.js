@@ -122,7 +122,7 @@ const productsSlice = createSlice({
     },
     deleteProductLocal: (state, action) => {
       state.products = state.products.filter(p => p.id !== action.payload)
-    },
+    }
   },
   extraReducers: (builder) => {
     builder

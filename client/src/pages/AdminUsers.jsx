@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAdminUsers, updateUser } from '../store/slices/adminUsersSlice'
+import { useGetUsersQuery, useUpdateUserMutation } from '../store/slices/adminApi'
 
 const AdminUsers = () => {
-  const dispatch = useDispatch()
-  const { users, loading, error } = useSelector(state => state.adminUsers)
   const [roleFilter, setRoleFilter] = useState('All')
+  const { data: users, isLoading, error } = useGetUsersQuery(
+    roleFilter !== 'All' ? { role: roleFilter } : {}
+  )
+  const [updateUser] = useUpdateUserMutation()
 
-  useEffect(() => {
-    const params = roleFilter !== 'All' ? { role: roleFilter } : {}
-    dispatch(getAdminUsers(params))
-  }, [dispatch, roleFilter])
-
-  const filteredUsers = roleFilter === 'All' ? users : users.filter(user => user.role === roleFilter)
+  const filteredUsers = roleFilter === 'All' ? users || [] : (users || []).filter(user => user.role === roleFilter)
   const roles = ['All', 'customer', 'admin']
 
   // Modal state
@@ -43,10 +39,9 @@ const AdminUsers = () => {
     e.preventDefault()
     try {
       if (editingUser) {
-        await dispatch(updateUser({ id: editingUser.id, userData: formData })).unwrap()
+        await updateUser({ id: editingUser.id, userData: formData }).unwrap()
         alert('User updated successfully')
         setIsModalOpen(false)
-        dispatch(getAdminUsers(roleFilter !== 'All' ? { role: roleFilter } : {}))
       }
     } catch (error) {
       alert('Failed to update user')
@@ -125,7 +120,7 @@ const AdminUsers = () => {
                 </tr>
               </thead>
               <tbody style={{ background: 'var(--glass-light)', borderColor: 'var(--glass-border)' }} className="divide-y">
-                {loading ? (
+                {isLoading ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center" style={{ color: 'var(--text-soft)' }}>
                       <div className="text-6xl mb-4">⏳</div>

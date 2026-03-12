@@ -5,7 +5,7 @@ import { forgetPassword } from '../store/slices/authSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 
-const ForgetPassword = () => {
+const ForgetPassword = React.memo(() => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -79,6 +79,6 @@ const ForgetPassword = () => {
       </motion.div>
     </div>
   )
-}
+})
 
-export default ForgetPassword
+export default React.memo(ForgetPassword)

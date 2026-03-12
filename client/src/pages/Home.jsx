@@ -1,8 +1,9 @@
 import React, { useEffect, useState, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { getProducts, getFeaturedProducts } from '../store/slices/productsSlice'
+import { useGetProductsQuery, useGetFeaturedProductsQuery } from '../store/slices/adminApi'
 import { motion } from 'framer-motion'
+import audioFile from '../assets/Celion_Dion_-_My_Heart_Will_Go_On_OST_Titanic_(mp3.pm).mp3'
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -47,224 +48,99 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const ProductImage = ({ src, alt, className, style, onLoad, onError, sizes }) => {
-  const [imageSrc, setImageSrc] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  useEffect(() => {
-    if (!src) return
-
-    const img = new Image()
-    img.onload = () => {
-      setImageSrc(src)
-      setLoading(false)
-      onLoad?.()
-    }
-    img.onerror = () => {
-      setError(true)
-      setLoading(false)
-      onError?.()
-    }
-    img.src = src
-  }, [src, onLoad, onError])
-
-  if (error || !src) {
-    return null
+// Image optimization function - moved before ProductImage
+const getOptimizedUrl = (url, size = 'medium') => {
+  if (!url) return null
+  
+  // Skip optimization for base64 or blob URLs
+  if (url.startsWith('data:') || url.startsWith('blob:')) {
+    return url
   }
+  
+  // Image size optimization for different screen sizes
+  const sizes = {
+    small: 'w_200,h_200,c_fill,q_auto,f_auto',  // Auto format + quality
+    medium: 'w_400,h_400,c_fill,q_auto,f_auto', 
+    large: 'w_600,h_600,c_fill,q_auto,f_auto'
+  }
+  
+  // If it's a Cloudinary URL, add optimization
+  if (url.includes('cloudinary.com')) {
+    const optimization = sizes[size]
+    return url.replace('/upload/', `/upload/${optimization}/`)
+  }
+  
+  // For other URLs, add basic quality hint
+  if (url.includes('?')) {
+    return `${url}&quality=80&format=webp`
+  } else {
+    return `${url}?quality=80&format=webp`
+  }
+}
 
-  if (loading) {
+const ProductImage = React.memo(({ src, alt, className, style, onLoad, onError, sizes }) => {
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  const [shouldLoad, setShouldLoad] = useState(false)
+  const containerRef = React.useRef()
+
+  // Intersection Observer - attached to container div (always rendered)
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShouldLoad(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.05, rootMargin: '100px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  if (!src || error) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-bright"></div>
+      <div ref={containerRef} className="h-full flex items-center justify-center">
+        <span className="text-6xl opacity-60">📦</span>
       </div>
     )
   }
 
   return (
-    <img
-      src={imageSrc}
-      alt={alt}
-      loading="lazy"
-      className={className}
-      style={style}
-      sizes={sizes}
-    />
+    <div ref={containerRef} className="h-full w-full relative">
+      {/* Spinner while not loaded */}
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-teal-800/50 to-teal-900/50">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-400"></div>
+        </div>
+      )}
+      {/* Render img only when in viewport - browser handles actual loading */}
+      {shouldLoad && (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          className={className}
+          style={{
+            ...style,
+            opacity: loaded ? 1 : 0,
+            transition: 'opacity 0.4s ease'
+          }}
+          sizes={sizes}
+          onLoad={() => { setLoaded(true); onLoad?.() }}
+          onError={() => { setError(true); onError?.() }}
+        />
+      )}
+    </div>
   )
-}
+})
 
-const Home = () => {
-  const dispatch = useDispatch()
-  const featuredProducts = useSelector(
-    state => state.products.featuredProducts || []
-  )
-  const allProducts = useSelector(
-    state => state.products.products || []
-  )
-  const productsLoading = useSelector(
-    state => state.products.loadingProducts || state.products.loadingFeatured
-  )
-  const productsError = useSelector(
-    state => state.products.error
-  )
-
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(false)
-  const [loadedImages, setLoadedImages] = useState({})
-  const [imageErrors, setImageErrors] = useState({})
-  const [componentMounted, setComponentMounted] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const audioRef = React.useRef(null)
-  const [isMobile, setIsMobile] = useState(false)
-
-  // Autoplay trick: browsers allow muted autoplay, then we unmute
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  useEffect(() => {
-    if (isMobile) return  // mobile pe skip karo
-    const audio = audioRef.current
-    if (!audio) return
-    audio.volume = 0.4
-    audio.muted = true // Start muted to allow autoplay
-    audio.play().then(() => {
-      setIsPlaying(true)
-      // Unmute after a short delay or on interaction
-      setTimeout(() => {
-        audio.muted = false
-      }, 1000) // Unmute after 1 second
-    }).catch(() => {
-      // fallback: play on first user interaction
-      const onInteract = () => {
-        audio.muted = false
-        audio.play().then(() => setIsPlaying(true)).catch(() => {})
-        document.removeEventListener('click', onInteract)
-        document.removeEventListener('touchstart', onInteract)
-      }
-      document.addEventListener('click', onInteract)
-      document.addEventListener('touchstart', onInteract)
-    })
-  }, [isMobile])
-
-  const toggleAudio = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause()
-        setIsPlaying(false)
-      } else {
-        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
-      }
-    }
-  }
-
-  // Fetch all products and featured products
-  useEffect(() => {
-    setComponentMounted(true)
-    try {
-      dispatch(getProducts())
-      dispatch(getFeaturedProducts())
-    } catch (error) {
-      console.error('Error fetching products:', error)
-    }
-  }, [dispatch])
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      setComponentMounted(false)
-    }
-  }, [])
-
-  // Auto Slide for All Products
-  useEffect(() => {
-    if (!componentMounted || !isAutoPlaying || allProducts.length <= 1) return
-
-    const maxSlides = allProducts.length - 1
-
-    const interval = setInterval(() => {
-      setCurrentSlide(prev =>
-        prev >= maxSlides ? 0 : prev + 1
-      )
-    }, 4000)
-
-    return () => clearInterval(interval)
-  }, [isAutoPlaying, allProducts, componentMounted])
-
-  // Auto Slide for Featured Products
-  useEffect(() => {
-    if (!componentMounted || !isAutoPlaying || featuredProducts.length <= 1) return
-
-    const maxSlides = featuredProducts.length - 1
-
-    const interval = setInterval(() => {
-      setCurrentFeaturedSlide(prev =>
-        prev >= maxSlides ? 0 : prev + 1
-      )
-    }, 4000)
-
-    return () => clearInterval(interval)
-  }, [isAutoPlaying, featuredProducts, componentMounted])
-
-  const nextSlide = () => {
-    if (allProducts.length <= 1) return
-    const maxSlides = allProducts.length - 1
-    setCurrentSlide(prev =>
-      prev >= maxSlides ? 0 : prev + 1
-    )
-  }
-
-  const prevSlide = () => {
-    if (allProducts.length <= 1) return
-    const maxSlides = allProducts.length - 1
-    setCurrentSlide(prev =>
-      prev === 0 ? maxSlides : prev - 1
-    )
-  }
-
-  const nextFeaturedSlide = () => {
-    if (featuredProducts.length <= 1) return
-    const maxSlides = featuredProducts.length - 1
-    setCurrentFeaturedSlide(prev =>
-      prev >= maxSlides ? 0 : prev + 1
-    )
-  }
-
-  const prevFeaturedSlide = () => {
-    if (featuredProducts.length <= 1) return
-    const maxSlides = featuredProducts.length - 1
-    setCurrentFeaturedSlide(prev =>
-      prev === 0 ? maxSlides : prev - 1
-    )
-  }
-
-  const goToSlide = index => {
-    setCurrentSlide(index)
-  }
-
-  const modelImages = [
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206791/img2_wb4n3k.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img3_xffkyd.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img5_nv7b5y.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img8_ezrlde.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg'
-  ]
-
-  const getOptimizedUrl = (url) => {
-    // Cloudinary URL mein w_400,q_auto,f_auto add karo
-    return url.replace('/upload/', '/upload/w_400,q_auto,f_auto/')
-  }
-
-  const visibleImages = isMobile ? modelImages.slice(0, 4) : modelImages
-
-  const renderProduct = (product) => {
+const ProductCard = React.memo(({ product, isMobile, imageLoaded, imageError, onImageLoad, onImageError }) => {
     if (!product || !product.id) return null
 
     let images = product.images
@@ -277,21 +153,7 @@ const Home = () => {
       }
     }
 
-    const imageUrl = images && images.length > 0 ? images[0] : null
-    const imageLoaded = loadedImages[product.id]
-    const imageError = imageErrors[product.id]
-
-    const handleImageLoad = () => {
-      if (componentMounted) {
-        setLoadedImages(prev => ({ ...prev, [product.id]: true }))
-      }
-    }
-
-    const handleImageError = () => {
-      if (componentMounted) {
-        setImageErrors(prev => ({ ...prev, [product.id]: true }))
-      }
-    }
+    const imageUrl = images && images.length > 0 ? getOptimizedUrl(images[0], isMobile ? 'small' : 'medium') : null
 
     return (
       <Link
@@ -310,26 +172,17 @@ const Home = () => {
           background: 'linear-gradient(135deg, rgba(10,40,45,0.8), rgba(10,50,55,0.6))'
         }}>
           {imageUrl && !imageError ? (
-            <>
-              {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-bright"></div>
-                </div>
-              )}
-              <img
-                src={imageUrl}
-                alt={product.name || 'Product'}
-                loading="lazy"
-                className={`w-full h-full object-contain md:object-cover hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                style={{
-                  filter: 'brightness(0.9) contrast(1.1)',
-                  transition: 'opacity 0.3s ease'
-                }}
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-                sizes="(max-width: 768px) 100vw, 256px"
-              />
-            </>
+            <ProductImage
+              src={imageUrl}
+              alt={product.name || 'Product'}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              style={{
+                filter: 'brightness(0.95) contrast(1.05) saturate(1.1)',
+              }}
+              onLoad={onImageLoad}
+              onError={onImageError}
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 256px"
+            />
           ) : (
             <div className="h-full flex items-center justify-center">
               <span className="text-6xl opacity-60">
@@ -377,7 +230,161 @@ const Home = () => {
         </div>
       </Link>
     )
+  })
+
+const Home = () => {
+  const dispatch = useDispatch()
+  
+  // Use RTK Query for optimized data fetching with pagination
+  const { data: productsData, isLoading: productsLoading, error: productsError, refetch: refetchProducts } = useGetProductsQuery({ 
+    limit: 8, // Sirf 8 products load karna hai initially
+    page: 1 
+  })
+  const { data: featuredData, isLoading: featuredLoading, error: featuredError, refetch: refetchFeatured } = useGetFeaturedProductsQuery()
+
+  // Extract arrays from the response data
+  const allProducts = Array.isArray(productsData) ? productsData : (productsData?.data?.products || [])
+  const featuredProducts = Array.isArray(featuredData) ? featuredData : (featuredData?.data || [])
+
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
+  const [loadedImages, setLoadedImages] = useState({})
+  const [imageErrors, setImageErrors] = useState({})
+  const [componentMounted, setComponentMounted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = React.useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Audio setup - NO AUTOPLAY
+  useEffect(() => {
+    if (isMobile) return  // mobile pe audio hide karo
+    
+    const audio = audioRef.current
+    if (!audio) return
+    
+    // Audio setup for manual play only
+    audio.volume = 0.4
+    audio.preload = 'none' // Network bandwidth save karo
+    
+    // Cleanup
+    return () => {
+      if (audio) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+    }
+  }, [isMobile])
+
+  const toggleAudio = async () => {
+    if (!audioRef.current) return
+    
+    if (isPlaying) {
+      audioRef.current.pause()
+      // setIsPlaying handled by onPause event on the <audio> element
+    } else {
+      try {
+        await audioRef.current.play()
+        // setIsPlaying handled by onPlay event on the <audio> element
+      } catch (error) {
+        console.log('Audio play failed:', error.message)
+        setIsPlaying(false)
+      }
+    }
   }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    setComponentMounted(true)
+    return () => {
+      setComponentMounted(false)
+    }
+  }, [])
+
+  // Auto Slide for All Products - DISABLED for performance
+  useEffect(() => {
+    // Disabled to prevent CPU spikes
+    return () => {}
+  }, [])
+
+  // Auto Slide for Featured Products - DISABLED for performance  
+  useEffect(() => {
+    // Disabled to prevent CPU spikes
+    return () => {}
+  }, [])
+
+  const nextSlide = () => {
+    if (!Array.isArray(allProducts) || allProducts.length <= 1) return
+    const maxSlides = allProducts.length - 1
+    setCurrentSlide(prev =>
+      prev >= maxSlides ? 0 : prev + 1
+    )
+  }
+
+  const prevSlide = () => {
+    if (!Array.isArray(allProducts) || allProducts.length <= 1) return
+    const maxSlides = allProducts.length - 1
+    setCurrentSlide(prev =>
+      prev === 0 ? maxSlides : prev - 1
+    )
+  }
+
+  const nextFeaturedSlide = () => {
+    if (!Array.isArray(featuredProducts) || featuredProducts.length <= 1) return
+    const maxSlides = featuredProducts.length - 1
+    setCurrentFeaturedSlide(prev =>
+      prev >= maxSlides ? 0 : prev + 1
+    )
+  }
+
+  const prevFeaturedSlide = () => {
+    if (!Array.isArray(featuredProducts) || featuredProducts.length <= 1) return
+    const maxSlides = featuredProducts.length - 1
+    setCurrentFeaturedSlide(prev =>
+      prev === 0 ? maxSlides : prev - 1
+    )
+  }
+
+  const goToSlide = React.useCallback(index => {
+    setCurrentSlide(index)
+  }, [])
+
+  const goToFeaturedSlide = React.useCallback(index => {
+    setCurrentFeaturedSlide(index)
+  }, [])
+
+  const modelImages = [
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206791/img2_wb4n3k.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img3_xffkyd.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img5_nv7b5y.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img8_ezrlde.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg'
+  ]
+
+  const visibleImages = isMobile ? modelImages.slice(0, 4) : modelImages
+
+  // ProductCard is now defined outside Home to prevent recreation on every render
+  const handleImageLoad = React.useCallback((productId) => {
+    if (componentMounted) {
+      setLoadedImages(prev => ({ ...prev, [productId]: true }))
+    }
+  }, [componentMounted])
+
+  const handleImageError = React.useCallback((productId) => {
+    if (componentMounted) {
+      setImageErrors(prev => ({ ...prev, [productId]: true }))
+    }
+  }, [componentMounted])
 
   // Skeleton card component
   const SkeletonCard = () => (
@@ -415,35 +422,45 @@ const Home = () => {
         pointerEvents: 'none'
       }}></div>
       
-      {/* Audio Element */}
+      {/* Audio Element - Using Imported File */}
       <audio
         ref={audioRef}
-        src="/src/assets/Celion_Dion_-_My_Heart_Will_Go_On_OST_Titanic_(mp3.pm).mp3"
+        src={audioFile}
         loop
+        preload="none"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
+        onEnded={() => {
+          if (audioRef.current) {
+            audioRef.current.currentTime = 0
+            audioRef.current.play().catch(() => {})
+          }
+        }}
+        onError={(e) => {
+          console.error('Audio error:', e.target.error?.message || 'File not found')
+          setIsPlaying(false)
+        }}
         style={{ display: 'none' }}
       />
       
       {/* Audio Controls */}
-      {!isMobile && (
-        <button
+      <button
           onClick={toggleAudio}
           style={{
             position: 'fixed',
-            top: '80px',
-            right: '20px',
+            top: isMobile ? '70px' : '80px',
+            right: isMobile ? '15px' : '20px',
             zIndex: '1000',
             background: isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)',
             color: '#071e24',
             border: 'none',
             borderRadius: '50%',
-            width: '52px',
-            height: '52px',
+            width: isMobile ? '44px' : '52px',
+            height: isMobile ? '44px' : '52px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.3rem',
+            fontSize: isMobile ? '1.1rem' : '1.3rem',
             cursor: 'pointer',
             boxShadow: isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)',
             backdropFilter: 'blur(10px)',
@@ -464,7 +481,6 @@ const Home = () => {
         >
           {isPlaying ? '⏸️' : '▶️'}
         </button>
-      )}
       
       {/* Bubbles Animation */}
       {!isMobile && (
@@ -558,14 +574,6 @@ const Home = () => {
             }}>
               GET Ashokaaz™
             </span>
-            <span style={{
-              display: 'block',
-              marginBottom: '0.5rem',
-              padding: '0.5rem 0',
-              fontSize: 'clamp(1.2rem, 4vw, 2.2rem)'
-            }}>
-              Global Exim Traders
-            </span>
             <span className="brand-exim" style={{
               display: 'block',
               fontStyle: 'italic',
@@ -577,6 +585,21 @@ const Home = () => {
               fontWeight: '600'
             }}>
               where elegance meets global luxury
+            </span>
+            <span style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              padding: '0.5rem 0',
+              fontSize: 'clamp(1.6rem, 5vw, 2.8rem)',
+              fontFamily: 'Cinzel, serif',
+              fontWeight: '700',
+              letterSpacing: '0.08em',
+              color: '#FFFFFF',
+              textShadow: '2px 2px 0px rgba(0,0,0,0.8), -1px -1px 0px rgba(0,0,0,0.3), 1px 1px 0px rgba(255,255,255,0.2), inset 0px 0px 8px rgba(0,0,0,0.4)',
+              textStroke: '1px rgba(0,0,0,0.3)',
+              WebkitTextStroke: '1px rgba(0,0,0,0.3)'
+            }}>
+              Global Exim Traders
             </span>
           </motion.h1>
           
@@ -873,11 +896,10 @@ const Home = () => {
                   cursor: 'pointer'
                 }}
               >
-                <img
+                <ProductImage
                   src={getOptimizedUrl(image)}
                   alt={`Model ${index + 1}`}
                   className="w-full object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
                   style={{
                     height: isMobile ? '200px' : '280px',
                     filter: 'brightness(0.9) contrast(1.1)',
@@ -981,16 +1003,16 @@ const Home = () => {
           </motion.p>
         </div>
 
-        {productsLoading ? (
+        {productsLoading || featuredLoading ? (
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : productsError ? (
           <div className="text-center py-16">
             <p style={{ color: 'var(--text-muted)', fontFamily: 'Lora, serif', marginBottom: '1rem' }}>Unable to load products</p>
-            <button onClick={() => dispatch(getProducts())} style={{ background: 'var(--teal-bright)', color: '#071e24', padding: '0.5rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Retry</button>
+            <button onClick={() => refetchProducts()} style={{ background: 'var(--teal-bright)', color: '#071e24', padding: '0.5rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Retry</button>
           </div>
-        ) : allProducts.length === 0 ? (
+        ) : !Array.isArray(allProducts) || allProducts.length === 0 ? (
           <div className="text-center py-16" style={{
             color: 'var(--text-muted)',
             fontFamily: 'Lora, serif',
@@ -1001,7 +1023,7 @@ const Home = () => {
         ) : (
           <div className="relative max-w-7xl mx-auto px-8">
             {/* Left Arrow */}
-            {allProducts.length > 1 && (
+            {Array.isArray(allProducts) && allProducts.length > 1 && (
               <button
                 onClick={prevSlide}
                 style={{
@@ -1042,7 +1064,7 @@ const Home = () => {
             )}
 
             {/* Right Arrow */}
-            {allProducts.length > 1 && (
+            {Array.isArray(allProducts) && allProducts.length > 1 && (
               <button
                 onClick={nextSlide}
                 style={{
@@ -1086,25 +1108,32 @@ const Home = () => {
               <div
                 className="flex gap-4 md:gap-6 transition-transform duration-500 ease-in-out"
                 style={{
-                  transform: allProducts.length > 1 
+                  transform: Array.isArray(allProducts) && allProducts.length > 1 
                     ? `translateX(-${currentSlide * 100}%)` 
                     : 'none'
                 }}
               >
-                {allProducts.map(product => (
+                {Array.isArray(allProducts) && allProducts.map(product => (
                   <div
                     key={product.id}
                     className="flex-shrink-0 w-full md:w-64"
                   >
-                    {renderProduct(product)}
+                    <ProductCard
+                      product={product}
+                      isMobile={isMobile}
+                      imageLoaded={loadedImages[product.id]}
+                      imageError={imageErrors[product.id]}
+                      onImageLoad={() => handleImageLoad(product.id)}
+                      onImageError={() => handleImageError(product.id)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
 
-            {allProducts.length > 1 && (
+            {Array.isArray(allProducts) && allProducts.length > 1 && (
               <div className="flex justify-center mt-12 gap-3">
-                {allProducts.map((_, index) => (
+                {Array.isArray(allProducts) && allProducts.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
@@ -1212,11 +1241,16 @@ const Home = () => {
           </motion.p>
         </div>
 
-        {productsLoading ? (
+        {productsLoading || featuredLoading ? (
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
-        ) : featuredProducts.length === 0 ? (
+        ) : featuredError ? (
+          <div className="text-center py-16">
+            <p style={{ color: 'var(--text-muted)', fontFamily: 'Lora, serif', marginBottom: '1rem' }}>Unable to load featured products</p>
+            <button onClick={() => refetchFeatured()} style={{ background: 'var(--teal-bright)', color: '#071e24', padding: '0.5rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Retry</button>
+          </div>
+        ) : !Array.isArray(featuredProducts) || featuredProducts.length === 0 ? (
           <div className="text-center py-16" style={{
             color: 'var(--text-muted)',
             fontFamily: 'Lora, serif',
@@ -1227,7 +1261,7 @@ const Home = () => {
         ) : (
           <div className="relative max-w-7xl mx-auto px-8">
             {/* Left Arrow */}
-            {featuredProducts.length > 1 && (
+            {Array.isArray(featuredProducts) && featuredProducts.length > 1 && (
               <button
                 onClick={prevFeaturedSlide}
                 style={{
@@ -1268,7 +1302,7 @@ const Home = () => {
             )}
 
             {/* Right Arrow */}
-            {featuredProducts.length > 1 && (
+            {Array.isArray(featuredProducts) && featuredProducts.length > 1 && (
               <button
                 onClick={nextFeaturedSlide}
                 style={{
@@ -1312,25 +1346,32 @@ const Home = () => {
               <div
                 className="flex gap-4 md:gap-6 transition-transform duration-500 ease-in-out"
                 style={{
-                  transform: featuredProducts.length > 1 
+                  transform: Array.isArray(featuredProducts) && featuredProducts.length > 1 
                     ? `translateX(-${currentFeaturedSlide * 100}%)` 
                     : 'none'
                 }}
               >
-                {featuredProducts.map(product => (
+                {Array.isArray(featuredProducts) && featuredProducts.map(product => (
                   <div
                     key={product.id}
                     className="flex-shrink-0 w-full md:w-64"
                   >
-                    {renderProduct(product)}
+                    <ProductCard
+                      product={product}
+                      isMobile={isMobile}
+                      imageLoaded={loadedImages[product.id]}
+                      imageError={imageErrors[product.id]}
+                      onImageLoad={() => handleImageLoad(product.id)}
+                      onImageError={() => handleImageError(product.id)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
 
-            {featuredProducts.length > 1 && (
+            {Array.isArray(featuredProducts) && featuredProducts.length > 1 && (
               <div className="flex justify-center mt-12 gap-3">
-                {featuredProducts.map((_, index) => (
+                {Array.isArray(featuredProducts) && featuredProducts.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToFeaturedSlide(index)}

@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAdminPayments } from '../store/slices/adminPaymentsSlice'
+import { useGetPaymentsQuery } from '../store/slices/adminApi'
 
 const AdminPayments = () => {
-  const dispatch = useDispatch()
-  const { payments, loading, error } = useSelector(state => state.adminPayments)
   const [statusFilter, setStatusFilter] = useState('All')
+  const { data: payments, isLoading, error } = useGetPaymentsQuery(
+    statusFilter !== 'All' ? { status: statusFilter } : {}
+  )
 
-  useEffect(() => {
-    const params = statusFilter !== 'All' ? { status: statusFilter } : {}
-    dispatch(getAdminPayments(params))
-  }, [dispatch, statusFilter])
-
-  const filteredPayments = statusFilter === 'All' ? payments : payments.filter(payment => payment.status === statusFilter)
+  const filteredPayments = statusFilter === 'All' ? payments || [] : (payments || []).filter(payment => payment.status === statusFilter)
   const statuses = ['All', 'Completed', 'Pending', 'Failed', 'Refunded']
 
   return (
@@ -94,7 +89,7 @@ const AdminPayments = () => {
                 </tr>
               </thead>
               <tbody style={{ background: 'var(--glass-light)', borderColor: 'var(--glass-border)' }} className="divide-y">
-                {loading ? (
+                {isLoading ? (
                   <tr>
                     <td colSpan="8" className="px-6 py-12 text-center" style={{ color: 'var(--text-soft)' }}>
                       <div className="text-6xl mb-4">⏳</div>

@@ -1,0 +1,1053 @@
+import React, { useEffect, useState, Suspense } from 'react'
+import { Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { getProducts, getFeaturedProducts } from '../store/slices/productsSlice'
+import { motion } from 'framer-motion'
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Homepage Error:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a2830' }}>
+          <div className="text-center">
+            <h1 style={{ color: 'var(--text-bright)', marginBottom: '1rem' }}>Something went wrong</h1>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ 
+                background: 'var(--teal-bright)', 
+                color: '#071e24', 
+                padding: '0.5rem 1rem', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+
+const ProductImage = React.memo(({ src, alt, className, style, onLoad, onError, sizes }) => {
+  const [imageSrc, setImageSrc] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    if (!src) return
+
+    const img = new Image()
+    img.onload = () => {
+      setImageSrc(src)
+      setLoading(false)
+      onLoad?.()
+    }
+    img.onerror = () => {
+      setError(true)
+      setLoading(false)
+      onError?.()
+    }
+    img.src = src
+  }, [src, onLoad, onError])
+
+  if (error || !src) {
+    return null
+  }
+
+  if (loading) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-bright"></div>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={alt}
+      loading="lazy"
+      className={className}
+      style={style}
+      sizes={sizes}
+    />
+  )
+})
+
+const Home = () => {
+  const dispatch = useDispatch()
+  const featuredProducts = useSelector(
+    state => state.products.featuredProducts || []
+  )
+  const allProducts = useSelector(
+    state => state.products.products || []
+  )
+  const productsLoading = useSelector(
+    state => state.products.loadingProducts || state.products.loadingFeatured
+  )
+  const productsError = useSelector(
+    state => state.products.error
+  )
+
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false)
+  const [loadedImages, setLoadedImages] = useState({})
+  const [imageErrors, setImageErrors] = useState({})
+  const [componentMounted, setComponentMounted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = React.useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Autoplay trick: browsers allow muted autoplay, then we unmute
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  useEffect(() => {
+    if (isMobile) return  // mobile pe skip karo
+    const audio = audioRef.current
+    if (!audio) return
+    audio.volume = 0.4
+    audio.muted = true // Start muted to allow autoplay
+    audio.play().then(() => {
+      setIsPlaying(true)
+      // Unmute after a short delay or on interaction
+      setTimeout(() => {
+        audio.muted = false
+      }, 1000) // Unmute after 1 second
+    }).catch(() => {
+      // fallback: play on first user interaction
+      const onInteract = () => {
+        audio.muted = false
+        audio.play().then(() => setIsPlaying(true)).catch(() => {})
+        document.removeEventListener('click', onInteract)
+        document.removeEventListener('touchstart', onInteract)
+      }
+      document.addEventListener('click', onInteract)
+      document.addEventListener('touchstart', onInteract)
+    })
+  }, [isMobile])
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
+      }
+    }
+  }
+
+  // Fetch all products and featured products
+  useEffect(() => {
+    setComponentMounted(true)
+    try {
+      dispatch(getProducts())
+      dispatch(getFeaturedProducts())
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    }
+  }, [dispatch])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      setComponentMounted(false)
+    }
+  }, [])
+
+  // Auto Slide for All Products
+  useEffect(() => {
+    if (!componentMounted || !isAutoPlaying || allProducts.length <= 1) return
+
+    const maxSlides = allProducts.length - 1
+
+    const interval = setInterval(() => {
+      setCurrentSlide(prev =>
+        prev >= maxSlides ? 0 : prev + 1
+      )
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, allProducts, componentMounted])
+
+  // Auto Slide for Featured Products
+  useEffect(() => {
+    if (!componentMounted || !isAutoPlaying || featuredProducts.length <= 1) return
+
+    const maxSlides = featuredProducts.length - 1
+
+    const interval = setInterval(() => {
+      setCurrentFeaturedSlide(prev =>
+        prev >= maxSlides ? 0 : prev + 1
+      )
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, featuredProducts, componentMounted])
+
+  const nextSlide = () => {
+    if (allProducts.length <= 1) return
+    const maxSlides = allProducts.length - 1
+    setCurrentSlide(prev =>
+      prev >= maxSlides ? 0 : prev + 1
+    )
+  }
+
+  const prevSlide = () => {
+    if (allProducts.length <= 1) return
+    const maxSlides = allProducts.length - 1
+    setCurrentSlide(prev =>
+      prev === 0 ? maxSlides : prev - 1
+    )
+  }
+
+  const nextFeaturedSlide = () => {
+    if (featuredProducts.length <= 1) return
+    const maxSlides = featuredProducts.length - 1
+    setCurrentFeaturedSlide(prev =>
+      prev >= maxSlides ? 0 : prev + 1
+    )
+  }
+
+  const prevFeaturedSlide = () => {
+    if (featuredProducts.length <= 1) return
+    const maxSlides = featuredProducts.length - 1
+    setCurrentFeaturedSlide(prev =>
+      prev === 0 ? maxSlides : prev - 1
+    )
+  }
+
+  const goToSlide = index => {
+    setCurrentSlide(index)
+  }
+
+  const modelImages = [
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206791/img2_wb4n3k.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img3_xffkyd.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img5_nv7b5y.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img8_ezrlde.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg'
+  ]
+
+  const getOptimizedUrl = (url) => {
+    // Cloudinary URL mein w_400,q_auto,f_auto add karo
+    return url.replace('/upload/', '/upload/w_400,q_auto,f_auto/')
+  }
+
+  const visibleImages = isMobile ? modelImages.slice(0, 4) : modelImages
+
+  const renderProduct = React.memo((product) => {
+    if (!product || !product.id) return null
+
+    let images = product.images
+
+    if (typeof images === 'string') {
+      try {
+        images = JSON.parse(images)
+      } catch {
+        images = []
+      }
+    }
+
+    const imageUrl = images && images.length > 0 ? images[0] : null
+    const imageLoaded = loadedImages[product.id]
+    const imageError = imageErrors[product.id]
+
+    const handleImageLoad = () => {
+      if (componentMounted) {
+        setLoadedImages(prev => ({ ...prev, [product.id]: true }))
+      }
+    }
+
+    const handleImageError = () => {
+      if (componentMounted) {
+        setImageErrors(prev => ({ ...prev, [product.id]: true }))
+      }
+    }
+
+    return (
+      <Link
+        to={`/product/${product.id}`}
+        className="block overflow-hidden transition-all hover:shadow-xl hover:shadow-teal-400/20"
+        style={{
+          background: 'var(--glass-card)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '12px',
+          backdropFilter: 'blur(8px)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <div className="h-56 overflow-hidden relative" style={{
+          background: 'linear-gradient(135deg, rgba(10,40,45,0.8), rgba(10,50,55,0.6))'
+        }}>
+          {imageUrl && !imageError ? (
+            <>
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-bright"></div>
+                </div>
+              )}
+              <img
+                src={imageUrl}
+                alt={product.name || 'Product'}
+                loading="lazy"
+                className={`w-full h-full object-contain md:object-cover hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{
+                  filter: 'brightness(0.9) contrast(1.1)',
+                  transition: 'opacity 0.3s ease'
+                }}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                sizes="(max-width: 768px) 100vw, 256px"
+              />
+            </>
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <span className="text-6xl opacity-60">
+                {product.icon || '📦'}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="p-6" style={{
+          background: 'linear-gradient(to bottom, rgba(10,40,45,0.9), rgba(8,30,35,0.95))'
+        }}>
+          <h3 style={{
+            fontFamily: 'Playfair Display, serif',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            color: 'var(--gold-bright)',
+            marginBottom: '0.75rem',
+            lineHeight: '1.3'
+          }}>
+            {product.name}
+          </h3>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: '1rem'
+          }}>
+            <span style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: 'var(--teal-bright)',
+              letterSpacing: '0.02em'
+            }}>
+              ₹{product.price}
+            </span>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              background: 'var(--gold-bright)',
+              borderRadius: '50%',
+              boxShadow: '0 0 12px rgba(224,194,128,0.6)'
+            }}></div>
+          </div>
+        </div>
+      </Link>
+    )
+  })
+
+  // Skeleton card component
+  const SkeletonCard = () => (
+    <div style={{
+      background: 'var(--glass-card)',
+      border: '1px solid var(--glass-border)',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      animation: 'pulse 1.5s ease-in-out infinite'
+    }}>
+      <div style={{ height: '224px', background: 'rgba(37,204,200,0.08)' }} />
+      <div style={{ padding: '1.5rem' }}>
+        <div style={{ height: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '12px', width: '70%' }} />
+        <div style={{ height: '24px', background: 'rgba(37,204,200,0.12)', borderRadius: '4px', width: '40%' }} />
+      </div>
+    </div>
+  )
+
+  return (
+    <ErrorBoundary>
+      <div className="min-h-screen" style={{
+      background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
+      backdropFilter: 'blur(2px)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'radial-gradient(ellipse at center, rgba(37,204,200,0.1) 0%, transparent 70%)',
+        animation: 'waterWave 8s ease-in-out infinite',
+        pointerEvents: 'none'
+      }}></div>
+      
+      {/* Audio Element */}
+      <audio
+        ref={audioRef}
+        src="/src/assets/Celion_Dion_-_My_Heart_Will_Go_On_OST_Titanic_(mp3.pm).mp3"
+        loop
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        style={{ display: 'none' }}
+      />
+      
+      {/* Audio Controls */}
+      {!isMobile && (
+        <button
+          onClick={toggleAudio}
+          style={{
+            position: 'fixed',
+            top: '80px',
+            right: '20px',
+            zIndex: '1000',
+            background: isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)',
+            color: '#071e24',
+            border: 'none',
+            borderRadius: '50%',
+            width: '52px',
+            height: '52px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.3rem',
+            cursor: 'pointer',
+            boxShadow: isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(37,204,200,1)'
+            e.currentTarget.style.transform = 'scale(1.1)'
+            e.currentTarget.style.boxShadow = '0 6px 30px rgba(37,204,200,0.6)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = isPlaying ? 'rgba(37,204,200,0.95)' : 'rgba(37,204,200,0.7)'
+            e.currentTarget.style.transform = 'scale(1)'
+            e.currentTarget.style.boxShadow = isPlaying ? '0 0 20px rgba(37,204,200,0.6)' : '0 4px 16px rgba(37,204,200,0.3)'
+          }}
+          title={isPlaying ? 'Pause Music' : 'Play Music'}
+          aria-label={isPlaying ? 'Pause Music' : 'Play Music'}
+        >
+          {isPlaying ? '⏸️' : '▶️'}
+        </button>
+      )}
+      
+      {/* Bubbles Animation */}
+      {!isMobile && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          pointerEvents: 'none'
+        }}>
+          {[...Array(5)].map((_, i) => {
+            const sizes = [8, 12, 6, 15, 10]
+            const lefts = [10, 25, 50, 70, 85]
+            const durations = [8, 10, 7, 12, 9]
+            return (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  bottom: '-20px',
+                  left: `${lefts[i]}%`,
+                  width: `${sizes[i]}px`,
+                  height: `${sizes[i]}px`,
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: '50%',
+                  animation: `bubbleRise ${durations[i]}s linear infinite`,
+                  animationDelay: `${i * 2}s`
+                }}
+              />
+            )
+          })}
+        </div>
+      )}
+      
+      {/* HERO */}
+      <section className="relative py-24 flex items-center justify-center" style={{
+        backgroundImage: 'linear-gradient(to bottom, rgba(8,25,30,0.65) 0%, rgba(8,25,30,0.3) 35%, rgba(8,25,30,0.7) 100%)',
+        backgroundAttachment: 'scroll'
+      }}>
+        <div className="text-center max-w-6xl px-6">
+          <div className="hero-eyebrow" style={{
+            fontFamily: 'Raleway, sans-serif',
+            fontSize: '0.65rem',
+            fontWeight: '700',
+            letterSpacing: '0.65em',
+            color: 'var(--teal-bright)',
+            textTransform: 'uppercase',
+            marginBottom: '2rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <span style={{
+              display: 'inline-block',
+              width: '35px',
+              height: '1px',
+              background: 'var(--teal)'
+            }}></span>
+            WELCOME TO
+            <span style={{
+              display: 'inline-block',
+              width: '35px',
+              height: '1px',
+              background: 'var(--teal)'
+            }}></span>
+          </div>
+          <motion.h1 
+            initial={{ opacity: 0, y: -50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="hero-title"
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(2.8rem,6vw,5.5rem)',
+              fontWeight: '900',
+              lineHeight: '0.93',
+              letterSpacing: '-0.02em',
+              color: '#FFFFFF',
+              textShadow: '4px 4px 12px rgba(0,0,0,0.8)',
+              marginBottom: '0.5rem'
+            }}
+          >
+            <span className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl flex flex-wrap font-semibold font-serif text-white' style={{
+              display: 'block',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
+              letterSpacing: '0.1em',
+              marginBottom: '0.5rem'
+            }}>
+              GET Ashokaaz™
+            </span>
+            <span style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              padding: '0.5rem 0',
+              fontSize: 'clamp(1.2rem, 4vw, 2.2rem)'
+            }}>
+              Global Exim Traders
+            </span>
+            <span className="brand-exim" style={{
+              display: 'block',
+              fontStyle: 'italic',
+              color: 'var(--gold-bright)',
+              fontFamily: 'Cinzel, serif',
+              fontSize: 'clamp(1.1rem,2vw,1.6rem)',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
+              letterSpacing: '0.1em',
+              fontWeight: '600'
+            }}>
+              where elegance meets global luxury
+            </span>
+          </motion.h1>
+          
+          <div className="lotus-divider" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            margin: '2rem 0'
+          }}>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '100px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+            <div className="lotus-gem" style={{
+              width: '9px',
+              height: '9px',
+              background: 'var(--teal-bright)',
+              transform: 'rotate(45deg)',
+              animation: 'floatLotus 4s ease-in-out infinite'
+            }}></div>
+            <div className="lotus-line" style={{
+              flex: '1',
+              maxWidth: '100px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, var(--teal), transparent)'
+            }}></div>
+          </div>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="hero-tagline"
+            style={{
+              fontFamily: 'Lora, serif',
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.1rem,2vw,1.6rem)',
+              color: '#FFFFFF',
+              marginBottom: '1rem'
+            }}
+          >
+            Discover authentic Indian craftsmanship & premium export-quality collections
+          </motion.p>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="hero-subtitle"
+            style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '1.2rem',
+              fontWeight: 'bold',
+              letterSpacing: '0.06em',
+              color: '#FFFFFF',
+              lineHeight: '1.9',
+              marginBottom: '3rem'
+            }}
+          >
+            Curated selection of finest jewellery and handicrafts from traditional artisans
+          </motion.p>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex justify-center gap-6 mb-12"
+          >
+            <Link to="/products" className="btn-primary" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.7rem',
+              fontWeight: '700',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              color: '#071e24',
+              background: 'var(--teal-bright)',
+              padding: '1rem 2.4rem',
+              textDecoration: 'none',
+              display: 'inline-block',
+              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 0.3s'
+            }}>
+              Explore Collections
+            </Link>
+            <Link to="/about" className="btn-secondary" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.7rem',
+              fontWeight: '600',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: 'var(--gold-bright)',
+              background: 'rgba(10,40,45,0.5)',
+              padding: '1rem 2.4rem',
+              border: '1px solid rgba(200,162,110,0.45)',
+              textDecoration: 'none',
+              display: 'inline-block',
+              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
+              backdropFilter: 'blur(8px)',
+              transition: 'all 0.35s'
+            }}>
+              Our Story
+            </Link>
+          </motion.div>
+          
+          {/* Trust Badges */}
+          <div className="trust-row" style={{
+            position: 'relative',
+            zIndex: '10',
+            width: '100%',
+            background: 'rgba(8,30,35,0.92)',
+            borderTop: '1px solid var(--glass-border)',
+            padding: '1.3rem 4%',
+            marginTop: '4rem',
+            borderRadius: '8px'
+          }}>
+            <div className="trust-label-v" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.58rem',
+              fontWeight: '700',
+              letterSpacing: '0.4em',
+              color: 'var(--teal)',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              marginBottom: '1rem'
+            }}>
+              TRUSTED BY GLOBAL CLIENTS
+            </div>
+            <div className="trust-badges-v" style={{
+              display: 'flex',
+              gap: '1.8rem',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
+            }}>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ EXPORT QUALITY
+              </div>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ AUTHENTIC HANDICRAFTS
+              </div>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ PREMIUM JEWELRY
+              </div>
+              <div className="badge-text" style={{
+                fontFamily: 'Raleway, sans-serif',
+                fontSize: '0.58rem',
+                fontWeight: '600',
+                letterSpacing: '0.12em',
+                color: 'var(--text-soft)',
+                textTransform: 'uppercase'
+              }}>
+                ✓ GLOBAL SHIPPING
+              </div>
+            </div>
+          </div>
+          
+          {/* Additional Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 text-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="p-8 rounded-lg"
+              style={{
+                background: 'rgba(8,30,35,0.95)',
+                border: '1px solid var(--glass-border)'
+              }}
+            >
+              <div className="text-5xl mb-4">🏛️</div>
+              <h3 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: 'var(--gold-bright)',
+                marginBottom: '1rem'
+              }}>Traditional Heritage</h3>
+              <p style={{
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: 'var(--text-soft)',
+                lineHeight: '1.6'
+              }}>Authentic Indian craftsmanship passed through generations</p>
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="p-8 rounded-lg"
+              style={{
+                background: 'rgba(8,30,35,0.95)',
+                border: '1px solid var(--glass-border)'
+              }}
+            >
+              <div className="text-5xl mb-4">🌍</div>
+              <h3 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: 'var(--gold-bright)',
+                marginBottom: '1rem'
+              }}>Global Quality</h3>
+              <p style={{
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: 'var(--text-soft)',
+                lineHeight: '1.6'
+              }}>Export-grade products meeting international standards</p>
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+              className="p-8 rounded-lg"
+              style={{
+                background: 'rgba(8,30,35,0.95)',
+                border: '1px solid var(--glass-border)'
+              }}
+            >
+              <div className="text-5xl mb-4">✨</div>
+              <h3 style={{
+                fontFamily: 'Playfair Display, serif',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: 'var(--gold-bright)',
+                marginBottom: '1rem'
+              }}>Premium Collection</h3>
+              <p style={{
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: 'var(--text-soft)',
+                lineHeight: '1.6'
+              }}>Curated selection of finest jewelry and handicrafts</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* MODEL IMAGES GRID */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="py-16"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(8,30,35,0.6), rgba(8,30,35,0.4))'
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {visibleImages.map((image, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                className="relative overflow-hidden rounded-lg shadow-lg"
+                style={{
+                  background: 'var(--glass-card)',
+                  border: '1px solid var(--glass-border)',
+                  backdropFilter: 'blur(8px)',
+                  cursor: 'pointer'
+                }}
+              >
+                <img
+                  src={getOptimizedUrl(image)}
+                  alt={`Model ${index + 1}`}
+                  className="w-full object-cover hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                  style={{
+                    height: isMobile ? '200px' : '280px',
+                    filter: 'brightness(0.9) contrast(1.1)',
+                    display: 'block'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent)',
+                  padding: '1rem',
+                  color: '#FFFFFF'
+                }}>
+                  <p style={{
+                    fontFamily: 'Lora, serif',
+                    fontSize: '0.85rem',
+                    opacity: '0.9',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Elegance Personified
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ALL PRODUCTS CAROUSEL */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="py-24"
+        style={{
+          background: 'linear-gradient(to bottom, transparent, rgba(8,30,35,0.4))'
+        }}
+      >
+        <div className="max-w-7xl mx-auto text-center mb-16 px-6">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(2rem,4vw,3rem)',
+              fontWeight: '700',
+              color: 'var(--gold-bright)',
+              marginBottom: '1rem',
+              letterSpacing: '0.02em'
+            }}
+          >
+            Our Premium Collection
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{
+              fontFamily: 'Lora, serif',
+              fontSize: '1.1rem',
+              color: 'var(--text-soft)',
+              lineHeight: '1.6',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}
+          >
+            Discover our handpicked selection of authentic Indian jewelry and handicrafts
+          </motion.p>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6">
+          {productsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <SkeletonCard key={index} />
+              ))}
+            </div>
+          ) : productsError ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">❌</div>
+              <h3 style={{ color: 'var(--gold-bright)', marginBottom: '1rem' }}>Error Loading Products</h3>
+              <p style={{ color: 'var(--text-soft)' }}>{productsError}</p>
+            </div>
+          ) : allProducts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {allProducts.slice(0, 8).map((product) => (
+                <div key={product.id}>
+                  {renderProduct(product)}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📦</div>
+              <h3 style={{ color: 'var(--text-bright)', marginBottom: '1rem' }}>No Products Available</h3>
+              <p style={{ color: 'var(--text-soft)' }}>Check back soon for our amazing collection!</p>
+            </div>
+          )}
+        </div>
+      </motion.section>
+
+      {/* FOOTER CTA */}
+      <section className="py-16" style={{
+        background: 'linear-gradient(to bottom, rgba(8,30,35,0.4), rgba(8,30,35,0.8))'
+      }}>
+        <div className="max-w-4xl mx-auto text-center px-6">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(1.8rem,3vw,2.5rem)',
+              fontWeight: '700',
+              color: 'var(--gold-bright)',
+              marginBottom: '1rem'
+            }}
+          >
+            Ready to Experience Excellence?
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{
+              fontFamily: 'Lora, serif',
+              fontSize: '1.1rem',
+              color: 'var(--text-soft)',
+              lineHeight: '1.6',
+              marginBottom: '2rem'
+            }}
+          >
+            Join thousands of satisfied customers worldwide who trust Ashokaaz™ for authentic Indian luxury
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Link to="/products" className="btn-primary" style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              color: '#071e24',
+              background: 'var(--teal-bright)',
+              padding: '1rem 3rem',
+              textDecoration: 'none',
+              display: 'inline-block',
+              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
+              transition: 'all 0.3s'
+            }}>
+              Shop Now
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+    </ErrorBoundary>
+  )
+}
+
+export default Home

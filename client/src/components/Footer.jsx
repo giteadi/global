@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const Footer = () => {
+const Footer = React.memo(() => {
   const currentYear = new Date().getFullYear()
 
   return (
@@ -161,6 +161,6 @@ const Footer = () => {
       </div>
     </footer>
   )
-}
+})
 
-export default Footer
+export default React.memo(Footer)

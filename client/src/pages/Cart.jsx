@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { removeFromCart, updateQuantity, clearCart } from '../store/slices/cartSlice'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 
-const Cart = () => {
+const Cart = React.memo(() => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -29,7 +29,10 @@ const Cart = () => {
     navigate('/checkout') // optional redirect
   }
 
-  if (!items.length) {
+  // Memoize cart items to prevent re-renders
+  const memoizedItems = useMemo(() => items, [items])
+
+  if (!memoizedItems.length) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 flex items-center justify-center px-4">
         <motion.div
@@ -218,6 +221,6 @@ const Cart = () => {
       </div>
     </div>
   )
-}
+})
 
 export default Cart

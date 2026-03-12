@@ -1,26 +1,28 @@
-import { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserProfile } from '../store/slices/authSlice'
 
-const AppInitializer = ({ children }) => {
+const AppInitializer = React.memo(({ children }) => {
   const dispatch = useDispatch()
   const { token, user, loading, error, profileFetchAttempted } = useSelector(state => state.auth)
 
+  // Memoize the condition to prevent unnecessary re-renders
+  const shouldFetchProfile = useMemo(() => {
+    return token && !user && !loading && !error && !profileFetchAttempted
+  }, [token, user, loading, error, profileFetchAttempted])
+
   useEffect(() => {
-    // If we have a token but no user data, fetch the profile
-    // Only fetch if not currently loading, no previous error, and profile not already attempted
-    if (token && !user && !loading && !error && !profileFetchAttempted) {
+    if (shouldFetchProfile) {
       console.log('AppInitializer: Fetching user profile')
       dispatch(getUserProfile())
     } else if (error && profileFetchAttempted) {
       console.log('AppInitializer: Auth error detected, clearing token')
-      // Clear invalid token
       dispatch({ type: 'auth/clearError' })
       localStorage.removeItem('token')
     }
-  }, [token, user, loading, error, profileFetchAttempted, dispatch])
+  }, [shouldFetchProfile, error, profileFetchAttempted, dispatch])
 
   return children
-}
+})
 
 export default AppInitializer

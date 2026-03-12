@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { getUserProfile, updateUserProfile } from '../store/slices/authSlice'
+import { updateUserProfile } from '../store/slices/authSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 
@@ -18,6 +18,9 @@ const Profile = () => {
     country: 'India'
   })
 
+  // Memoize form data to prevent unnecessary re-renders
+  const memoizedFormData = useMemo(() => formData, [formData])
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -31,12 +34,6 @@ const Profile = () => {
       })
     }
   }, [user])
-
-  useEffect(() => {
-    if (user) {
-      dispatch(getUserProfile())
-    }
-  }, [dispatch, user])
 
   const handleChange = (e) => {
     setFormData({

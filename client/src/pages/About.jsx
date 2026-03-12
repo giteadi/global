@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-const About = () => {
+const About = React.memo(() => {
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
       <div className="max-w-6xl mx-auto">
@@ -180,6 +180,6 @@ const About = () => {
       </div>
     </div>
   )
-}
+})
 
-export default About
+export default React.memo(About)

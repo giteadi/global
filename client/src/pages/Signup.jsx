@@ -5,7 +5,7 @@ import { signupUser } from '../store/slices/authSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 
-const Signup = () => {
+const Signup = React.memo(() => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -214,6 +214,6 @@ const Signup = () => {
       </motion.div>
     </div>
   )
-}
+})
 
-export default Signup
+export default React.memo(Signup)

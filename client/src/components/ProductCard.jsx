@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
 
-const ProductCard = ({ product }) => {
+const ProductCard = React.memo(({ product }) => {
   const dispatch = useDispatch()
 
   const handleAddToCart = (e) => {
@@ -76,6 +76,6 @@ const ProductCard = ({ product }) => {
       </div>
     </div>
   )
-}
+})
 
-export default ProductCard
+export default React.memo(ProductCard)

@@ -3,7 +3,16 @@ import API_BASE from '../../api/config'
 
 export const adminApi = createApi({
   reducerPath: 'adminApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${API_BASE}/api` }),
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: `${API_BASE}/api`,
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.token
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
+    },
+  }),
   endpoints: (builder) => ({
     // Users CRUD
     getUsers: builder.query({
@@ -72,6 +81,18 @@ export const adminApi = createApi({
         method: 'DELETE'
       }),
       invalidatesTags: ['Products']
+    }),
+
+    // Get Single Product
+    getProduct: builder.query({
+      query: (id) => `products/${id}`,
+      providesTags: ['Products']
+    }),
+
+    // Get Featured Products
+    getFeaturedProducts: builder.query({
+      query: () => 'products/featured',
+      providesTags: ['Products']
     }),
 
     // Orders CRUD
@@ -146,6 +167,27 @@ export const adminApi = createApi({
     getDashboardStats: builder.query({
       query: () => 'analytics/dashboard',
       providesTags: ['Dashboard']
+    }),
+
+    // Contacts
+    getContacts: builder.query({
+      query: () => 'contacts/admin',
+      providesTags: ['Contacts']
+    }),
+    updateContactStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `contacts/admin/${id}/status`,
+        method: 'PUT',
+        body: { status }
+      }),
+      invalidatesTags: ['Contacts']
+    }),
+    deleteContact: builder.mutation({
+      query: (id) => ({
+        url: `contacts/admin/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Contacts']
     })
   })
 })
@@ -159,6 +201,8 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetProductQuery,
+  useGetFeaturedProductsQuery,
   useGetOrdersQuery,
   useUpdateOrderMutation,
   useGetCategoriesQuery,
@@ -167,5 +211,8 @@ export const {
   useDeleteCategoryMutation,
   useGetPaymentsQuery,
   useGetAnalyticsQuery,
-  useGetDashboardStatsQuery
+  useGetDashboardStatsQuery,
+  useGetContactsQuery,
+  useUpdateContactStatusMutation,
+  useDeleteContactMutation
 } = adminApi

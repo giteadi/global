@@ -25,6 +25,17 @@ import AdminAnalytics from './pages/AdminAnalytics'
 import AdminSettings from './pages/AdminSettings'
 import './styles.css'
 
+// Memoized ScrollToTop component
+const ScrollToTop = React.memo(() => {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+})
+
 // Global Error Boundary
 class AppErrorBoundary extends React.Component {
   constructor(props) {
@@ -68,26 +79,15 @@ class AppErrorBoundary extends React.Component {
   }
 }
 
-// Loading component
-const PageLoader = () => (
+// Memoized Loading component
+const PageLoader = React.memo(() => (
   <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a2830' }}>
     <div className="text-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-bright mx-auto mb-4"></div>
       <p style={{ color: 'var(--text-bright)' }}>Loading...</p>
     </div>
   </div>
-)
-
-// Scroll to top component
-function ScrollToTop() {
-  const { pathname } = useLocation()
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-
-  return null
-}
+))
 
 function App() {
   return (
@@ -124,33 +124,7 @@ function App() {
             </main>
             <Footer />
           </div>
-          <div className="bubbles-container">
-            {Array.from({length: 10}, (_, i) => (
-              <div key={i} className="bubble"></div>
-            ))}
-          </div>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: 'var(--teal)',
-                color: 'var(--white)',
-              },
-              success: {
-                style: {
-                  background: 'var(--gold)',
-                  color: 'var(--text-bright)',
-                },
-              },
-              error: {
-                style: {
-                  background: 'var(--maroon)',
-                  color: 'var(--white)',
-                },
-              },
-            }}
-          />
+          <Toaster />
         </Router>
       </AppInitializer>
     </AppErrorBoundary>

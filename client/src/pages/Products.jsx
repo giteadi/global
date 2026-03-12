@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { setProducts, setLoading } from '../store/slices/productsSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
-import API_BASE from '../api/config'
+import { useGetProductsQuery, useGetCategoriesQuery } from '../store/slices/adminApi'
 
 const Products = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { products, loading } = useSelector(state => state.products)
   const { user } = useSelector(state => state.auth)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
-  const [categories, setCategories] = useState([])
+  
+  // Use RTK Query for optimized data fetching
+  const { data: products = [], isLoading: productsLoading } = useGetProductsQuery()
+  const { data: categoriesData = [] } = useGetCategoriesQuery()
+  
+  // Memoize categories to prevent re-renders
+  const categories = useMemo(() => categoriesData, [categoriesData])
 
   // Read category from URL on mount
   useEffect(() => {
@@ -25,54 +29,23 @@ const Products = () => {
     }
   }, [searchParams])
 
-  const fetchProducts = async () => {
-    try {
-      dispatch(setLoading(true))
-      const response = await fetch(`${API_BASE}/api/products`)
-      const data = await response.json()
-      if (data.success) {
-        dispatch(setProducts(data.data.products))
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error)
-      toast.error('Failed to fetch products')
-    } finally {
-      dispatch(setLoading(false))
-    }
-  }
-
-  useEffect(() => {
-    fetchProducts()
-    fetchCategories()
-  }, [])
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(`${API_BASE}/api/categories`)
-      const data = await response.json()
-      if (data.success) {
-        setCategories(Array.isArray(data.data) ? data.data : [])
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-      toast.error('Failed to fetch categories')
-    }
-  }
-
-  const filteredProducts = products
-    .filter(product => {
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.description.toLowerCase().includes(searchTerm.toLowerCase())
-      return matchesCategory && matchesSearch
-    })
-    .map(product => {
-      let images = product.images
-      if (typeof images === 'string') {
-        try { images = JSON.parse(images) } catch { images = [] }
-      }
-      return { ...product, images: Array.isArray(images) ? images : [] }
-    })
+  // Memoize filtered products to prevent re-calculations
+  const filteredProducts = useMemo(() => {
+    return products
+      .filter(product => {
+        const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             product.description.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchesCategory && matchesSearch
+      })
+      .map(product => {
+        let images = product.images
+        if (typeof images === 'string') {
+          try { images = JSON.parse(images) } catch { images = [] }
+        }
+        return { ...product, images: Array.isArray(images) ? images : [] }
+      })
+  }, [products, selectedCategory, searchTerm])
 
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">

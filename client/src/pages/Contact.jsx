@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import API_BASE from '../api/config'
 
-const Contact = () => {
+const Contact = React.memo(() => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -256,6 +256,6 @@ const Contact = () => {
       </div>
     </div>
   )
-}
+})
 
-export default Contact
+export default React.memo(Contact)

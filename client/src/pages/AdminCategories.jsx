@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AdminLayout from '../components/AdminLayout'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAdminCategories, createCategory, updateCategory, deleteCategory } from '../store/slices/adminCategoriesSlice'
+import { useGetCategoriesQuery, useCreateCategoryMutation, useUpdateCategoryMutation, useDeleteCategoryMutation } from '../store/slices/adminApi'
 import toast from 'react-hot-toast'
 
 const AdminCategories = () => {
-  const dispatch = useDispatch()
-  const { categories, loading, error } = useSelector(state => state.adminCategories)
+  const { data: categories, isLoading, error } = useGetCategoriesQuery()
+  const [createCategory] = useCreateCategoryMutation()
+  const [updateCategory] = useUpdateCategoryMutation()
+  const [deleteCategory] = useDeleteCategoryMutation()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
@@ -15,10 +16,6 @@ const AdminCategories = () => {
     description: '',
     icon: '🏷️'
   })
-
-  useEffect(() => {
-    dispatch(getAdminCategories())
-  }, [dispatch])
 
   const handleFormChange = (e) => {
     const { name, value } = e.target
@@ -54,7 +51,7 @@ const AdminCategories = () => {
     }
     if (window.confirm(`Are you sure you want to delete "${name}" category?`)) {
       try {
-        await dispatch(deleteCategory(id)).unwrap()
+        await deleteCategory(id).unwrap()
         toast.success('Category deleted successfully')
         window.dispatchEvent(new Event('categories-updated'))
       } catch (error) {
@@ -72,12 +69,12 @@ const AdminCategories = () => {
           toast.error('Invalid category ID')
           return
         }
-        await dispatch(updateCategory({ id: categoryId, categoryData: formData })).unwrap()
+        await updateCategory({ id: categoryId, categoryData: formData }).unwrap()
         toast.success('Category updated successfully')
         window.dispatchEvent(new Event('categories-updated'))
         setShowEditModal(false)
       } else {
-        await dispatch(createCategory(formData)).unwrap()
+        await createCategory(formData).unwrap()
         toast.success('Category created successfully')
         window.dispatchEvent(new Event('categories-updated'))
         setShowAddModal(false)
@@ -106,7 +103,7 @@ const AdminCategories = () => {
         </div>
 
         {/* Categories Grid */}
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="text-6xl mb-4">⏳</div>

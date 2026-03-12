@@ -1,64 +1,36 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleCart, closeCart } from '../store/slices/cartSlice'
 import { logout } from '../store/slices/authSlice'
-import API_BASE from '../api/config'
+import { useGetCategoriesQuery } from '../store/slices/adminApi'
 
-const Navbar = () => {
+const Navbar = React.memo(() => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
-  const [categories, setCategories] = useState([])
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const { items, isOpen, total } = useSelector(state => state.cart)
   const { user, token, isAdmin } = useSelector(state => state.auth)
-
-  // Fetch categories function
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(`${API_BASE}/api/categories`, {
-        cache: 'no-store' // Prevent browser caching
-      })
-      const data = await response.json()
-      if (data.success) {
-        setCategories(data.data.categories || data.data)
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-    }
-  }
-
-  // Fetch categories on mount and periodically
-  useEffect(() => {
-    // Initial fetch
-    fetchCategories()
-    
-    // Refetch every 10 seconds to keep categories updated
-    const interval = setInterval(fetchCategories, 10000)
-    
-    // Listen for custom category update events
-    const handleCategoryUpdate = () => fetchCategories()
-    window.addEventListener('categories-updated', handleCategoryUpdate)
-    
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('categories-updated', handleCategoryUpdate)
-    }
-  }, [location.pathname]) // Depend on location to refetch on route changes
-
-  // Refetch when dropdown opens
-  const handleCategoryDropdownToggle = () => {
-    if (!isCategoryOpen) {
-      fetchCategories() // Refresh categories when opening dropdown
-    }
-    setIsCategoryOpen(!isCategoryOpen)
-  }
+  
+  // Use RTK Query for optimized categories fetching
+  const { data: categoriesData = [] } = useGetCategoriesQuery()
+  
+  // Memoize categories to prevent re-renders
+  const categories = useMemo(() => categoriesData, [categoriesData])
 
   const handleLogout = () => {
     dispatch(logout())
-    navigate('/')
+    navigate('/login')
+  }
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  const toggleCategoryDropdown = () => {
+    setIsCategoryOpen(!isCategoryOpen)
   }
 
   const handleCategoryClick = (category) => {
@@ -89,7 +61,7 @@ const Navbar = () => {
                   fontFamily: "'Playfair Display', serif"
                 }}
               >
-                Global Exim Traders™
+                Global Exim Traders
               </span>
             </Link>
 
@@ -102,7 +74,7 @@ const Navbar = () => {
               {/* Categories Dropdown */}
               <div className="relative">
                 <button
-                  onClick={handleCategoryDropdownToggle}
+                  onClick={toggleCategoryDropdown}
                   className="nav-link flex items-center gap-1"
                 >
                   Categories
@@ -240,7 +212,7 @@ const Navbar = () => {
               {/* Mobile Categories */}
               <div>
                 <button
-                  onClick={handleCategoryDropdownToggle}
+                  onClick={toggleCategoryDropdown}
                   className="nav-link w-full text-left flex items-center justify-between"
                 >
                   Categories
@@ -418,6 +390,6 @@ const Navbar = () => {
       <div className="h-16"></div>
     </>
   )
-}
+})
 
-export default Navbar
+export default React.memo(Navbar)

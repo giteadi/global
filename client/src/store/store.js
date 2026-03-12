@@ -4,11 +4,6 @@ import storage from 'redux-persist/lib/storage'
 import productsSlice from './slices/productsSlice'
 import cartSlice from './slices/cartSlice'
 import authSlice from './slices/authSlice'
-import adminOrdersSlice from './slices/adminOrdersSlice'
-import adminUsersSlice from './slices/adminUsersSlice'
-import adminPaymentsSlice from './slices/adminPaymentsSlice'
-import adminCategoriesSlice from './slices/adminCategoriesSlice'
-import analyticsSlice from './slices/analyticsSlice'
 import { adminApi } from './slices/adminApi'
 
 const persistConfig = {
@@ -24,11 +19,6 @@ export const store = configureStore({
     products: productsSlice,
     cart: cartSlice,
     auth: persistedAuthReducer,
-    adminOrders: adminOrdersSlice,
-    adminUsers: adminUsersSlice,
-    adminPayments: adminPaymentsSlice,
-    adminCategories: adminCategoriesSlice,
-    analytics: analyticsSlice,
     [adminApi.reducerPath]: adminApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

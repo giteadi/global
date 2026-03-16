@@ -1,14 +1,35 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetPaymentsQuery } from '../store/slices/adminApi'
 
 const AdminPayments = () => {
   const [statusFilter, setStatusFilter] = useState('All')
-  const { data: payments, isLoading, error } = useGetPaymentsQuery(
+  const [localStoragePayments, setLocalStoragePayments] = useState([])
+  const { data: apiPayments, isLoading, error } = useGetPaymentsQuery(
     statusFilter !== 'All' ? { status: statusFilter } : {}
   )
 
-  const filteredPayments = statusFilter === 'All' ? payments || [] : (payments || []).filter(payment => payment.status === statusFilter)
+  // Load payments from localStorage
+  useEffect(() => {
+    const storedPayments = JSON.parse(localStorage.getItem('payments') || '[]')
+    setLocalStoragePayments(storedPayments)
+  }, [])
+
+  // Combine API and localStorage payments
+  const allPayments = [
+    ...(apiPayments || []),
+    ...localStoragePayments.map(payment => ({
+      ...payment,
+      _id: payment.id,
+      amount: payment.total,
+      method: payment.paymentMethod,
+      customer: payment.userInfo,
+      created_at: payment.timestamp,
+      status: payment.status || 'Completed'
+    }))
+  ]
+
+  const filteredPayments = statusFilter === 'All' ? allPayments : allPayments.filter(payment => payment.status === statusFilter)
   const statuses = ['All', 'Completed', 'Pending', 'Failed', 'Refunded']
 
   return (
@@ -124,23 +145,26 @@ const AdminPayments = () => {
                   </tr>
                 ) : (
                   filteredPayments.map((payment) => (
-                    <tr key={payment._id} className="hover:opacity-80">
+                    <tr key={payment._id || payment.id} className="hover:opacity-80">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
-                          {payment._id ? `PAY${payment._id.slice(-6)}` : 'N/A'}
+                          {payment._id ? `PAY${payment._id.slice(-6)}` : `PAY${payment.id?.toString().slice(-6)}`}
+                          {payment.id && !payment._id && (
+                            <span className="ml-2 text-xs bg-yellow-900/20 text-yellow-300 px-2 py-1 rounded">Local</span>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.orderId ? `ORD${payment.orderId.slice(-6)}` : 'N/A'}
+                        {payment.orderId ? `ORD${payment.orderId.slice(-6)}` : `ORD${payment.id?.toString().slice(-6)}`}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.customer?.name || 'Guest'}
+                        {payment.customer?.name || payment.userInfo?.name || 'Guest'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
                         ₹{payment.amount || 0}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.method || 'Unknown'}
+                        <span className="capitalize">{payment.method || 'Unknown'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -153,7 +177,7 @@ const AdminPayments = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-soft)' }}>
-                        {new Date(payment.created_at).toLocaleDateString('en-IN')}
+                        {new Date(payment.created_at || payment.timestamp).toLocaleDateString('en-IN')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button style={{ color: 'var(--teal-bright)' }} className="mr-3 hover:opacity-80">

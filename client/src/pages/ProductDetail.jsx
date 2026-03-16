@@ -58,7 +58,7 @@ const ProductDetail = () => {
     }
   }
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     if (!singleProduct) return
 
     // Check if user is logged in
@@ -68,67 +68,10 @@ const ProductDetail = () => {
       return
     }
 
-    const amount = singleProduct.price * quantity
-
-    try {
-      // Create order
-      const response = await fetch(`${API_BASE}/api/payments/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ amount }),
-      })
-
-      const order = await response.json()
-
-      // Razorpay options
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_XXXXXXXXXXXX',
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Global Exim Traders',
-        description: `Purchase of ${singleProduct.name}`,
-        order_id: order.id,
-        handler: async function (response) {
-          // Verify payment
-          const verifyResponse = await fetch(`${API_BASE}/api/payments/verify-payment`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          })
-
-          const verifyResult = await verifyResponse.json()
-
-          if (verifyResult.success) {
-            toast.success('Payment successful!')
-            // Here you can save the order to database or redirect
-          } else {
-            toast.error('Payment verification failed!')
-          }
-        },
-        prefill: {
-          name: 'Customer Name',
-          email: 'customer@example.com',
-          contact: '9999999999',
-        },
-        theme: {
-          color: '#C8A96E',
-        },
-      }
-
-      const rzp = new window.Razorpay(options)
-      rzp.open()
-    } catch (error) {
-      toast.error('Payment failed!')
-      console.error(error)
-    }
+    // Add item to cart and redirect to checkout
+    dispatch(addToCart({ ...singleProduct, quantity }))
+    toast.success('Redirecting to checkout...')
+    navigate('/checkout')
   }
 
   if (loading || !singleProduct) {

@@ -23,6 +23,8 @@ import AdminContacts from './pages/AdminContacts'
 import AdminPayments from './pages/AdminPayments'
 import AdminAnalytics from './pages/AdminAnalytics'
 import AdminSettings from './pages/AdminSettings'
+import Checkout from './pages/Checkout'
+import PaymentSuccess from './pages/PaymentSuccess'
 import './styles.css'
 
 // Memoized ScrollToTop component
@@ -119,6 +121,8 @@ function App() {
                   <Route path="/admin/payments" element={<AdminPayments />} />
                   <Route path="/admin/analytics" element={<AdminAnalytics />} />
                   <Route path="/admin/settings" element={<AdminSettings />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
                 </Routes>
               </Suspense>
             </main>

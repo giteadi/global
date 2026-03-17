@@ -556,48 +556,80 @@ const Home = () => {
             transition={{ duration: 0.8 }}
             className="hero-title"
             style={{
-              fontFamily: 'Playfair Display, serif',
-              fontSize: 'clamp(2.8rem,6vw,5.5rem)',
-              fontWeight: '900',
-              lineHeight: '0.93',
-              letterSpacing: '-0.02em',
-              color: '#FFFFFF',
-              textShadow: '4px 4px 12px rgba(0,0,0,0.8)',
+              lineHeight: '1.1',
+              letterSpacing: '0',
               marginBottom: '0.5rem'
             }}
           >
-            <span className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl flex flex-wrap font-semibold font-serif text-white' style={{
+            {/* "GET" — small uppercase, same golden color */}
+            <span style={{
               display: 'block',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
+              fontFamily: '"Great Vibes", "Dancing Script", cursive',
+              fontSize: 'clamp(1.2rem, 2.5vw, 2rem)',
+              fontWeight: '400',
+              color: 'var(--gold-bright)',
               letterSpacing: '0.1em',
-              marginBottom: '0.5rem'
+              marginBottom: '-0.3rem',
+              textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 16px rgba(224,194,128,0.4)'
             }}>
-              GET Ashokaaz™
+              Get
             </span>
+
+            {/* "AshokaazZ" — large elegant script, golden */}
+            <span style={{
+              display: 'block',
+              fontFamily: '"Great Vibes", "Dancing Script", cursive',
+              fontSize: 'clamp(3.5rem, 9vw, 7rem)',
+              fontWeight: '400',
+              color: 'var(--gold-bright)',
+              lineHeight: '1',
+              textShadow: '2px 2px 8px rgba(0,0,0,0.9), 0px 0px 24px rgba(224,194,128,0.5)',
+              letterSpacing: '0.02em',
+              marginBottom: '0.1rem'
+            }}>
+              AshokaazZ
+            </span>
+
+            {/* "Zewels ✦" — same script font, same golden */}
+            <span style={{
+              display: 'block',
+              fontFamily: '"Great Vibes", "Dancing Script", cursive',
+              fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+              fontWeight: '400',
+              color: 'var(--gold-bright)',
+              letterSpacing: '0.08em',
+              textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(224,194,128,0.5)',
+              marginBottom: '0.6rem'
+            }}>
+              Zewels ✦
+            </span>
+
+            {/* Tagline italic */}
             <span className="brand-exim" style={{
               display: 'block',
               fontStyle: 'italic',
-              color: 'var(--gold-bright)',
-              fontFamily: 'Cinzel, serif',
-              fontSize: 'clamp(1.1rem,2vw,1.6rem)',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 8px rgba(224,194,128,0.6), -1px -1px 0px rgba(255,255,255,0.3)',
-              letterSpacing: '0.1em',
-              fontWeight: '600'
+              color: 'rgba(255,255,255,0.85)',
+              fontFamily: 'Lora, Georgia, serif',
+              fontSize: 'clamp(0.85rem, 1.6vw, 1.1rem)',
+              letterSpacing: '0.05em',
+              fontWeight: '400',
+              marginBottom: '1.2rem'
             }}>
-              where elegance meets global luxury
+              "Where elegance meets global luxury."
             </span>
+
+            {/* "Global Exim Traders" */}
             <span style={{
               display: 'block',
               marginBottom: '0.5rem',
-              padding: '0.5rem 0',
-              fontSize: 'clamp(1.6rem, 5vw, 2.8rem)',
-              fontFamily: 'Cinzel, serif',
-              fontWeight: '700',
-              letterSpacing: '0.08em',
+              padding: '0.3rem 0',
+              fontSize: 'clamp(1.1rem, 3vw, 1.8rem)',
+              fontFamily: 'Cinzel, "Playfair Display", serif',
+              fontWeight: '600',
+              letterSpacing: '0.18em',
               color: '#FFFFFF',
-              textShadow: '2px 2px 0px rgba(0,0,0,0.8), -1px -1px 0px rgba(0,0,0,0.3), 1px 1px 0px rgba(255,255,255,0.2), inset 0px 0px 8px rgba(0,0,0,0.4)',
-              textStroke: '1px rgba(0,0,0,0.3)',
-              WebkitTextStroke: '1px rgba(0,0,0,0.3)'
+              textTransform: 'uppercase',
+              textShadow: '2px 2px 6px rgba(0,0,0,0.8), 0 0 10px rgba(255,255,255,0.1)'
             }}>
               Global Exim Traders
             </span>

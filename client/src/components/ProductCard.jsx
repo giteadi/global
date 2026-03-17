@@ -78,4 +78,4 @@ const ProductCard = React.memo(({ product }) => {
   )
 })
 
-export default React.memo(ProductCard)
+export default ProductCard

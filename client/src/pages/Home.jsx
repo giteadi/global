@@ -392,8 +392,7 @@ const Home = () => {
       background: 'var(--glass-card)',
       border: '1px solid var(--glass-border)',
       borderRadius: '12px',
-      overflow: 'hidden',
-      animation: 'pulse 1.5s ease-in-out infinite'
+      overflow: 'hidden'
     }}>
       <div style={{ height: '224px', background: 'rgba(37,204,200,0.08)' }} />
       <div style={{ padding: '1.5rem' }}>
@@ -418,8 +417,8 @@ const Home = () => {
         width: '100%',
         height: '100%',
         background: 'radial-gradient(ellipse at center, rgba(37,204,200,0.1) 0%, transparent 70%)',
-        animation: 'waterWave 8s ease-in-out infinite',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        animation: 'none'
       }}></div>
       
       {/* Audio Element - Using Imported File */}
@@ -482,40 +481,7 @@ const Home = () => {
           {isPlaying ? '⏸️' : '▶️'}
         </button>
       
-      {/* Bubbles Animation */}
-      {!isMobile && (
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-          pointerEvents: 'none'
-        }}>
-          {[...Array(5)].map((_, i) => {
-            const sizes = [8, 12, 6, 15, 10]
-            const lefts = [10, 25, 50, 70, 85]
-            const durations = [8, 10, 7, 12, 9]
-            return (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  bottom: '-20px',
-                  left: `${lefts[i]}%`,
-                  width: `${sizes[i]}px`,
-                  height: `${sizes[i]}px`,
-                  background: 'rgba(255,255,255,0.2)',
-                  borderRadius: '50%',
-                  animation: `bubbleRise ${durations[i]}s linear infinite`,
-                  animationDelay: `${i * 2}s`
-                }}
-              />
-            )
-          })}
-        </div>
-      )}
+      {/* Bubbles Animation - DISABLED for performance */}
       
       {/* HERO */}
       <section className="relative py-24 flex items-center justify-center" style={{
@@ -652,8 +618,7 @@ const Home = () => {
               width: '9px',
               height: '9px',
               background: 'var(--teal-bright)',
-              transform: 'rotate(45deg)',
-              animation: 'floatLotus 4s ease-in-out infinite'
+              transform: 'rotate(45deg)'
             }}></div>
             <div className="lotus-line" style={{
               flex: '1',
@@ -1142,7 +1107,10 @@ const Home = () => {
                 style={{
                   transform: Array.isArray(allProducts) && allProducts.length > 1 
                     ? `translateX(-${currentSlide * 100}%)` 
-                    : 'none'
+                    : 'none',
+                  willChange: 'transform',
+                  backfaceVisibility: 'hidden',
+                  perspective: 1000
                 }}
               >
                 {Array.isArray(allProducts) && allProducts.map(product => (
@@ -1245,8 +1213,7 @@ const Home = () => {
               width: '9px',
               height: '9px',
               background: 'var(--teal-bright)',
-              transform: 'rotate(45deg)',
-              animation: 'floatLotus 4s ease-in-out infinite'
+              transform: 'rotate(45deg)'
             }}></div>
             <div className="lotus-line" style={{
               flex: '1',
@@ -1380,7 +1347,10 @@ const Home = () => {
                 style={{
                   transform: Array.isArray(featuredProducts) && featuredProducts.length > 1 
                     ? `translateX(-${currentFeaturedSlide * 100}%)` 
-                    : 'none'
+                    : 'none',
+                  willChange: 'transform',
+                  backfaceVisibility: 'hidden',
+                  perspective: 1000
                 }}
               >
                 {Array.isArray(featuredProducts) && featuredProducts.map(product => (

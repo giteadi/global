@@ -364,14 +364,18 @@ const Home = () => {
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773206791/img2_wb4n3k.jpg',
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img3_xffkyd.jpg',
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img5_nv7b5y.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img8_ezrlde.jpg',
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg'
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img1_tvaz89.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-11_at_14.10.08_mmaxot.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-09_at_16.54.26_aryjws.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-09_at_13.56.30_rjhdna.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895325/WhatsApp_Image_2026-03-09_at_14.05.25_eq5qpd.jpg'
   ]
 
-  const visibleImages = isMobile ? modelImages.slice(0, 4) : modelImages
+  const visibleImages = isMobile ? modelImages.slice(0, 8) : modelImages
 
   // ProductCard is now defined outside Home to prevent recreation on every render
   const handleImageLoad = React.useCallback((productId) => {
@@ -531,7 +535,7 @@ const Home = () => {
             <span style={{
               display: 'block',
               fontFamily: '"Great Vibes", "Dancing Script", cursive',
-              fontSize: 'clamp(1.2rem, 2.5vw, 2rem)',
+              fontSize: 'clamp(2rem, 4vw, 3.5rem)',
               fontWeight: '400',
               color: 'var(--gold-bright)',
               letterSpacing: '0.1em',
@@ -553,7 +557,7 @@ const Home = () => {
               letterSpacing: '0.02em',
               marginBottom: '0.1rem'
             }}>
-              AshokaazZ
+              Ashokaaz
             </span>
 
             {/* "Zewels ✦" — same script font, same golden */}

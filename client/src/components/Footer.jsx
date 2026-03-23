@@ -13,7 +13,7 @@ const Footer = React.memo(() => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <span className="text-2xl">🏛️</span>
-              <span className="text-xl font-serif font-bold" style={{ color: 'var(--gold-bright)' }}>Global Exim</span>
+              <span className="text-xl font-serif font-bold" style={{ color: 'var(--gold-bright)' }}>Global Exim Traders</span>
             </div>
             <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-soft)' }}>
               Where Heritage Meets Global Elegance. Premium Indian handicrafts and fashion jewellery delivered worldwide.

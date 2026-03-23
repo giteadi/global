@@ -4,9 +4,10 @@ import { useGetUsersQuery, useUpdateUserMutation } from '../store/slices/adminAp
 
 const AdminUsers = () => {
   const [roleFilter, setRoleFilter] = useState('All')
-  const { data: users, isLoading, error } = useGetUsersQuery(
+  const { data: usersData, isLoading, error } = useGetUsersQuery(
     roleFilter !== 'All' ? { role: roleFilter } : {}
   )
+  const users = usersData?.data?.users || []
   const [updateUser] = useUpdateUserMutation()
 
   const filteredUsers = roleFilter === 'All' ? users || [] : (users || []).filter(user => user.role === roleFilter)

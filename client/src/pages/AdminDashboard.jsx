@@ -5,14 +5,15 @@ import { useGetDashboardStatsQuery } from '../store/slices/adminApi'
 const AdminDashboard = () => {
   const { data: stats, isLoading, error } = useGetDashboardStatsQuery()
 
-  const dashboardData = stats?.data || {
+  const dashboardData = stats?.data?.stats || {
     totalUsers: 0,
     totalProducts: 0,
     totalOrders: 0,
-    totalRevenue: 0,
-    recentOrders: [],
-    topProducts: []
+    totalRevenue: 0
   }
+  
+  const recentOrders = stats?.data?.recentOrders || []
+  const topProducts = stats?.data?.topProducts || []
 
   const statsCards = [
     { title: 'Total Products', value: dashboardData.totalProducts, icon: '📦', loading: isLoading },
@@ -51,8 +52,8 @@ const AdminDashboard = () => {
               <div className="space-y-4">
                 {isLoading ? (
                   <div className="text-center py-4" style={{ color: 'var(--text-soft)' }}>Loading...</div>
-                ) : dashboardData.recentOrders?.length > 0 ? (
-                  dashboardData.recentOrders.slice(0, 4).map((order) => (
+                ) : recentOrders?.length > 0 ? (
+                  recentOrders.slice(0, 4).map((order) => (
                     <div key={order.id} style={{ background: 'var(--glass-light)', border: '1px solid var(--glass-border)' }} className="flex items-center justify-between p-4 rounded-lg">
                       <div>
                         <p className="font-medium" style={{ color: 'var(--text-bright)' }}>#{order.id}</p>
@@ -87,18 +88,18 @@ const AdminDashboard = () => {
               <div className="space-y-4">
                 {isLoading ? (
                   <div className="text-center py-4" style={{ color: 'var(--text-soft)' }}>Loading...</div>
-                ) : dashboardData.topProducts?.length > 0 ? (
-                  dashboardData.topProducts.slice(0, 4).map((product, index) => (
+                ) : topProducts?.length > 0 ? (
+                  topProducts.slice(0, 4).map((product, index) => (
                     <div key={index} style={{ background: 'var(--glass-light)', border: '1px solid var(--glass-border)' }} className="flex items-center justify-between p-4 rounded-lg">
                       <div className="flex items-center">
                         <span className="text-2xl mr-3">{product.icon || '📦'}</span>
                         <div>
                           <p className="font-medium" style={{ color: 'var(--text-bright)' }}>{product.name}</p>
-                          <p className="text-sm" style={{ color: 'var(--text-soft)' }}>{product.sales_count || 0} sold</p>
+                          <p className="text-sm" style={{ color: 'var(--text-soft)' }}>{product.sales || 0} sold</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium" style={{ color: 'var(--text-bright)' }}>₹{product.price}</p>
+                        <p className="font-medium" style={{ color: 'var(--text-bright)' }}>₹{product.revenue}</p>
                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Revenue</p>
                       </div>
                     </div>

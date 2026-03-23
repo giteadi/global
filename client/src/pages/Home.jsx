@@ -902,7 +902,6 @@ const Home = () => {
         </div>
       </motion.section>
 
-      {/* ALL PRODUCTS CAROUSEL */}
       <motion.section 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

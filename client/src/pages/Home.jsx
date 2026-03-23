@@ -531,47 +531,18 @@ const Home = () => {
               marginBottom: '0.5rem'
             }}
           >
-            {/* "GET" — small uppercase, same golden color */}
+            {/* "Get AshokaaZ" — single line with same font */}
             <span style={{
               display: 'block',
               fontFamily: '"Great Vibes", "Dancing Script", cursive',
-              fontSize: 'clamp(2rem, 4vw, 3.5rem)',
+              fontSize: 'clamp(3rem, 6vw, 5rem)',
               fontWeight: '400',
               color: 'var(--gold-bright)',
-              letterSpacing: '0.1em',
-              marginBottom: '-0.3rem',
+              letterSpacing: '0.05em',
+              marginBottom: '0.1rem',
               textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 16px rgba(224,194,128,0.4)'
             }}>
-              Get
-            </span>
-
-            {/* "AshokaazZ" — large elegant script, golden */}
-            <span style={{
-              display: 'block',
-              fontFamily: '"Great Vibes", "Dancing Script", cursive',
-              fontSize: 'clamp(3.5rem, 9vw, 7rem)',
-              fontWeight: '400',
-              color: 'var(--gold-bright)',
-              lineHeight: '1',
-              textShadow: '2px 2px 8px rgba(0,0,0,0.9), 0px 0px 24px rgba(224,194,128,0.5)',
-              letterSpacing: '0.02em',
-              marginBottom: '0.1rem'
-            }}>
-              Ashokaaz
-            </span>
-
-            {/* "Zewels ✦" — same script font, same golden */}
-            <span style={{
-              display: 'block',
-              fontFamily: '"Great Vibes", "Dancing Script", cursive',
-              fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
-              fontWeight: '400',
-              color: 'var(--gold-bright)',
-              letterSpacing: '0.08em',
-              textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(224,194,128,0.5)',
-              marginBottom: '0.6rem'
-            }}>
-              Zewels ✦
+              Get AshokaaZ
             </span>
 
             {/* Tagline italic */}

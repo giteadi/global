@@ -17,7 +17,7 @@ const AdminPayments = () => {
 
   // Combine API and localStorage payments
   const allPayments = [
-    ...(apiPayments || []),
+    ...(apiPayments?.data?.payments || []),
     ...localStoragePayments.map(payment => ({
       ...payment,
       _id: payment.id,

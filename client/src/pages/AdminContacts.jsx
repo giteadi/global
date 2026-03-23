@@ -8,7 +8,8 @@ const AdminContacts = () => {
   const [showDetailModal, setShowDetailModal] = useState(false)
   
   // Using RTK Query for optimized performance
-  const { data: contacts = [], isLoading, error } = useGetContactsQuery()
+  const { data: contactsData, isLoading, error } = useGetContactsQuery()
+  const contacts = contactsData?.data || []
   const [updateContactStatus] = useUpdateContactStatusMutation()
   const [deleteContact] = useDeleteContactMutation()
 

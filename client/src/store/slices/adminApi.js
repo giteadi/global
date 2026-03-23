@@ -149,7 +149,7 @@ export const adminApi = createApi({
         const { page = 1, limit = 10, status } = params
         const queryString = new URLSearchParams({ page: page.toString(), limit: limit.toString() })
         if (status) queryString.append('status', status)
-        return `payments/admin?${queryString}`
+        return `payments/admin/payments?${queryString}`
       },
       providesTags: ['Payments']
     }),

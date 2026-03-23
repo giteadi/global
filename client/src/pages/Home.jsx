@@ -965,14 +965,156 @@ const Home = () => {
             style={{
               fontFamily: 'Lora, serif',
               fontSize: '1.1rem',
-              color: 'var(--text-soft)',
+              color: '#FFFFFF',
               lineHeight: '1.6',
-              maxWidth: '600px',
+              maxWidth: '800px',
               margin: '0 auto'
             }}
           >
-            Explore our complete collection from all categories
+            <strong style={{ color: 'var(--gold-bright)' }}>All Categories of Fashion Jewelleries:</strong><br/>
+            Afghani Jewellery, Oxidised, German Silver, Double Tone, Black Metal, Gold Plated, CZ Jewellery, and more...
           </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            style={{
+              marginTop: '2rem',
+              maxWidth: '900px',
+              margin: '2rem auto 0'
+            }}
+          >
+            <h4 style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '1.2rem',
+              fontWeight: '600',
+              color: 'var(--gold-bright)',
+              marginBottom: '1rem',
+              textAlign: 'center'
+            }}>
+              All Categories:
+            </h4>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+              textAlign: 'center',
+              marginBottom: '2rem'
+            }}>
+              {[
+                'Afghani Jewellery',
+                'Oxidised',
+                'German Silver',
+                'Double Tone',
+                'Black Metal',
+                'Gold Plated',
+                'CZ Jewellery',
+                'Traditional'
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.4 + index * 0.05 }}
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: '0 8px 32px rgba(224,194,128,0.3)'
+                  }}
+                  style={{
+                    padding: '1rem',
+                    background: 'linear-gradient(135deg, rgba(224,194,128,0.1), rgba(224,194,128,0.05))',
+                    border: '1px solid rgba(224,194,128,0.3)',
+                    borderRadius: '12px',
+                    backdropFilter: 'blur(12px)',
+                    color: '#FFFFFF',
+                    fontFamily: 'Lora, serif',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, transparent, var(--gold-bright), transparent)'
+                  }}></div>
+                  {item}
+                </motion.div>
+              ))}
+            </div>
+            
+            <h4 style={{
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '1.2rem',
+              fontWeight: '600',
+              color: 'var(--gold-bright)',
+              marginBottom: '1rem',
+              textAlign: 'center'
+            }}>
+              Sub Categories:
+            </h4>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+              textAlign: 'center'
+            }}>
+              {[
+                'Necklace (Kundan)',
+                'Necklace with Ear Tops',
+                'Only Ear Tops',
+                'Bangles',
+                'Rings',
+                'Bracelets',
+                'Anklets',
+                'Maang Tikka'
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.4 + index * 0.05 }}
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: '0 8px 32px rgba(224,194,128,0.3)'
+                  }}
+                  style={{
+                    padding: '1rem',
+                    background: 'linear-gradient(135deg, rgba(224,194,128,0.1), rgba(224,194,128,0.05))',
+                    border: '1px solid rgba(224,194,128,0.3)',
+                    borderRadius: '12px',
+                    backdropFilter: 'blur(12px)',
+                    color: '#FFFFFF',
+                    fontFamily: 'Lora, serif',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, transparent, var(--gold-bright), transparent)'
+                  }}></div>
+                  {item}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
         {productsLoading || featuredLoading ? (

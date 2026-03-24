@@ -173,6 +173,21 @@ nav {
   }
 }
 
+@keyframes bounce {
+  0%, 80%, 100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+  40% { 
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* ====== BUTTON STYLES ====== */
 .btn-primary:hover {
   background:var(--teal-light);
@@ -253,4 +268,124 @@ nav {
 
 .model-grid-item:hover .model-grid-image {
   transform: scale(1.05);
+}
+
+/* ====== RESPONSIVE ADMIN STYLES ====== */
+/* Mobile-first responsive improvements */
+@media (max-width: 640px) {
+  /* Admin table responsive scrolling */
+  table {
+    font-size: 0.875rem;
+  }
+  
+  .px-6 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  /* Hide non-essential columns on mobile */
+  .table-hide-mobile {
+    display: none;
+  }
+  
+  /* Stack form inputs */
+  .grid.grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid.grid-cols-1.md\\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Modal full width on mobile */
+  .max-w-2xl {
+    max-width: 100% !important;
+    margin: 0 1rem !important;
+  }
+  
+  /* Button sizing */
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Admin sidebar adjust */
+  .h-screen.flex {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet adjustments */
+  .max-w-2xl {
+    max-width: 90%;
+  }
+}
+
+/* ====== ANIMATION UTILITY CLASSES ====== */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1.4s infinite;
+}
+
+/* Loading spinner styles */
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-sm {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-width: 1.5px;
+}
+
+.spinner-lg {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3px;
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 100%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Button disabled state */
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* ====== FORM RESPONSIVE ====== */
+@media (max-width: 640px) {
+  .space-y-4 {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse))) !important;
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse)) !important;
+  }
+  
+  input[type="file"],
+  textarea,
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
 }

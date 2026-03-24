@@ -19,7 +19,7 @@ const AdminDashboard = () => {
     { title: 'Total Products', value: dashboardData.totalProducts, icon: '📦', loading: isLoading },
     { title: 'Total Orders', value: dashboardData.totalOrders, icon: '📋', loading: isLoading },
     { title: 'Total Users', value: dashboardData.totalUsers, icon: '👥', loading: isLoading },
-    { title: 'Revenue', value: `₹${dashboardData.totalRevenue?.toLocaleString() || '0'}`, icon: '�', loading: isLoading }
+    { title: 'Revenue', value: `₹${dashboardData.totalRevenue?.toLocaleString() || '0'}`, icon: '💰', loading: isLoading }
   ]
 
   return (
@@ -33,7 +33,14 @@ const AdminDashboard = () => {
                 <div>
                   <p className="text-sm" style={{ color: 'var(--text-soft)' }}>{stat.title}</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>
-                    {stat.loading ? '...' : stat.value}
+                    {stat.loading ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-block w-3 h-3 rounded-full bg-teal-400 animate-bounce" style={{ animation: 'bounce 1.4s infinite' }}></span>
+                        <span className="text-sm">Loading</span>
+                      </span>
+                    ) : (
+                      stat.value
+                    )}
                   </p>
                 </div>
                 <div className="text-3xl">{stat.icon}</div>

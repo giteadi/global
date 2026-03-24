@@ -123,9 +123,15 @@ const AdminUsers = () => {
               <tbody style={{ background: 'var(--glass-light)', borderColor: 'var(--glass-border)' }} className="divide-y">
                 {isLoading ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center" style={{ color: 'var(--text-soft)' }}>
-                      <div className="text-6xl mb-4">⏳</div>
-                      <div className="text-lg font-medium mb-2">Loading users...</div>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center gap-4">
+                        <div className="flex gap-2">
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite' }}></div>
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.2s' }}></div>
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.4s' }}></div>
+                        </div>
+                        <p style={{ color: 'var(--text-soft)' }}>Loading users...</p>
+                      </div>
                     </td>
                   </tr>
                 ) : error ? (

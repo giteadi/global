@@ -27,13 +27,13 @@ const AdminOrders = () => {
     <AdminLayout>
       <div className="space-y-6 min-h-[calc(100vh-280px)] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Order Management</h1>
-            <p style={{ color: 'var(--text-soft)' }}>Manage customer orders and shipments</p>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-start sm:items-center">
+          <div className="flex-1">
+            <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Order Management</h1>
+            <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Manage customer orders and shipments</p>
           </div>
           <button
-            className="btn-primary"
+            className="btn-primary whitespace-nowrap w-full sm:w-auto"
           >
             Export Orders
           </button>
@@ -69,9 +69,10 @@ const AdminOrders = () => {
         </div>
 
         {/* Orders Table */}
-        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y" style={{ borderColor: 'var(--glass-border)' }}>
+        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+          <div className="overflow-x-auto overflow-y-auto flex-1 -mx-4 md:mx-0">
+            <div className="px-4 md:px-0 inline-block w-full min-w-full md:w-auto">
+              <table className="w-full divide-y" style={{ borderColor: 'var(--glass-border)' }}>
               <thead style={{ background: 'var(--glass)' }}>
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-soft)' }}>
@@ -100,9 +101,15 @@ const AdminOrders = () => {
               <tbody style={{ background: 'var(--glass-light)', borderColor: 'var(--glass-border)' }} className="divide-y">
                 {isLoading ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center" style={{ color: 'var(--text-soft)' }}>
-                      <div className="text-6xl mb-4">⏳</div>
-                      <div className="text-lg font-medium mb-2">Loading orders...</div>
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center gap-4">
+                        <div className="flex gap-2">
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite' }}></div>
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.2s' }}></div>
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.4s' }}></div>
+                        </div>
+                        <p style={{ color: 'var(--text-soft)' }}>Loading orders...</p>
+                      </div>
                     </td>
                   </tr>
                 ) : error ? (
@@ -185,6 +192,7 @@ const AdminOrders = () => {
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>

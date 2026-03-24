@@ -89,14 +89,14 @@ const AdminCategories = () => {
     <AdminLayout>
       <div className="space-y-6 min-h-[calc(100vh-280px)] flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Category Management</h1>
-            <p style={{ color: 'var(--text-soft)' }}>Manage product categories and organization</p>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-start sm:items-center">
+          <div className="flex-1">
+            <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Category Management</h1>
+            <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Manage product categories and organization</p>
           </div>
           <button
             onClick={handleAddCategory}
-            className="btn-primary"
+            className="btn-primary whitespace-nowrap w-full sm:w-auto"
           >
             Add New Category
           </button>
@@ -106,8 +106,12 @@ const AdminCategories = () => {
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="text-6xl mb-4">⏳</div>
-              <div className="text-lg font-semibold mb-2" style={{ color: 'var(--text-bright)' }}>Loading categories...</div>
+              <div className="flex gap-2 mb-4 justify-center">
+                <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite' }}></div>
+                <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.2s' }}></div>
+                <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.4s' }}></div>
+              </div>
+              <p style={{ color: 'var(--text-soft)' }}>Loading categories...</p>
             </div>
           </div>
         ) : error ? (

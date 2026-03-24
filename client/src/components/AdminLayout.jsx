@@ -161,33 +161,33 @@ const AdminLayout = ({ children }) => {
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
         <header style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--glass-border)' }}>
-          <div className="px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-3 md:gap-0">
+            <div className="flex items-center space-x-2 md:space-x-4 flex-1 min-w-0">
               {/* Mobile Hamburger */}
               <button
                 onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-                className="md:hidden p-2 rounded-lg transition-colors"
+                className="md:hidden p-2 rounded-lg transition-colors flex-shrink-0"
                 style={{ background: 'rgba(27,158,155,0.1)', color: 'var(--text-bright)' }}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-              <div>
-                <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-bright)' }}>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg md:text-2xl font-semibold truncate" style={{ color: 'var(--text-bright)' }}>
                   {menuItems.find(item => item.path === location.pathname)?.title || 'Admin Dashboard'}
                 </h2>
-                <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
+                <p className="text-xs md:text-sm hidden sm:block truncate" style={{ color: 'var(--text-soft)' }}>
                   {menuItems.find(item => item.path === location.pathname)?.description || 'Manage your business'}
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
+            <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
+              <div className="text-right hidden md:block">
                 <div className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>{user?.name || 'Admin'}</div>
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Administrator</div>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style={{ background: 'var(--teal)' }}>
+              <div className="w-8 md:w-10 h-8 md:h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0" style={{ background: 'var(--teal)' }}>
                 {user?.name?.charAt(0) || 'A'}
               </div>
             </div>
@@ -195,7 +195,7 @@ const AdminLayout = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 min-h-[calc(100vh-200px)]" style={{ background: 'transparent' }}>
+        <main className="flex-1 p-4 md:p-6 min-h-[calc(100vh-200px)] overflow-x-hidden" style={{ background: 'transparent' }}>
           {children}
         </main>
       </div>

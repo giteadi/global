@@ -11,6 +11,9 @@ const AdminProducts = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showCategoryModal, setShowCategoryModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
     description: '',
@@ -35,8 +38,8 @@ const AdminProducts = () => {
   })
 
   const params = {
-    page: 1,
-    limit: 15, // 15 products per page
+    page: currentPage,
+    limit: 20, // Increase to 20 products per page for better performance
     ...(filterCategory !== 'All' && { category: filterCategory }),
     ...(searchTerm && { search: searchTerm })
   }
@@ -51,6 +54,8 @@ const AdminProducts = () => {
 
   const products = productsData?.data?.products || []
   const categories = categoriesData?.data?.categories || []
+  const totalProducts = productsData?.data?.total || 0
+  const totalPages = Math.ceil(totalProducts / 20) || 1
 
   const handleCategoryFormChange = (e) => {
     const { name, value } = e.target
@@ -108,6 +113,7 @@ const AdminProducts = () => {
 
   const handleCreateCategory = async (e) => {
     e.preventDefault()
+    setIsCreatingCategory(true)
     try {
       await createCategory(categoryFormData).unwrap()
       toast.success('Category created successfully')
@@ -116,17 +122,20 @@ const AdminProducts = () => {
       refetchCategories()
     } catch (error) {
       toast.error('Failed to create category')
+    } finally {
+      setIsCreatingCategory(false)
     }
   }
 
   const handleAddProduct = () => {
+    console.log('Add Product button clicked!')
     setEditingProduct(null)
     setFormData({
       name: '',
       description: '',
       category: categories.length > 0 ? categories[0].name : 'Temple Heritage',
-      price: '',
-      stock: '',
+      price: '0',
+      stock: '0',
       material: '',
       craftsmanship: '',
       origin: 'Rajasthan, India',
@@ -177,6 +186,8 @@ const AdminProducts = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault()
+    console.log('Form submitted!', { formData, editingProduct })
+    setIsSubmitting(true)
     try {
       const productData = {
         ...formData,
@@ -189,36 +200,40 @@ const AdminProducts = () => {
         toast.success('Product updated successfully')
         setShowEditModal(false)
       } else {
+        console.log('Creating product with data:', productData)
         await createProduct(productData).unwrap()
         toast.success('Product created successfully')
         setShowAddModal(false)
       }
       refetch()
     } catch (error) {
+      console.error('Error saving product:', error)
       toast.error('Failed to save product: ' + error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-6 flex flex-col h-full">
+      <div className="space-y-4 md:space-y-6 flex flex-col h-full">
         {/* Header */}
-        <div className="flex justify-between items-center flex-shrink-0">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Product Management</h1>
-            <p style={{ color: 'var(--text-soft)' }}>Manage your product catalog</p>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-start sm:items-center flex-shrink-0">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>Product Management</h1>
+            <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Manage your product catalog</p>
           </div>
           <button
             onClick={handleAddProduct}
-            className="btn-primary"
+            className="btn-primary whitespace-nowrap w-full sm:w-auto"
           >
             Add New Product
           </button>
         </div>
 
         {/* Filters */}
-        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="p-4 rounded-lg flex-shrink-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="p-3 md:p-4 rounded-lg flex-shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-bright)' }}>Search</label>
               <input
@@ -263,8 +278,9 @@ const AdminProducts = () => {
 
         {/* Products Table */}
         <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
-          <div className="overflow-x-auto overflow-y-auto flex-1">
-            <table className="min-w-full divide-y" style={{ borderColor: 'var(--glass-border)' }}>
+          <div className="overflow-x-auto overflow-y-auto flex-1 -mx-4 md:mx-0">
+            <div className="px-4 md:px-0 inline-block w-full min-w-full md:w-auto">
+              <table className="w-full divide-y" style={{ borderColor: 'var(--glass-border)' }}>
               <thead style={{ background: 'var(--glass)' }}>
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-soft)' }}>
@@ -290,8 +306,15 @@ const AdminProducts = () => {
               <tbody style={{ background: 'var(--glass-light)', borderColor: 'var(--glass-border)' }} className="divide-y">
                 {loading ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center" style={{ color: 'var(--text-soft)' }}>
-                      Loading products...
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center gap-4">
+                        <div className="flex gap-2">
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite' }}></div>
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.2s' }}></div>
+                          <div className="w-3 h-3 rounded-full bg-teal-400" style={{ animation: 'bounce 1.4s infinite 0.4s' }}></div>
+                        </div>
+                        <p style={{ color: 'var(--text-soft)' }}>Loading products...</p>
+                      </div>
                     </td>
                   </tr>
                 ) : products.length === 0 ? (
@@ -362,13 +385,69 @@ const AdminProducts = () => {
                 )}
               </tbody>
             </table>
+            </div>
           </div>
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 md:px-6 py-4 border-t" style={{ borderColor: 'var(--glass-border)' }}>
+              <div className="text-sm" style={{ color: 'var(--text-soft)' }}>
+                Showing {(currentPage - 1) * 20 + 1} to {Math.min(currentPage * 20, totalProducts)} of {totalProducts} products
+              </div>
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded-lg transition-colors disabled:opacity-50 text-sm"
+                  style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
+                >
+                  Previous
+                </button>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className="px-2 py-1 rounded-lg transition-colors text-sm"
+                      style={{
+                        background: pageNum === currentPage ? 'var(--teal)' : 'var(--glass)',
+                        color: pageNum === currentPage ? 'var(--white)' : 'var(--text-soft)',
+                        border: `1px solid ${pageNum === currentPage ? 'var(--teal)' : 'var(--glass-border)'}`
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded-lg transition-colors disabled:opacity-50 text-sm"
+                  style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         </div>
 
         {/* Add/Edit Product Modal */}
         {(showAddModal || showEditModal) && (
           <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
-            <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
+            <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-4 md:p-6 w-full ml-4 mr-4 md:ml-0 md:mr-0 max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
                   {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -736,17 +815,26 @@ const AdminProducts = () => {
                       setShowAddModal(false)
                       setShowEditModal(false)
                     }}
-                    className="px-4 py-2 rounded-lg transition-colors"
+                    disabled={isSubmitting}
+                    className="px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
                     style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-lg transition-colors"
+                    disabled={isSubmitting}
+                    className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70"
                     style={{ background: 'var(--teal)', color: 'var(--white)' }}
                   >
-                    {editingProduct ? 'Update Product' : 'Add Product'}
+                    {isSubmitting ? (
+                      <>
+                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        {editingProduct ? 'Updating...' : 'Adding...'}
+                      </>
+                    ) : (
+                      editingProduct ? 'Update Product' : 'Add Product'
+                    )}
                   </button>
                 </div>
               </form>
@@ -757,7 +845,7 @@ const AdminProducts = () => {
         <div>
           {showCategoryModal && (
           <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
-            <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6 w-full max-w-md">
+            <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-4 md:p-6 w-full ml-4 mr-4 md:ml-0 md:mr-0 max-w-md max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
                   Create New Category
@@ -831,17 +919,26 @@ const AdminProducts = () => {
                   <button
                     type="button"
                     onClick={() => setShowCategoryModal(false)}
-                    className="px-4 py-2 rounded-lg transition-colors"
+                    disabled={isCreatingCategory}
+                    className="px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
                     style={{ background: 'var(--glass)', color: 'var(--text-soft)', border: '1px solid var(--glass-border)' }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-lg transition-colors"
+                    disabled={isCreatingCategory}
+                    className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70"
                     style={{ background: 'var(--teal)', color: 'var(--white)' }}
                   >
-                    Create Category
+                    {isCreatingCategory ? (
+                      <>
+                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        Creating...
+                      </>
+                    ) : (
+                      'Create Category'
+                    )}
                   </button>
                 </div>
               </form>

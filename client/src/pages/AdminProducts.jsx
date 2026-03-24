@@ -442,7 +442,6 @@ const AdminProducts = () => {
             </div>
           )}
         </div>
-        </div>
 
         {/* Add/Edit Product Modal */}
         {(showAddModal || showEditModal) && (
@@ -842,8 +841,7 @@ const AdminProducts = () => {
           </div>
         )}
 
-        <div>
-          {showCategoryModal && (
+        {showCategoryModal && (
           <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.6)' }}>
             <div style={{ background: 'var(--glass)', backdropFilter: 'blur(20px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-4 md:p-6 w-full ml-4 mr-4 md:ml-0 md:mr-0 max-w-md max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
@@ -945,7 +943,6 @@ const AdminProducts = () => {
             </div>
           </div>
         )}
-        </div>
       </div>
     </AdminLayout>
   )

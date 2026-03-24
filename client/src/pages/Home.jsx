@@ -412,7 +412,7 @@ const Home = () => {
       background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
       backdropFilter: 'blur(2px)',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'visible'
     }}>
       <div style={{
         position: 'absolute',
@@ -848,11 +848,13 @@ const Home = () => {
         transition={{ duration: 0.8 }}
         className="py-16"
         style={{
-          background: 'linear-gradient(to bottom, rgba(8,30,35,0.6), rgba(8,30,35,0.4))'
+          background: 'linear-gradient(to bottom, rgba(8,30,35,0.6), rgba(8,30,35,0.4))',
+          overflow: 'visible',
+          paddingBottom: '4rem'
         }}
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="max-w-7xl mx-auto px-6" style={{ overflow: 'visible' }}>
+          <div className="model-grid-container">
             {visibleImages.map((image, index) => (
               <motion.div
                 key={index}
@@ -860,22 +862,27 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="relative overflow-hidden rounded-lg shadow-lg"
+                className="model-grid-item"
                 style={{
                   background: 'var(--glass-card)',
                   border: '1px solid var(--glass-border)',
                   backdropFilter: 'blur(8px)',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  borderRadius: '12px'
                 }}
               >
                 <ProductImage
                   src={getOptimizedUrl(image)}
                   alt={`Model ${index + 1}`}
-                  className="w-full object-cover hover:scale-105 transition-transform duration-500"
+                  className="model-grid-image"
                   style={{
-                    height: isMobile ? '200px' : '280px',
                     filter: 'brightness(0.9) contrast(1.1)',
-                    display: 'block'
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top center'
                   }}
                 />
                 <div style={{

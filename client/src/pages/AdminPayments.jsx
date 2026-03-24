@@ -155,7 +155,7 @@ const AdminPayments = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
-                        {payment.orderId ? `ORD${payment.orderId.slice(-6)}` : `ORD${payment.id?.toString().slice(-6)}`}
+                        {payment.orderId ? `ORD${payment.orderId.toString().slice(-6)}` : `ORD${payment.id?.toString().slice(-6)}`}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-bright)' }}>
                         {payment.customer?.name || payment.userInfo?.name || 'Guest'}

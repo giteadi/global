@@ -51,18 +51,8 @@ exports.getProducts = async (req, res) => {
     console.log('Products query took:', Date.now() - startTime, 'ms')
     console.log('Total products:', total)
 
-    // Optimize JSON parsing - extract only first image for list
-    for (let i = 0; i < products.length; i++) {
-      // Images already parsed by Product.getAll model
-      const imgs = products[i].images || []
-      products[i].image = Array.isArray(imgs) ? imgs[0] : null
-      delete products[i].images // Remove heavy images array
-      
-      // Skip heavy JSON parsing for list view
-      products[i].features = []
-      products[i].tags = []
-      products[i].seo_keywords = []
-    }
+    // Images already processed in Product.getAll model
+    // No additional processing needed
 
     console.log('Returning products count:', products.length)
 

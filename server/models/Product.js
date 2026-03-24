@@ -53,17 +53,22 @@ class Product {
 
       // Parse JSON fields at DB level for performance
       return rows.map(row => {
-        // Parse images and extract first one
-        if (row.images && typeof row.images === 'string' && row.images.trim() !== '') {
+        // Handle MySQL JSON column - parse the base64 string
+        let imagesArray = []
+        
+        if (row.images && typeof row.images === 'string') {
           try {
             const parsedImages = JSON.parse(row.images)
-            row.images = Array.isArray(parsedImages) ? parsedImages[0] : null
+            imagesArray = Array.isArray(parsedImages) ? parsedImages : []
           } catch {
-            row.images = null
+            imagesArray = []
           }
-        } else {
-          row.images = null
+        } else if (row.images && Array.isArray(row.images)) {
+          imagesArray = row.images
         }
+        
+        // Keep first image only for list view
+        row.images = imagesArray.length > 0 ? [imagesArray[0]] : []
         
         // Set other JSON fields to empty arrays for list view
         row.features = []

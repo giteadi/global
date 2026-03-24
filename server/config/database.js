@@ -7,7 +7,7 @@ const pool = mysql.createPool({
   password: 'Tiger@123',
   database: 'global_exim',
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 50, // Increased from 10
   queueLimit: 0
 })
 

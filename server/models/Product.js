@@ -4,7 +4,11 @@ class Product {
   // Get products with filters
   static async getAll(query = {}, options = {}) {
     try {
-      let sql = `SELECT * FROM products WHERE is_active = 1`
+      let sql = `
+      SELECT id, name, price, category, images, is_featured, created_at
+      FROM products 
+      WHERE is_active = 1
+    `
       const params = []
 
       // Add filters
@@ -19,13 +23,14 @@ class Product {
       }
 
       // Add search
-      if (query.$text) {
-        sql += ` AND MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)`
-        params.push(query.$text.$search)
+      if (query.name && query.name.$like) {
+        sql += ` AND name LIKE ?`
+        params.push(query.name.$like)
       }
 
-      // Add sorting
-      const sortField = options.sortBy || 'id'
+      // Add sorting with SQL injection protection
+      const ALLOWED_SORT = ['id', 'name', 'price', 'category', 'created_at', 'is_featured']
+      const sortField = ALLOWED_SORT.includes(options.sortBy) ? options.sortBy : 'id'
       const sortOrder = options.sortOrder === 'asc' ? 'ASC' : 'DESC'
       sql += ` ORDER BY ${sortField} ${sortOrder}`
 
@@ -46,15 +51,25 @@ class Product {
       const [rows] = await pool.query(sql, params)
       console.log('Product.getAll rows length:', rows.length)
 
+      // Parse JSON fields at DB level for performance
       return rows.map(row => {
+        // Parse images and extract first one
         if (row.images && typeof row.images === 'string' && row.images.trim() !== '') {
           try {
-            row.images = JSON.parse(row.images)
-          } catch (e) {
-            console.log('Error parsing images for product:', row.id, row.images, e.message)
-            row.images = []
+            const parsedImages = JSON.parse(row.images)
+            row.images = Array.isArray(parsedImages) ? parsedImages[0] : null
+          } catch {
+            row.images = null
           }
+        } else {
+          row.images = null
         }
+        
+        // Set other JSON fields to empty arrays for list view
+        row.features = []
+        row.tags = []
+        row.seo_keywords = []
+        
         return row
       })
     } catch (error) {
@@ -79,9 +94,9 @@ class Product {
     }
 
     // Add search
-    if (query.$text) {
-      sql += ` AND MATCH(name, description) AGAINST(? IN NATURAL LANGUAGE MODE)`
-      params.push(query.$text.$search)
+    if (query.name && query.name.$like) {
+      sql += ` AND name LIKE ?`
+      params.push(query.name.$like)
     }
 
     const [rows] = await pool.query(sql, params)

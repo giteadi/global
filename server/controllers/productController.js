@@ -26,35 +26,50 @@ exports.getProducts = async (req, res) => {
     }
 
     if (search) {
-      query.$text = { $search: search }
+      // Use prefix search for better performance (can use index)
+      query.name = { $like: `${search}%` }
     }
 
     // Add sorting
     options.sortBy = sort
     options.sortOrder = order
 
-    // Add pagination
-    options.limit = parseInt(limit)
-    options.skip = (parseInt(page) - 1) * parseInt(limit)
+    // Add pagination with hard limit
+    const limitValue = Math.min(parseInt(limit), 20) // Max 20 products
+    options.limit = limitValue
+    options.skip = (parseInt(page) - 1) * limitValue
 
-    const products = await Product.getAll(query, options)
-    const total = await Product.count(query)
+    console.log('Starting product query...')
+    const startTime = Date.now()
+    
+    // Run queries in parallel for better performance
+    const [products, total] = await Promise.all([
+      Product.getAll(query, options),
+      Product.count(query)
+    ])
+    
+    console.log('Products query took:', Date.now() - startTime, 'ms')
+    console.log('Total products:', total)
 
-    // Parse JSON fields for each product
-    const parsedProducts = products.map(product => ({
-      ...product,
-      images: Array.isArray(product.images) ? product.images : (product.images ? JSON.parse(product.images) : []),
-      features: Array.isArray(product.features) ? product.features : (product.features ? JSON.parse(product.features) : []),
-      tags: Array.isArray(product.tags) ? product.tags : (product.tags ? JSON.parse(product.tags) : []),
-      seo_keywords: Array.isArray(product.seo_keywords) ? product.seo_keywords : (product.seo_keywords ? JSON.parse(product.seo_keywords) : [])
-    }))
+    // Optimize JSON parsing - extract only first image for list
+    for (let i = 0; i < products.length; i++) {
+      // Images already parsed by Product.getAll model
+      const imgs = products[i].images || []
+      products[i].image = Array.isArray(imgs) ? imgs[0] : null
+      delete products[i].images // Remove heavy images array
+      
+      // Skip heavy JSON parsing for list view
+      products[i].features = []
+      products[i].tags = []
+      products[i].seo_keywords = []
+    }
 
-    console.log('Returning products count:', parsedProducts.length)
+    console.log('Returning products count:', products.length)
 
     res.json({
       success: true,
       data: {
-        products: parsedProducts,
+        products: products,
         pagination: {
           page: parseInt(page),
           limit: parseInt(limit),

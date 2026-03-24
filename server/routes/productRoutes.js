@@ -1,4 +1,5 @@
 const express = require('express')
+const { auth, adminAuth } = require('../middleware/auth')
 const {
   getProducts,
   getProduct,
@@ -17,9 +18,9 @@ router.get('/featured', getFeaturedProducts)
 router.get('/categories', getCategories)
 router.get('/:id', getProduct)
 
-// Admin routes (would need authentication middleware)
-router.post('/', createProduct)
-router.put('/:id', updateProduct)
-router.delete('/:id', deleteProduct)
+// Admin routes (protected with authentication)
+router.post('/', auth, adminAuth, createProduct)
+router.put('/:id', auth, adminAuth, updateProduct)
+router.delete('/:id', auth, adminAuth, deleteProduct)
 
 module.exports = router

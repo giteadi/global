@@ -6,7 +6,7 @@ const AdminSettings = () => {
     siteTitle: 'Global Exim Traders',
     siteDescription: 'Where Heritage Meets Global Elegance',
     contactEmail: 'info@globalexim.com',
-    contactPhone: '+91 98765 43210',
+    contactPhone: '+91 98851 39882',
     currency: 'INR',
     taxRate: 18,
     shippingFee: 150,

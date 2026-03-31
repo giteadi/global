@@ -92,20 +92,9 @@ const Footer = React.memo(() => {
           <div>
             <h3 className="font-semibold mb-4" style={{ color: 'var(--text-bright)' }}>Contact Info</h3>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-start space-x-2">
-                <span style={{ color: 'var(--gold-bright)' }}>📍</span>
-                <span style={{ color: 'var(--text-soft)' }}>
-                  Export Import Zone<br/>
-                  Rajasthan, India
-                </span>
-              </li>
               <li className="flex items-center space-x-2">
                 <span style={{ color: 'var(--gold-bright)' }}>📞</span>
-                <span style={{ color: 'var(--text-soft)' }}> +91 98765 43210</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span style={{ color: 'var(--gold-bright)' }}>✉️</span>
-                <span style={{ color: 'var(--text-soft)' }}>info@globaleximtraders.com</span>
+                <span style={{ color: 'var(--text-soft)' }}> +91 98851 39882</span>
               </li>
             </ul>
           </div>

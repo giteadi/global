@@ -15,7 +15,19 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('')
   
   // Use RTK Query for optimized data fetching
-  const { data: products = [], isLoading: productsLoading } = useGetProductsQuery()
+  const { data: productsData = [], isLoading: productsLoading } = useGetProductsQuery()
+  
+  // Ensure products is always an array
+  const products = useMemo(() => {
+    console.log('Products data:', productsData)
+    if (!productsData) return []
+    if (Array.isArray(productsData)) return productsData
+    // Handle paginated response format { data: { products: [...] } }
+    if (productsData.data?.products && Array.isArray(productsData.data.products)) return productsData.data.products
+    if (productsData.products && Array.isArray(productsData.products)) return productsData.products
+    if (productsData.data && Array.isArray(productsData.data)) return productsData.data
+    return []
+  }, [productsData])
   const { data: categoriesData = [] } = useGetCategoriesQuery()
   
   // Memoize categories to prevent re-renders
@@ -107,7 +119,7 @@ const Products = () => {
         </div>
 
         {/* Products Grid */}
-        {loading ? (
+        {productsLoading ? (
           <div className="text-center py-20">
             <div className="text-2xl animate-pulse" style={{ color: 'var(--gold-bright)' }}>Loading...</div>
           </div>

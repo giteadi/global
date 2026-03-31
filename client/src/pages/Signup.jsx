@@ -102,7 +102,7 @@ const Signup = React.memo(() => {
                 value={formData.phone}
                 onChange={handleChange}
                 className="w-full bg-teal-900/50 border border-teal-600/30 text-white placeholder-teal-300 px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-400 transition-all"
-                placeholder="+91 98765 43210"
+                placeholder="+91 98851 39882"
               />
             </div>
 

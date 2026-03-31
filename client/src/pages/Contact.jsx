@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import API_BASE from '../api/config'
@@ -51,7 +52,7 @@ const Contact = React.memo(() => {
   }
 
   return (
-    <div className="min-h-screen py-20 px-4">
+    <div className="min-h-screen py-20 px-4 bg-gradient-to-b from-teal-950 to-teal-900">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div 
@@ -65,7 +66,7 @@ const Contact = React.memo(() => {
             Contact Us
           </h1>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
-          <p className="text-teal-200 max-w-2xl mx-auto">
+          <p className="text-white max-w-2xl mx-auto text-with-shadow">
             We'd love to hear from you. Whether you have a question about our products, 
             want to place a bulk order, or just want to connect with us.
           </p>
@@ -115,7 +116,7 @@ const Contact = React.memo(() => {
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full bg-teal-900/50 border border-teal-600/30 text-white placeholder-teal-300 px-4 py-3 rounded-lg focus:outline-none focus:border-yellow-400 transition-all"
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98851 39882"
                 />
               </div>
               
@@ -175,10 +176,9 @@ const Contact = React.memo(() => {
                   <span className="text-yellow-400 text-xl">📍</span>
                   <div>
                     <h3 className="text-white font-semibold mb-1 text-with-shadow">Address</h3>
-                    <p className="text-teal-200">
+                    <p className="text-white text-with-shadow">
                       Global Exim Traders<br/>
-                      Export Import Zone<br/>
-                      Rajasthan, India
+                      Hyderabad, India
                     </p>
                   </div>
                 </div>
@@ -187,17 +187,7 @@ const Contact = React.memo(() => {
                   <span className="text-yellow-400 text-xl">📞</span>
                   <div>
                     <h3 className="text-white font-semibold mb-1 text-with-shadow">Phone</h3>
-                    <p className="text-teal-200">+91 98765 43210</p>
-                    <p className="text-teal-200">+91 12345 67890</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <span className="text-yellow-400 text-xl">✉️</span>
-                  <div>
-                    <h3 className="text-white font-semibold mb-1 text-with-shadow">Email</h3>
-                    <p className="text-teal-200">info@globaleximtraders.com</p>
-                    <p className="text-teal-200">exports@globaleximtraders.com</p>
+                    <p className="text-white text-with-shadow">+91 98851 39882</p>
                   </div>
                 </div>
                 
@@ -205,8 +195,8 @@ const Contact = React.memo(() => {
                   <span className="text-yellow-400 text-xl">🕐</span>
                   <div>
                     <h3 className="text-white font-semibold mb-1 text-with-shadow">Business Hours</h3>
-                    <p className="text-teal-200">Monday - Saturday: 9:00 AM - 6:00 PM</p>
-                    <p className="text-teal-200">Sunday: Closed</p>
+                    <p className="text-white text-with-shadow">Monday - Saturday: 9:00 AM - 6:00 PM</p>
+                    <p className="text-white text-with-shadow">Sunday: Closed</p>
                   </div>
                 </div>
               </div>
@@ -217,38 +207,18 @@ const Contact = React.memo(() => {
               <h2 className="text-2xl font-serif text-white mb-6 text-with-shadow">Quick Links</h2>
               
               <div className="space-y-3">
-                <a href="#" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
-                  📄 Product Catalog
-                </a>
-                <a href="#" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
-                  📋 Bulk Order Form
-                </a>
-                <a href="#" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
-                  🏭 Export Information
-                </a>
-                <a href="#" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
-                  📊 Partnership Opportunities
-                </a>
-              </div>
-            </div>
-
-            {/* Social Media */}
-            <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
-              <h2 className="text-2xl font-serif text-white mb-6 text-with-shadow">Follow Us</h2>
-              
-              <div className="flex space-x-4">
-                <a href="#" className="w-12 h-12 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
-                  <span className="text-xl">f</span>
-                </a>
-                <a href="#" className="w-12 h-12 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
-                  <span className="text-xl">📷</span>
-                </a>
-                <a href="#" className="w-12 h-12 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
-                  <span className="text-xl">in</span>
-                </a>
-                <a href="#" className="w-12 h-12 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
-                  <span className="text-xl">🐦</span>
-                </a>
+                <Link to="/products" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
+                  �️ Products
+                </Link>
+                <Link to="/about" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
+                  🏛️ About Us
+                </Link>
+                <Link to="/contact" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
+                  📞 Contact
+                </Link>
+                <Link to="/" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
+                  🏠 Home
+                </Link>
               </div>
             </div>
           </motion.div>

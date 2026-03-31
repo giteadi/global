@@ -18,7 +18,12 @@ const Navbar = React.memo(() => {
   const { data: categoriesData = [] } = useGetCategoriesQuery()
   
   // Memoize categories to prevent re-renders
-  const categories = useMemo(() => categoriesData, [categoriesData])
+  const categories = useMemo(() => {
+    if (!categoriesData) return []
+    if (Array.isArray(categoriesData)) return categoriesData
+    if (categoriesData.data && Array.isArray(categoriesData.data)) return categoriesData.data
+    return []
+  }, [categoriesData])
 
   const handleLogout = () => {
     dispatch(logout())
@@ -71,50 +76,9 @@ const Navbar = React.memo(() => {
                 Home
               </Link>
               
-              {/* Categories Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={toggleCategoryDropdown}
-                  className="nav-link flex items-center gap-1"
-                >
-                  Categories
-                  <span className="text-xs">{isCategoryOpen ? '▲' : '▼'}</span>
-                </button>
-                
-                {isCategoryOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setIsCategoryOpen(false)}
-                    ></div>
-                    <div
-                      className="absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-20 py-2"
-                      style={{
-                        background: '#0a2830',
-                        border: '1px solid rgba(37,204,200,0.25)'
-                      }}
-                    >
-                      <button
-                        onClick={() => handleCategoryClick('All')}
-                        className="w-full text-left px-4 py-2 hover:bg-teal-700/30 transition-colors"
-                        style={{ color: 'var(--gold-bright)' }}
-                      >
-                        All Products
-                      </button>
-                      {categories.map((category) => (
-                        <button
-                          key={category.id || category._id || category.name}
-                          onClick={() => handleCategoryClick(category.name)}
-                          className="w-full text-left px-4 py-2 hover:bg-teal-700/30 transition-colors"
-                          style={{ color: 'var(--text-soft)' }}
-                        >
-                          {category.name}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+              <Link to="/products" className={isActive('/products') ? 'nav-link active' : 'nav-link'}>
+                Products
+              </Link>
               <Link to="/about" className={isActive('/about') ? 'nav-link active' : 'nav-link'}>
                 About
               </Link>
@@ -209,35 +173,9 @@ const Navbar = React.memo(() => {
                 Home
               </Link>
               
-              {/* Mobile Categories */}
-              <div>
-                <button
-                  onClick={toggleCategoryDropdown}
-                  className="nav-link w-full text-left flex items-center justify-between"
-                >
-                  Categories
-                  <span className="text-xs">{isCategoryOpen ? '▲' : '▼'}</span>
-                </button>
-                {isCategoryOpen && (
-                  <div className="pl-4 mt-2 space-y-2">
-                    <button
-                      onClick={() => handleCategoryClick('All')}
-                      className="nav-link w-full text-left text-sm"
-                    >
-                      All Products
-                    </button>
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => handleCategoryClick(category)}
-                        className="nav-link w-full text-left text-sm"
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="nav-link">
+                Products
+              </Link>
               <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="nav-link">
                 About
               </Link>

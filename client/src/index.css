@@ -189,6 +189,25 @@ nav {
 }
 
 /* ====== BUTTON STYLES ====== */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #0a2830;
+  background: var(--teal-bright);
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
 .btn-primary:hover {
   background:var(--teal-light);
   transform:translateY(-3px);

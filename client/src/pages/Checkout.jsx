@@ -85,7 +85,7 @@ const Checkout = () => {
           className="text-center"
         >
           <div className="text-6xl mb-4">🛒</div>
-          <h2 className="text-3xl font-serif text-white mb-4">
+          <h2 className="text-3xl font-serif text-white mb-4 text-with-shadow">
             Your cart is empty
           </h2>
           <button
@@ -105,7 +105,7 @@ const Checkout = () => {
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-serif text-white text-center mb-8"
+          className="text-4xl font-serif text-white text-center mb-8 text-with-shadow"
         >
           Checkout
         </motion.h1>
@@ -117,13 +117,13 @@ const Checkout = () => {
             animate={{ opacity: 1, x: 0 }}
             className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-6"
           >
-            <h2 className="text-xl font-serif text-white mb-6">Order Summary</h2>
+            <h2 className="text-xl font-serif text-white mb-6 text-with-shadow">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-white font-semibold">{item.name}</h3>
+                    <h3 className="text-white font-semibold text-with-shadow">{item.name}</h3>
                     <p className="text-teal-200 text-sm">Qty: {item.quantity}</p>
                   </div>
                   <p className="text-yellow-400 font-semibold">
@@ -142,7 +142,7 @@ const Checkout = () => {
                 <span>Tax (10%)</span>
                 <span>₹{(total * 0.1).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-white text-lg font-semibold">
+              <div className="flex justify-between text-white text-lg font-semibold text-with-shadow">
                 <span>Total</span>
                 <span className="text-yellow-400">
                   ₹{totalWithTax.toFixed(2)}
@@ -157,7 +157,7 @@ const Checkout = () => {
             animate={{ opacity: 1, x: 0 }}
             className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-6"
           >
-            <h2 className="text-xl font-serif text-white mb-6">Payment Method</h2>
+            <h2 className="text-xl font-serif text-white mb-6 text-with-shadow">Payment Method</h2>
             
             <div className="space-y-4">
               {/* Bank Transfer Option */}
@@ -176,7 +176,7 @@ const Checkout = () => {
                       <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                     )}
                   </div>
-                  <h3 className="text-white font-semibold">Bank Transfer</h3>
+                  <h3 className="text-white font-semibold text-with-shadow">Bank Transfer</h3>
                 </div>
                 
                 {selectedPaymentMethod === 'bank' && (
@@ -188,16 +188,16 @@ const Checkout = () => {
                     <div className="bg-teal-900/50 rounded-lg p-4 space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-teal-200">Account Name:</span>
-                        <span className="text-white font-semibold">{bankDetails.accountName}</span>
+                        <span className="text-white font-semibold text-with-shadow">{bankDetails.accountName}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-teal-200">Bank Name:</span>
-                        <span className="text-white font-semibold">{bankDetails.bankName}</span>
+                        <span className="text-white font-semibold text-with-shadow">{bankDetails.bankName}</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-teal-200">Account Number:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-white font-semibold">{bankDetails.accountNumber}</span>
+                          <span className="text-white font-semibold text-with-shadow">{bankDetails.accountNumber}</span>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
@@ -212,7 +212,7 @@ const Checkout = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-teal-200">IFSC Code:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-white font-semibold">{bankDetails.ifscCode}</span>
+                          <span className="text-white font-semibold text-with-shadow">{bankDetails.ifscCode}</span>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
@@ -245,7 +245,7 @@ const Checkout = () => {
                       <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                     )}
                   </div>
-                  <h3 className="text-white font-semibold">UPI Payment</h3>
+                  <h3 className="text-white font-semibold text-with-shadow">UPI Payment</h3>
                 </div>
                 
                 {selectedPaymentMethod === 'upi' && (
@@ -265,7 +265,7 @@ const Checkout = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-teal-200">UPI ID:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-white font-semibold">{bankDetails.upiId}</span>
+                          <span className="text-white font-semibold text-with-shadow">{bankDetails.upiId}</span>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()

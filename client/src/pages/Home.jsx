@@ -372,7 +372,11 @@ const Home = () => {
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-11_at_14.10.08_mmaxot.jpg',
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-09_at_16.54.26_aryjws.jpg',
     'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-09_at_13.56.30_rjhdna.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895325/WhatsApp_Image_2026-03-09_at_14.05.25_eq5qpd.jpg'
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364834/WhatsApp_Image_2026-03-24_at_19.43.15_muommg.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364834/WhatsApp_Image_2026-03-24_at_19.41.45_vpwusr.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364834/WhatsApp_Image_2026-03-24_at_19.40.11_glhjz4.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364833/WhatsApp_Image_2026-03-24_at_19.30.06_kexn9a.jpg',
+    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364833/WhatsApp_Image_2026-03-24_at_19.33.30_tzea17.jpg'
   ]
 
   const visibleImages = isMobile ? modelImages.slice(0, 8) : modelImages
@@ -409,8 +413,7 @@ const Home = () => {
   return (
     <ErrorBoundary>
       <div className="min-h-screen" style={{
-      background: 'linear-gradient(135deg, rgba(10,40,45,0.3), rgba(20,60,65,0.2), rgba(15,50,55,0.25))',
-      backdropFilter: 'blur(2px)',
+      background: 'transparent',
       position: 'relative',
       overflow: 'visible'
     }}>
@@ -489,7 +492,7 @@ const Home = () => {
       
       {/* HERO */}
       <section className="relative py-24 flex items-center justify-center" style={{
-        backgroundImage: 'linear-gradient(to bottom, rgba(8,25,30,0.65) 0%, rgba(8,25,30,0.3) 35%, rgba(8,25,30,0.7) 100%)',
+        backgroundImage: 'linear-gradient(to bottom, rgba(8,25,30,0.4) 0%, rgba(8,35,40,0.3) 35%, rgba(8,30,35,0.5) 100%)',
         backgroundAttachment: 'scroll'
       }}>
         <div className="text-center max-w-6xl px-6">
@@ -528,7 +531,11 @@ const Home = () => {
             style={{
               lineHeight: '1.1',
               letterSpacing: '0',
-              marginBottom: '0.5rem'
+              marginBottom: '0.5rem',
+              background: 'rgba(8,30,35,0.95)',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(37,204,200,0.3)'
             }}
           >
             {/* "Get AshokaaZ" — single line with same font */}
@@ -848,7 +855,7 @@ const Home = () => {
         transition={{ duration: 0.8 }}
         className="py-16"
         style={{
-          background: 'linear-gradient(to bottom, rgba(8,30,35,0.6), rgba(8,30,35,0.4))',
+          background: 'linear-gradient(to bottom, rgb(8,30,35), rgb(8,35,40))',
           overflow: 'visible',
           paddingBottom: '4rem'
         }}
@@ -916,7 +923,7 @@ const Home = () => {
         transition={{ duration: 0.8 }}
         className="py-24"
         style={{
-          background: 'linear-gradient(to bottom, transparent, rgba(8,30,35,0.4))'
+          background: 'linear-gradient(to bottom, rgb(8,30,35), rgb(8,35,40))'
         }}
       >
         <div className="max-w-7xl mx-auto text-center mb-16 px-6">
@@ -1299,7 +1306,7 @@ const Home = () => {
         transition={{ duration: 0.8 }}
         className="py-24"
         style={{
-          background: 'linear-gradient(to bottom, rgba(8,30,35,0.4), rgba(8,30,35,0.6))'
+          background: 'linear-gradient(to bottom, rgb(8,30,35), rgb(8,35,40))'
         }}
       >
         <div className="max-w-7xl mx-auto text-center mb-16 px-6">

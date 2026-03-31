@@ -98,7 +98,7 @@ const ProductDetail = () => {
   if (!Array.isArray(parsedImages)) parsedImages = []
 
   return (
-    <div className="min-h-screen py-20 px-4 bg-black/60">
+    <div className="min-h-screen py-20 px-4 bg-gradient-to-b from-teal-950 to-teal-900">
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumb removed as requested */}
 
@@ -150,20 +150,20 @@ const ProductDetail = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="mb-6">
-              <span className="text-yellow-400 text-sm uppercase tracking-wider">{singleProduct.category}</span>
+              <span className="text-white text-sm uppercase tracking-wider">{singleProduct.category}</span>
               <h1 className="text-4xl font-serif text-white mt-2 mb-4 text-with-shadow">{singleProduct.name}</h1>
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl text-yellow-400 font-bold">₹{singleProduct.price}</span>
                 <span className="text-teal-200 line-through">₹{Math.round(singleProduct.price * 1.5)}</span>
                 <span className="bg-yellow-400 text-black px-2 py-1 rounded-full text-sm font-semibold">33% OFF</span>
               </div>
-              <p className="text-teal-200 text-lg leading-relaxed text-with-shadow">{singleProduct.description}</p>
+              <p className="text-white text-lg leading-relaxed text-with-shadow">{singleProduct.description}</p>
             </div>
 
             {/* Quantity and Actions */}
             <div className="mb-8">
               <div className="flex items-center gap-4 mb-6">
-                <label className="text-white font-semibold">Quantity:</label>
+                <label className="text-white font-semibold text-with-shadow">Quantity:</label>
                 <div className="flex items-center bg-teal-800/50 backdrop-blur-sm border border-teal-600/30 rounded-lg">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -175,7 +175,7 @@ const ProductDetail = () => {
                     type="number"
                     value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-16 text-center bg-teal-800/30 text-white border-x border-teal-600/30 py-2"
+                    className="w-16 text-center bg-teal-800/30 text-white border-x border-teal-600/30 py-2 text-with-shadow"
                   />
                   <button
                     onClick={() => setQuantity(quantity + 1)}
@@ -209,8 +209,8 @@ const ProductDetail = () => {
                 {Object.entries(productDetails).map(([key, value]) => (
                   value && (
                     <div key={key} className="flex justify-between">
-                      <span className="text-teal-200 capitalize">{key.replace('_', ' ')}:</span>
-                      <span className="text-white">{value}</span>
+                      <span className="text-white capitalize text-with-shadow">{key.replace('_', ' ')}:</span>
+                      <span className="text-white text-with-shadow">{value}</span>
                     </div>
                   )
                 ))}

@@ -61,7 +61,7 @@ const Contact = React.memo(() => {
           className="text-center mb-16"
         >
           <span className="text-yellow-400 text-sm uppercase tracking-wider">Get In Touch</span>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mt-2 mb-4">
+          <h1 className="text-4xl md:text-5xl font-serif text-white mt-2 mb-4 text-with-shadow">
             Contact Us
           </h1>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
@@ -79,7 +79,7 @@ const Contact = React.memo(() => {
             transition={{ duration: 0.8 }}
             className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8"
           >
-            <h2 className="text-2xl font-serif text-white mb-6">Send us a Message</h2>
+            <h2 className="text-2xl font-serif text-white mb-6 text-with-shadow">Send us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-yellow-400 text-sm mb-2">Name *</label>
@@ -168,13 +168,13 @@ const Contact = React.memo(() => {
           >
             {/* Contact Details */}
             <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
-              <h2 className="text-2xl font-serif text-white mb-6">Contact Information</h2>
+              <h2 className="text-2xl font-serif text-white mb-6 text-with-shadow">Contact Information</h2>
               
               <div className="space-y-4">
                 <div className="flex items-start space-x-4">
                   <span className="text-yellow-400 text-xl">📍</span>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Address</h3>
+                    <h3 className="text-white font-semibold mb-1 text-with-shadow">Address</h3>
                     <p className="text-teal-200">
                       Global Exim Traders<br/>
                       Export Import Zone<br/>
@@ -186,7 +186,7 @@ const Contact = React.memo(() => {
                 <div className="flex items-start space-x-4">
                   <span className="text-yellow-400 text-xl">📞</span>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Phone</h3>
+                    <h3 className="text-white font-semibold mb-1 text-with-shadow">Phone</h3>
                     <p className="text-teal-200">+91 98765 43210</p>
                     <p className="text-teal-200">+91 12345 67890</p>
                   </div>
@@ -195,7 +195,7 @@ const Contact = React.memo(() => {
                 <div className="flex items-start space-x-4">
                   <span className="text-yellow-400 text-xl">✉️</span>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Email</h3>
+                    <h3 className="text-white font-semibold mb-1 text-with-shadow">Email</h3>
                     <p className="text-teal-200">info@globaleximtraders.com</p>
                     <p className="text-teal-200">exports@globaleximtraders.com</p>
                   </div>
@@ -204,7 +204,7 @@ const Contact = React.memo(() => {
                 <div className="flex items-start space-x-4">
                   <span className="text-yellow-400 text-xl">🕐</span>
                   <div>
-                    <h3 className="text-white font-semibold mb-1">Business Hours</h3>
+                    <h3 className="text-white font-semibold mb-1 text-with-shadow">Business Hours</h3>
                     <p className="text-teal-200">Monday - Saturday: 9:00 AM - 6:00 PM</p>
                     <p className="text-teal-200">Sunday: Closed</p>
                   </div>
@@ -214,7 +214,7 @@ const Contact = React.memo(() => {
 
             {/* Quick Links */}
             <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
-              <h2 className="text-2xl font-serif text-white mb-6">Quick Links</h2>
+              <h2 className="text-2xl font-serif text-white mb-6 text-with-shadow">Quick Links</h2>
               
               <div className="space-y-3">
                 <a href="#" className="block text-yellow-400 hover:text-yellow-300 transition-colors">
@@ -234,7 +234,7 @@ const Contact = React.memo(() => {
 
             {/* Social Media */}
             <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-8">
-              <h2 className="text-2xl font-serif text-white mb-6">Follow Us</h2>
+              <h2 className="text-2xl font-serif text-white mb-6 text-with-shadow">Follow Us</h2>
               
               <div className="flex space-x-4">
                 <a href="#" className="w-12 h-12 bg-yellow-400/20 border border-yellow-400 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">

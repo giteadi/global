@@ -42,7 +42,7 @@ const Cart = React.memo(() => {
           className="text-center"
         >
           <div className="text-6xl mb-4">🛒</div>
-          <h2 className="text-3xl font-serif text-white mb-4">
+          <h2 className="text-3xl font-serif text-white mb-4 text-with-shadow">
             Your cart is empty
           </h2>
           <p className="text-teal-200 mb-8">
@@ -66,7 +66,7 @@ const Cart = React.memo(() => {
         {/* Cart Items */}
         <div className="lg:col-span-2 bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-serif text-white">
+            <h2 className="text-xl font-serif text-white text-with-shadow">
               Cart Items ({items.length})
             </h2>
             <button
@@ -124,7 +124,7 @@ const Cart = React.memo(() => {
                         <div>
                           <h3
                             onClick={() => navigate(`/product/${item.id}`)}
-                            className="text-white font-semibold cursor-pointer hover:text-yellow-400"
+                            className="text-white font-semibold cursor-pointer hover:text-yellow-400 text-with-shadow"
                           >
                             {item.name}
                           </h3>
@@ -154,7 +154,7 @@ const Cart = React.memo(() => {
                           >
                             -
                           </button>
-                          <span className="text-white w-10 text-center">
+                          <span className="text-white w-10 text-center text-with-shadow">
                             {item.quantity}
                           </span>
                           <button
@@ -175,7 +175,7 @@ const Cart = React.memo(() => {
                           <p className="text-yellow-400 font-semibold">
                             ₹{item.price}
                           </p>
-                          <p className="text-white text-sm">
+                          <p className="text-white text-sm text-with-shadow">
                             ₹{(item.price * item.quantity).toFixed(2)}
                           </p>
                         </div>
@@ -190,7 +190,7 @@ const Cart = React.memo(() => {
 
         {/* Order Summary */}
         <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-6 h-fit sticky top-4">
-          <h2 className="text-xl font-serif text-white mb-6">
+          <h2 className="text-xl font-serif text-white mb-6 text-with-shadow">
             Order Summary
           </h2>
 
@@ -203,7 +203,7 @@ const Cart = React.memo(() => {
               <span>Tax (10%)</span>
               <span>₹{(total * 0.1).toFixed(2)}</span>
             </div>
-            <div className="border-t border-teal-600/30 pt-3 flex justify-between text-white text-lg font-semibold">
+            <div className="border-t border-teal-600/30 pt-3 flex justify-between text-white text-lg font-semibold text-with-shadow">
               <span>Total</span>
               <span className="text-yellow-400">
                 ₹{(total * 1.1).toFixed(2)}

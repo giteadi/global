@@ -13,7 +13,7 @@ const About = React.memo(() => {
           className="text-center mb-16"
         >
           <span className="text-yellow-400 text-sm uppercase tracking-wider">Our Story</span>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mt-2 mb-4">
+          <h1 className="text-4xl md:text-5xl font-serif text-white mt-2 mb-4 text-with-shadow">
             India's Heritage, <span className="italic">Delivered Globally</span>
           </h1>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
@@ -94,7 +94,7 @@ const About = React.memo(() => {
         <section className="mb-20">
           <div className="text-center mb-12">
             <span className="text-yellow-400 text-sm uppercase tracking-wider">What We Offer</span>
-            <h2 className="text-4xl font-serif text-white mt-2 mb-4">Our Collections</h2>
+            <h2 className="text-4xl font-serif text-white mt-2 mb-4 text-with-shadow">Our Collections</h2>
             <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
             <p className="text-teal-200 max-w-2xl mx-auto">
               Premium Luxury Quality · Detailed Craftsmanship · Elegant Finish · Global Aesthetic
@@ -118,7 +118,7 @@ const About = React.memo(() => {
                 className="bg-teal-800/30 border border-teal-600/30 rounded-lg p-6 text-center hover:border-yellow-400/50 transition-all"
               >
                 <span className="text-4xl mb-4 block">{item.icon}</span>
-                <h3 className="text-xl font-serif text-white mb-3">{item.title}</h3>
+                <h3 className="text-xl font-serif text-white mb-3 text-with-shadow">{item.title}</h3>
                 <p className="text-teal-200 text-sm">{item.desc}</p>
               </motion.div>
             ))}
@@ -129,7 +129,7 @@ const About = React.memo(() => {
         <section className="mb-20">
           <div className="text-center mb-12">
             <span className="text-yellow-400 text-sm uppercase tracking-wider">Our Commitment</span>
-            <h2 className="text-4xl font-serif text-white mt-2 mb-4">Certified & Fully Compliant</h2>
+            <h2 className="text-4xl font-serif text-white mt-2 mb-4 text-with-shadow">Certified & Fully Compliant</h2>
             <div className="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
           </div>
           
@@ -138,21 +138,21 @@ const About = React.memo(() => {
               <div className="w-20 h-20 bg-yellow-400/20 border-2 border-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🏆</span>
               </div>
-              <h3 className="text-xl font-serif text-white mb-3">Premium Quality</h3>
+              <h3 className="text-xl font-serif text-white mb-3 text-with-shadow">Premium Quality</h3>
               <p className="text-teal-200 text-sm">Every piece meets international quality standards and export requirements</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-yellow-400/20 border-2 border-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">📋</span>
               </div>
-              <h3 className="text-xl font-serif text-white mb-3">Legal Compliance</h3>
+              <h3 className="text-xl font-serif text-white mb-3 text-with-shadow">Legal Compliance</h3>
               <p className="text-teal-200 text-sm">Fully registered and compliant with all export-import regulations</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-yellow-400/20 border-2 border-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🌍</span>
               </div>
-              <h3 className="text-xl font-serif text-white mb-3">Global Reach</h3>
+              <h3 className="text-xl font-serif text-white mb-3 text-with-shadow">Global Reach</h3>
               <p className="text-teal-200 text-sm">Serving customers worldwide through trusted marketplaces</p>
             </div>
           </div>
@@ -161,7 +161,7 @@ const About = React.memo(() => {
         {/* Marketplaces */}
         <section className="text-center">
           <span className="text-yellow-400 text-sm uppercase tracking-wider">Available On</span>
-          <h2 className="text-3xl font-serif text-white mt-2 mb-8">Trusted Marketplaces</h2>
+          <h2 className="text-3xl font-serif text-white mt-2 mb-8 text-with-shadow">Trusted Marketplaces</h2>
           <div className="flex flex-wrap justify-center gap-4">
             <div className="bg-teal-800/30 border border-teal-600/30 rounded-lg px-6 py-3 hover:border-yellow-400/50 transition-all">
               <span className="text-yellow-400 font-semibold">Amazon</span>

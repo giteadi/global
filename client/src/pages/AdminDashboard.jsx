@@ -1,8 +1,10 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import { useGetDashboardStatsQuery } from '../store/slices/adminApi'
 
 const AdminDashboard = () => {
+  const navigate = useNavigate()
   const { data: stats, isLoading, error } = useGetDashboardStatsQuery()
 
   const dashboardData = stats?.data?.stats || {
@@ -123,19 +125,35 @@ const AdminDashboard = () => {
         <div style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-bright)' }}>Quick Actions</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="p-4 rounded-lg transition-colors" style={{ background: 'rgba(27,158,155,0.1)', color: 'var(--teal-bright)', border: '1px solid rgba(37,204,200,0.2)' }}>
+            <button 
+              onClick={() => navigate('/admin/products')}
+              className="p-4 rounded-lg transition-colors" 
+              style={{ background: 'rgba(27,158,155,0.1)', color: 'var(--teal-bright)', border: '1px solid rgba(37,204,200,0.2)' }}
+            >
               <div className="text-2xl mb-2">➕</div>
               <div className="text-sm font-medium">Add Product</div>
             </button>
-            <button className="p-4 rounded-lg transition-colors" style={{ background: 'rgba(37,204,200,0.1)', color: 'var(--teal-bright)', border: '1px solid rgba(37,204,200,0.2)' }}>
+            <button 
+              onClick={() => navigate('/admin/analytics')}
+              className="p-4 rounded-lg transition-colors" 
+              style={{ background: 'rgba(37,204,200,0.1)', color: 'var(--teal-bright)', border: '1px solid rgba(37,204,200,0.2)' }}
+            >
               <div className="text-2xl mb-2">📊</div>
               <div className="text-sm font-medium">View Reports</div>
             </button>
-            <button className="p-4 rounded-lg transition-colors" style={{ background: 'rgba(200,160,94,0.1)', color: 'var(--gold-bright)', border: '1px solid rgba(200,160,94,0.2)' }}>
+            <button 
+              onClick={() => navigate('/admin/users')}
+              className="p-4 rounded-lg transition-colors" 
+              style={{ background: 'rgba(200,160,94,0.1)', color: 'var(--gold-bright)', border: '1px solid rgba(200,160,94,0.2)' }}
+            >
               <div className="text-2xl mb-2">👥</div>
               <div className="text-sm font-medium">Manage Users</div>
             </button>
-            <button className="p-4 rounded-lg transition-colors" style={{ background: 'rgba(146,26,40,0.1)', color: 'var(--maroon)', border: '1px solid rgba(146,26,40,0.2)' }}>
+            <button 
+              onClick={() => navigate('/admin/settings')}
+              className="p-4 rounded-lg transition-colors" 
+              style={{ background: 'rgba(146,26,40,0.1)', color: 'var(--maroon)', border: '1px solid rgba(146,26,40,0.2)' }}
+            >
               <div className="text-2xl mb-2">⚙️</div>
               <div className="text-sm font-medium">Settings</div>
             </button>

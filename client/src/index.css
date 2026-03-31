@@ -275,12 +275,15 @@ nav {
 @media (max-width: 640px) {
   /* Admin table responsive scrolling */
   table {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
   
   .px-6 {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
   }
   
   /* Hide non-essential columns on mobile */
@@ -297,10 +300,22 @@ nav {
     grid-template-columns: 1fr !important;
   }
   
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid.grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid.grid-cols-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
   /* Modal full width on mobile */
   .max-w-2xl {
     max-width: 100% !important;
-    margin: 0 1rem !important;
+    margin: 0 0.5rem !important;
   }
   
   /* Button sizing */
@@ -309,9 +324,120 @@ nav {
     padding: 0.75rem 1rem;
   }
   
-  /* Admin sidebar adjust */
+  /* Admin sidebar adjust - collapse to bottom nav */
   .h-screen.flex {
     flex-direction: column;
+  }
+  
+  /* Admin layout padding */
+  .admin-content {
+    padding: 0.5rem !important;
+  }
+  
+  /* Stack flex rows on mobile */
+  .flex-row {
+    flex-direction: column !important;
+  }
+  
+  .items-center {
+    align-items: flex-start !important;
+  }
+  
+  /* Full width on mobile */
+  .w-full-mobile {
+    width: 100% !important;
+  }
+  
+  /* Text size adjustments */
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+  
+  .text-lg {
+    font-size: 1rem !important;
+  }
+  
+  .text-xl {
+    font-size: 1.125rem !important;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem !important;
+  }
+  
+  /* Gap adjustments */
+  .gap-6 {
+    gap: 0.75rem !important;
+  }
+  
+  .gap-4 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Padding adjustments */
+  .p-6 {
+    padding: 0.75rem !important;
+  }
+  
+  .p-4 {
+    padding: 0.5rem !important;
+  }
+  
+  /* Margin adjustments */
+  .m-6 {
+    margin: 0.75rem !important;
+  }
+  
+  /* Space adjustments */
+  .space-y-6 > * + * {
+    margin-top: 0.75rem !important;
+  }
+  
+  .space-x-8 > * + * {
+    margin-left: 0 !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  /* Card adjustments */
+  .rounded-lg {
+    border-radius: 0.375rem !important;
+  }
+  
+  /* Admin specific classes */
+  .admin-sidebar {
+    width: 100% !important;
+    position: relative !important;
+    height: auto !important;
+  }
+  
+  .admin-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Table specific */
+  thead {
+    display: none;
+  }
+  
+  tbody tr {
+    display: block;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 0.375rem;
+  }
+  
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  
+  tbody td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 0.5rem;
   }
 }
 
@@ -320,6 +446,14 @@ nav {
   .max-w-2xl {
     max-width: 90%;
   }
+  
+  .grid.grid-cols-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Desktop - default styles */
 }
 
 /* ====== ANIMATION UTILITY CLASSES ====== */

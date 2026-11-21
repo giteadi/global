@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from 'react'
+import React, { useEffect, useState, Suspense, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useGetProductsQuery, useGetFeaturedProductsQuery } from '../store/slices/adminApi'
@@ -140,7 +140,7 @@ const ProductImage = React.memo(({ src, alt, className, style, onLoad, onError, 
   )
 })
 
-const ProductCard = React.memo(({ product, isMobile, imageLoaded, imageError, onImageLoad, onImageError }) => {
+const ProductCard = React.memo(({ product, isMobile }) => {
     if (!product || !product.id) return null
 
     let images = product.images
@@ -158,79 +158,91 @@ const ProductCard = React.memo(({ product, isMobile, imageLoaded, imageError, on
     return (
       <Link
         to={`/product/${product.id}`}
-        className="block overflow-hidden transition-all hover:shadow-xl hover:shadow-teal-400/20"
-        style={{
-          background: 'var(--glass-card)',
-          border: '1px solid var(--glass-border)',
-          borderRadius: '12px',
-          backdropFilter: 'blur(8px)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
+        className="block apple-glass-card apple-press overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-teal-400/20 group relative rounded-2xl"
       >
-        <div className="h-56 overflow-hidden relative" style={{
-          background: 'linear-gradient(135deg, rgba(10,40,45,0.8), rgba(10,50,55,0.6))'
+        <div className="h-56 sm:h-60 overflow-hidden relative" style={{
+          background: 'linear-gradient(135deg, rgba(10,40,45,0.85), rgba(8,30,35,0.7))'
         }}>
-          {imageUrl && !imageError ? (
+          {imageUrl ? (
             <ProductImage
               src={imageUrl}
               alt={product.name || 'Product'}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               style={{
-                filter: 'brightness(0.95) contrast(1.05) saturate(1.1)',
+                filter: 'brightness(0.96) contrast(1.05) saturate(1.05)',
               }}
-              onLoad={onImageLoad}
-              onError={onImageError}
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 256px"
             />
           ) : (
             <div className="h-full flex items-center justify-center">
-              <span className="text-6xl opacity-60">
-                {product.icon || '📦'}
+              <span className="text-6xl group-hover:scale-110 transition-transform duration-300 opacity-80">
+                {product.icon || '🏛️'}
               </span>
             </div>
           )}
+
+          {/* Floating Category Tag */}
+          {product.category && (
+            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase backdrop-blur-md bg-black/45 border border-teal-500/20 text-[var(--gold-bright)] shadow-md">
+              {product.category}
+            </span>
+          )}
         </div>
-        <div className="p-6" style={{
-          background: 'linear-gradient(to bottom, rgba(10,40,45,0.9), rgba(8,30,35,0.95))'
+        <div className="p-5" style={{
+          background: 'linear-gradient(to bottom, rgba(10,40,45,0.85), rgba(8,30,35,0.95))'
         }}>
           <h3 style={{
             fontFamily: 'Playfair Display, serif',
-            fontSize: '1.25rem',
+            fontSize: '1.15rem',
             fontWeight: '600',
             color: 'var(--gold-bright)',
-            marginBottom: '0.75rem',
+            marginBottom: '0.5rem',
             lineHeight: '1.3'
-          }}>
+          }} className="line-clamp-1 group-hover:text-[var(--gold-pale)] transition-colors">
             {product.name}
           </h3>
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: '1rem'
+            marginTop: '0.75rem'
           }}>
             <span style={{
               fontFamily: 'Raleway, sans-serif',
-              fontSize: '1.5rem',
+              fontSize: '1.35rem',
               fontWeight: '700',
               color: 'var(--teal-bright)',
               letterSpacing: '0.02em'
             }}>
               ₹{product.price}
             </span>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              background: 'var(--gold-bright)',
-              borderRadius: '50%',
-              boxShadow: '0 0 12px rgba(224,194,128,0.6)'
-            }}></div>
+            <div className="flex items-center space-x-1.5 text-xs text-[var(--gold-bright)] font-semibold group-hover:translate-x-1 transition-transform">
+              <span>View</span>
+              <span>→</span>
+            </div>
           </div>
         </div>
       </Link>
     )
   })
+
+// Memoized SkeletonCard component outside Home to prevent remounting
+const SkeletonCard = React.memo(() => (
+  <div style={{
+    background: 'var(--glass-card)',
+    border: '1px solid var(--glass-border)',
+    borderRadius: '12px',
+    overflow: 'hidden'
+  }}>
+    <div style={{ height: '224px', background: 'rgba(37,204,200,0.08)' }} />
+    <div style={{ padding: '1.5rem' }}>
+      <div style={{ height: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '12px', width: '70%' }} />
+      <div style={{ height: '24px', background: 'rgba(37,204,200,0.12)', borderRadius: '4px', width: '40%' }} />
+    </div>
+  </div>
+))
+
+
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -248,9 +260,6 @@ const Home = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentFeaturedSlide, setCurrentFeaturedSlide] = useState(0)
-  const [loadedImages, setLoadedImages] = useState({})
-  const [imageErrors, setImageErrors] = useState({})
-  const [componentMounted, setComponentMounted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = React.useRef(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -283,139 +292,68 @@ const Home = () => {
     }
   }, [isMobile])
 
-  const toggleAudio = async () => {
+  const toggleAudio = useCallback(async () => {
     if (!audioRef.current) return
     
     if (isPlaying) {
       audioRef.current.pause()
-      // setIsPlaying handled by onPause event on the <audio> element
     } else {
       try {
         await audioRef.current.play()
-        // setIsPlaying handled by onPlay event on the <audio> element
       } catch (error) {
         console.log('Audio play failed:', error.message)
         setIsPlaying(false)
       }
     }
-  }
+  }, [isPlaying])
 
-  // Cleanup on unmount
-  useEffect(() => {
-    setComponentMounted(true)
-    return () => {
-      setComponentMounted(false)
-    }
-  }, [])
-
-  // Auto Slide for All Products - DISABLED for performance
-  useEffect(() => {
-    // Disabled to prevent CPU spikes
-    return () => {}
-  }, [])
-
-  // Auto Slide for Featured Products - DISABLED for performance  
-  useEffect(() => {
-    // Disabled to prevent CPU spikes
-    return () => {}
-  }, [])
-
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     if (!Array.isArray(allProducts) || allProducts.length <= 1) return
     const maxSlides = allProducts.length - 1
     setCurrentSlide(prev =>
       prev >= maxSlides ? 0 : prev + 1
     )
-  }
+  }, [allProducts])
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     if (!Array.isArray(allProducts) || allProducts.length <= 1) return
     const maxSlides = allProducts.length - 1
     setCurrentSlide(prev =>
       prev === 0 ? maxSlides : prev - 1
     )
-  }
+  }, [allProducts])
 
-  const nextFeaturedSlide = () => {
+  const nextFeaturedSlide = useCallback(() => {
     if (!Array.isArray(featuredProducts) || featuredProducts.length <= 1) return
     const maxSlides = featuredProducts.length - 1
     setCurrentFeaturedSlide(prev =>
       prev >= maxSlides ? 0 : prev + 1
     )
-  }
+  }, [featuredProducts])
 
-  const prevFeaturedSlide = () => {
+  const prevFeaturedSlide = useCallback(() => {
     if (!Array.isArray(featuredProducts) || featuredProducts.length <= 1) return
     const maxSlides = featuredProducts.length - 1
     setCurrentFeaturedSlide(prev =>
       prev === 0 ? maxSlides : prev - 1
     )
-  }
+  }, [featuredProducts])
 
-  const goToSlide = React.useCallback(index => {
+  const goToSlide = useCallback(index => {
     setCurrentSlide(index)
   }, [])
 
-  const goToFeaturedSlide = React.useCallback(index => {
+  const goToFeaturedSlide = useCallback(index => {
     setCurrentFeaturedSlide(index)
   }, [])
 
-  const modelImages = [
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206791/img2_wb4n3k.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img3_xffkyd.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img5_nv7b5y.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img4_gynggu.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img1_tvaz89.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img6_bbu1ew.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206792/img7_bgaydp.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773206793/img9_pku7et.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-11_at_14.10.08_mmaxot.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-09_at_16.54.26_aryjws.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1773895324/WhatsApp_Image_2026-03-09_at_13.56.30_rjhdna.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364834/WhatsApp_Image_2026-03-24_at_19.43.15_muommg.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364834/WhatsApp_Image_2026-03-24_at_19.41.45_vpwusr.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364834/WhatsApp_Image_2026-03-24_at_19.40.11_glhjz4.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364833/WhatsApp_Image_2026-03-24_at_19.30.06_kexn9a.jpg',
-    'https://res.cloudinary.com/bazeercloud/image/upload/v1774364833/WhatsApp_Image_2026-03-24_at_19.33.30_tzea17.jpg'
-  ]
-
-  const visibleImages = isMobile ? modelImages.slice(0, 8) : modelImages
-
-  // ProductCard is now defined outside Home to prevent recreation on every render
-  const handleImageLoad = React.useCallback((productId) => {
-    if (componentMounted) {
-      setLoadedImages(prev => ({ ...prev, [productId]: true }))
-    }
-  }, [componentMounted])
-
-  const handleImageError = React.useCallback((productId) => {
-    if (componentMounted) {
-      setImageErrors(prev => ({ ...prev, [productId]: true }))
-    }
-  }, [componentMounted])
-
-  // Skeleton card component
-  const SkeletonCard = () => (
-    <div style={{
-      background: 'var(--glass-card)',
-      border: '1px solid var(--glass-border)',
-      borderRadius: '12px',
-      overflow: 'hidden'
-    }}>
-      <div style={{ height: '224px', background: 'rgba(37,204,200,0.08)' }} />
-      <div style={{ padding: '1.5rem' }}>
-        <div style={{ height: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginBottom: '12px', width: '70%' }} />
-        <div style={{ height: '24px', background: 'rgba(37,204,200,0.12)', borderRadius: '4px', width: '40%' }} />
-      </div>
-    </div>
-  )
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen" style={{
+      <div className="min-h-screen w-full max-w-full overflow-x-hidden" style={{
       background: 'transparent',
       position: 'relative',
-      overflow: 'visible'
+      overflowX: 'hidden'
     }}>
       <div style={{
         position: 'absolute',
@@ -533,9 +471,10 @@ const Home = () => {
               letterSpacing: '0',
               marginBottom: '0.5rem',
               background: 'rgba(8,30,35,0.95)',
-              padding: '2rem',
+              padding: isMobile ? '1.25rem 0.75rem' : '2rem',
               borderRadius: '12px',
-              border: '1px solid rgba(37,204,200,0.3)'
+              border: '1px solid rgba(37,204,200,0.3)',
+              maxWidth: '100%'
             }}
           >
             {/* "Get AshokaaZ" — single line with same font */}
@@ -651,7 +590,7 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex justify-center gap-6 mb-12"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-12 w-full max-w-md mx-auto px-2"
           >
             <Link to="/products" className="btn-primary" style={{
               fontFamily: 'Raleway, sans-serif',
@@ -847,75 +786,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* MODEL IMAGES GRID */}
-      <motion.section 
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-        className="py-16"
-        style={{
-          background: 'linear-gradient(to bottom, rgb(8,30,35), rgb(8,35,40))',
-          overflow: 'visible',
-          paddingBottom: '4rem'
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6" style={{ overflow: 'visible' }}>
-          <div className="model-grid-container">
-            {visibleImages.map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="model-grid-item"
-                style={{
-                  background: 'var(--glass-card)',
-                  border: '1px solid var(--glass-border)',
-                  backdropFilter: 'blur(8px)',
-                  cursor: 'pointer',
-                  overflow: 'hidden',
-                  borderRadius: '12px'
-                }}
-              >
-                <ProductImage
-                  src={getOptimizedUrl(image)}
-                  alt={`Model ${index + 1}`}
-                  className="model-grid-image"
-                  style={{
-                    filter: 'brightness(0.9) contrast(1.1)',
-                    display: 'block',
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'top center'
-                  }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent)',
-                  padding: '1rem',
-                  color: '#FFFFFF'
-                }}>
-                  <p style={{
-                    fontFamily: 'Lora, serif',
-                    fontSize: '0.85rem',
-                    opacity: '0.9',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Elegance Personified
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
+      {/* TOP PRODUCTS SECTION */}
+      {(productsLoading || (Array.isArray(allProducts) && allProducts.length > 0)) && (
       <motion.section 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -961,7 +833,7 @@ const Home = () => {
               height: '9px',
               background: 'var(--teal-bright)',
               transform: 'rotate(45deg)',
-              animation: 'floatLotus 4s ease-in-out infinite'
+              animation: 'none'
             }}></div>
             <div className="lotus-line" style={{
               flex: '1',
@@ -1009,13 +881,7 @@ const Home = () => {
             }}>
               All Categories:
             </h4>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1rem',
-              textAlign: 'center',
-              marginBottom: '2rem'
-            }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4 mb-8 text-center w-full">
               {[
                 'Afghani Jewellery',
                 'Oxidised',
@@ -1074,12 +940,7 @@ const Home = () => {
             }}>
               Sub Categories:
             </h4>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1rem',
-              textAlign: 'center'
-            }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4 text-center w-full">
               {[
                 'Necklace (Kundan)',
                 'Necklace with Ear Tops',
@@ -1130,44 +991,31 @@ const Home = () => {
           </motion.div>
         </div>
 
-        {productsLoading || featuredLoading ? (
+        {productsLoading ? (
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
-        ) : productsError ? (
-          <div className="text-center py-16">
-            <p style={{ color: 'var(--text-muted)', fontFamily: 'Lora, serif', marginBottom: '1rem' }}>Unable to load products</p>
-            <button onClick={() => refetchProducts()} style={{ background: 'var(--teal-bright)', color: '#071e24', padding: '0.5rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Retry</button>
-          </div>
-        ) : !Array.isArray(allProducts) || allProducts.length === 0 ? (
-          <div className="text-center py-16" style={{
-            color: 'var(--text-muted)',
-            fontFamily: 'Lora, serif',
-            fontSize: '1.1rem'
-          }}>
-            No products available
-          </div>
-        ) : (
-          <div className="relative max-w-7xl mx-auto px-8">
-            {/* Left Arrow */}
+        ) : productsError || !Array.isArray(allProducts) || allProducts.length === 0 ? null : (
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-8 w-full overflow-hidden">
+            {/* Left Arrow (Desktop only) */}
             {Array.isArray(allProducts) && allProducts.length > 1 && (
               <button
                 onClick={prevSlide}
+                className="hidden md:flex"
                 style={{
                   position: 'absolute',
-                  left: '0',
+                  left: '10px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'var(--teal-bright)',
                   color: '#071e24',
                   border: 'none',
-                  width: '48px',
-                  height: '48px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
-                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem',
+                  fontSize: '1.4rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s',
@@ -1190,25 +1038,25 @@ const Home = () => {
               </button>
             )}
 
-            {/* Right Arrow */}
+            {/* Right Arrow (Desktop only) */}
             {Array.isArray(allProducts) && allProducts.length > 1 && (
               <button
                 onClick={nextSlide}
+                className="hidden md:flex"
                 style={{
                   position: 'absolute',
-                  right: '0',
+                  right: '10px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'var(--teal-bright)',
                   color: '#071e24',
                   border: 'none',
-                  width: '48px',
-                  height: '48px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
-                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem',
+                  fontSize: '1.4rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s',
@@ -1251,10 +1099,6 @@ const Home = () => {
                     <ProductCard
                       product={product}
                       isMobile={isMobile}
-                      imageLoaded={loadedImages[product.id]}
-                      imageError={imageErrors[product.id]}
-                      onImageLoad={() => handleImageLoad(product.id)}
-                      onImageError={() => handleImageError(product.id)}
                     />
                   </div>
                 ))}
@@ -1297,8 +1141,10 @@ const Home = () => {
           </div>
         )}
       </motion.section>
+      )}
 
       {/* FEATURED SECTION */}
+      {(featuredLoading || (Array.isArray(featuredProducts) && featuredProducts.length > 0)) && (
       <motion.section 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -1370,44 +1216,31 @@ const Home = () => {
           </motion.p>
         </div>
 
-        {productsLoading || featuredLoading ? (
+        {featuredLoading ? (
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
-        ) : featuredError ? (
-          <div className="text-center py-16">
-            <p style={{ color: 'var(--text-muted)', fontFamily: 'Lora, serif', marginBottom: '1rem' }}>Unable to load featured products</p>
-            <button onClick={() => refetchFeatured()} style={{ background: 'var(--teal-bright)', color: '#071e24', padding: '0.5rem 1.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Retry</button>
-          </div>
-        ) : !Array.isArray(featuredProducts) || featuredProducts.length === 0 ? (
-          <div className="text-center py-16" style={{
-            color: 'var(--text-muted)',
-            fontFamily: 'Lora, serif',
-            fontSize: '1.1rem'
-          }}>
-            No featured products available
-          </div>
-        ) : (
-          <div className="relative max-w-7xl mx-auto px-8">
-            {/* Left Arrow */}
+        ) : featuredError || !Array.isArray(featuredProducts) || featuredProducts.length === 0 ? null : (
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-8 w-full overflow-hidden">
+            {/* Left Arrow (Desktop only) */}
             {Array.isArray(featuredProducts) && featuredProducts.length > 1 && (
               <button
                 onClick={prevFeaturedSlide}
+                className="hidden md:flex"
                 style={{
                   position: 'absolute',
-                  left: '0',
+                  left: '10px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'var(--teal-bright)',
                   color: '#071e24',
                   border: 'none',
-                  width: '48px',
-                  height: '48px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
-                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem',
+                  fontSize: '1.4rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s',
@@ -1430,25 +1263,25 @@ const Home = () => {
               </button>
             )}
 
-            {/* Right Arrow */}
+            {/* Right Arrow (Desktop only) */}
             {Array.isArray(featuredProducts) && featuredProducts.length > 1 && (
               <button
                 onClick={nextFeaturedSlide}
+                className="hidden md:flex"
                 style={{
                   position: 'absolute',
-                  right: '0',
+                  right: '10px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'var(--teal-bright)',
                   color: '#071e24',
                   border: 'none',
-                  width: '48px',
-                  height: '48px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
-                  display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.5rem',
+                  fontSize: '1.4rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   transition: 'all 0.3s',
@@ -1491,10 +1324,6 @@ const Home = () => {
                     <ProductCard
                       product={product}
                       isMobile={isMobile}
-                      imageLoaded={loadedImages[product.id]}
-                      imageError={imageErrors[product.id]}
-                      onImageLoad={() => handleImageLoad(product.id)}
-                      onImageError={() => handleImageError(product.id)}
                     />
                   </div>
                 ))}
@@ -1537,6 +1366,7 @@ const Home = () => {
           </div>
         )}
       </motion.section>
+      )}
     </div>
     </ErrorBoundary>
   )

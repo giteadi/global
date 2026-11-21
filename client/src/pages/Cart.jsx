@@ -1,9 +1,110 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { removeFromCart, updateQuantity, clearCart } from '../store/slices/cartSlice'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+
+// Memoized Cart Item Component to prevent whole list re-renders
+const CartItem = React.memo(({ item, onRemove, onUpdateQuantity, onNavigateProduct }) => {
+  const imageUrl = useMemo(() => {
+    let images = item.images
+    if (typeof images === 'string') {
+      try {
+        images = JSON.parse(images)
+      } catch {
+        images = []
+      }
+    }
+    return images && images.length > 0 ? images[0] : null
+  }, [item.images])
+
+  const itemPrice = Number(item.price) || 0
+  const itemQty = Number(item.quantity) || 1
+  const lineTotal = (itemPrice * itemQty).toFixed(2)
+
+  return (
+    <div className="bg-teal-900/30 border border-teal-600/20 rounded-lg p-4">
+      <div className="flex gap-4">
+        {/* Product Image */}
+        <div
+          onClick={() => onNavigateProduct(item.id)}
+          className="w-20 h-20 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg overflow-hidden cursor-pointer flex-shrink-0"
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={item.name}
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-3xl">
+              📦
+            </div>
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between mb-2">
+            <div>
+              <h3
+                onClick={() => onNavigateProduct(item.id)}
+                className="text-white font-semibold cursor-pointer hover:text-yellow-400 text-with-shadow truncate"
+              >
+                {item.name}
+              </h3>
+              <p className="text-yellow-400 text-sm">
+                {item.category}
+              </p>
+            </div>
+            <button
+              onClick={() => onRemove(item.id)}
+              className="text-red-400 hover:text-red-300 p-1"
+              aria-label="Remove item"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="flex justify-between items-center mt-3">
+            {/* Quantity */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onUpdateQuantity(item.id, itemQty - 1)}
+                className="w-8 h-8 bg-teal-700 hover:bg-teal-600 text-white rounded font-bold transition-colors"
+                aria-label="Decrease quantity"
+              >
+                -
+              </button>
+              <span className="text-white w-10 text-center text-with-shadow font-semibold">
+                {itemQty}
+              </span>
+              <button
+                onClick={() => onUpdateQuantity(item.id, itemQty + 1)}
+                className="w-8 h-8 bg-teal-700 hover:bg-teal-600 text-white rounded font-bold transition-colors"
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+
+            {/* Price */}
+            <div className="text-right">
+              <p className="text-yellow-400 font-semibold">
+                ₹{itemPrice}
+              </p>
+              <p className="text-white text-sm text-with-shadow">
+                ₹{lineTotal}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+})
 
 const Cart = React.memo(() => {
   const dispatch = useDispatch()
@@ -11,28 +112,38 @@ const Cart = React.memo(() => {
 
   const { items = [], total = 0 } = useSelector((state) => state.cart || {})
 
-  const handleRemoveItem = (id) => {
+  const handleRemoveItem = useCallback((id) => {
     dispatch(removeFromCart(id))
     toast.success('Item removed from cart')
-  }
+  }, [dispatch])
 
-  const handleUpdateQuantity = (id, quantity) => {
+  const handleUpdateQuantity = useCallback((id, quantity) => {
     if (quantity <= 0) {
       handleRemoveItem(id)
     } else {
       dispatch(updateQuantity({ id, quantity }))
     }
-  }
+  }, [dispatch, handleRemoveItem])
 
-  const handleCheckout = () => {
+  const handleClearCart = useCallback(() => {
+    dispatch(clearCart())
+  }, [dispatch])
+
+  const handleNavigateProduct = useCallback((id) => {
+    navigate(`/product/${id}`)
+  }, [navigate])
+
+  const handleCheckout = useCallback(() => {
     toast.success('Proceeding to checkout...')
-    navigate('/checkout') // optional redirect
-  }
+    navigate('/checkout')
+  }, [navigate])
 
-  // Memoize cart items to prevent re-renders
-  const memoizedItems = useMemo(() => items, [items])
+  const numTotal = Number(total) || 0
+  const subtotalFormatted = numTotal.toFixed(2)
+  const taxFormatted = (numTotal * 0.1).toFixed(2)
+  const grandTotalFormatted = (numTotal * 1.1).toFixed(2)
 
-  if (!memoizedItems.length) {
+  if (!items.length) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 flex items-center justify-center px-4">
         <motion.div
@@ -62,7 +173,6 @@ const Cart = React.memo(() => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-950 to-teal-900 py-20 px-4">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
-
         {/* Cart Items */}
         <div className="lg:col-span-2 bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
@@ -70,121 +180,23 @@ const Cart = React.memo(() => {
               Cart Items ({items.length})
             </h2>
             <button
-              onClick={() => dispatch(clearCart())}
-              className="text-yellow-400 hover:text-yellow-300 text-sm"
+              onClick={handleClearCart}
+              className="text-yellow-400 hover:text-yellow-300 text-sm font-semibold transition-colors"
             >
               Clear Cart
             </button>
           </div>
 
           <div className="space-y-4">
-            {items.map((item) => {
-              let images = item.images
-
-              if (typeof images === 'string') {
-                try {
-                  images = JSON.parse(images)
-                } catch {
-                  images = []
-                }
-              }
-
-              const imageUrl =
-                images && images.length > 0 ? images[0] : null
-
-              return (
-                <div
-                  key={item.id}
-                  className="bg-teal-900/30 border border-teal-600/20 rounded-lg p-4"
-                >
-                  <div className="flex gap-4">
-
-                    {/* Product Image */}
-                    <div
-                      onClick={() => navigate(`/product/${item.id}`)}
-                      className="w-20 h-20 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg overflow-hidden cursor-pointer"
-                    >
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={item.name}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-3xl">
-                          📦
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="flex-1">
-                      <div className="flex justify-between mb-2">
-                        <div>
-                          <h3
-                            onClick={() => navigate(`/product/${item.id}`)}
-                            className="text-white font-semibold cursor-pointer hover:text-yellow-400 text-with-shadow"
-                          >
-                            {item.name}
-                          </h3>
-                          <p className="text-yellow-400 text-sm">
-                            {item.category}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleRemoveItem(item.id)}
-                          className="text-red-400"
-                        >
-                          ✕
-                        </button>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        {/* Quantity */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() =>
-                              handleUpdateQuantity(
-                                item.id,
-                                item.quantity - 1
-                              )
-                            }
-                            className="w-8 h-8 bg-teal-700 text-white rounded"
-                          >
-                            -
-                          </button>
-                          <span className="text-white w-10 text-center text-with-shadow">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              handleUpdateQuantity(
-                                item.id,
-                                item.quantity + 1
-                              )
-                            }
-                            className="w-8 h-8 bg-teal-700 text-white rounded"
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        {/* Price */}
-                        <div className="text-right">
-                          <p className="text-yellow-400 font-semibold">
-                            ₹{item.price}
-                          </p>
-                          <p className="text-white text-sm text-with-shadow">
-                            ₹{(item.price * item.quantity).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+            {items.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                onRemove={handleRemoveItem}
+                onUpdateQuantity={handleUpdateQuantity}
+                onNavigateProduct={handleNavigateProduct}
+              />
+            ))}
           </div>
         </div>
 
@@ -197,23 +209,23 @@ const Cart = React.memo(() => {
           <div className="space-y-3 mb-6">
             <div className="flex justify-between text-teal-200">
               <span>Subtotal</span>
-              <span>₹{total.toFixed(2)}</span>
+              <span>₹{subtotalFormatted}</span>
             </div>
             <div className="flex justify-between text-teal-200">
               <span>Tax (10%)</span>
-              <span>₹{(total * 0.1).toFixed(2)}</span>
+              <span>₹{taxFormatted}</span>
             </div>
             <div className="border-t border-teal-600/30 pt-3 flex justify-between text-white text-lg font-semibold text-with-shadow">
               <span>Total</span>
               <span className="text-yellow-400">
-                ₹{(total * 1.1).toFixed(2)}
+                ₹{grandTotalFormatted}
               </span>
             </div>
           </div>
 
           <button
             onClick={handleCheckout}
-            className="w-full bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold"
+            className="w-full bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105"
           >
             Proceed to Checkout
           </button>

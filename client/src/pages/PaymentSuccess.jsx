@@ -14,12 +14,14 @@ const PaymentSuccess = () => {
       return
     }
     
-    // Store payment data for admin dashboard
+    // Store payment data for admin dashboard safely without duplicate entries
     const existingPayments = JSON.parse(localStorage.getItem('payments') || '[]')
-    existingPayments.push(paymentData)
-    localStorage.setItem('payments', JSON.stringify(existingPayments))
-    
-    toast.success('Order placed successfully!')
+    const alreadySaved = existingPayments.some(p => p.id === paymentData.id)
+    if (!alreadySaved) {
+      existingPayments.push(paymentData)
+      localStorage.setItem('payments', JSON.stringify(existingPayments))
+      toast.success('Order placed successfully!')
+    }
   }, [paymentData, navigate])
 
   return (

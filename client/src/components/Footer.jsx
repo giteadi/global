@@ -125,7 +125,7 @@ const Footer = React.memo(() => {
       </div>
 
       {/* Bottom Footer */}
-      <div className="py-4" style={{ borderTop: '1px solid rgba(37,204,200,0.25)' }}>
+      <div className="py-4 pb-24 md:pb-4" style={{ borderTop: '1px solid rgba(37,204,200,0.25)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm">
             <div className="mb-2 md:mb-0" style={{ color: 'var(--text-soft)' }}>
@@ -152,4 +152,4 @@ const Footer = React.memo(() => {
   )
 })
 
-export default React.memo(Footer)
+export default Footer

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setSingleProduct } from '../store/slices/productsSlice'
@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import API_BASE from '../api/config'
 
-const ProductDetail = () => {
+const ProductDetail = React.memo(() => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -46,7 +46,7 @@ const ProductDetail = () => {
     }
   }, [id, dispatch, navigate])
 
-  const handleAddToCart = () => {
+  const handleAddToCart = useCallback(() => {
     if (!user) {
       toast.error('Please login to add items to cart')
       navigate('/login')
@@ -56,9 +56,9 @@ const ProductDetail = () => {
       dispatch(addToCart({ ...singleProduct, quantity }))
       toast.success(`${singleProduct.name} added to cart!`)
     }
-  }
+  }, [user, singleProduct, quantity, dispatch, navigate])
 
-  const handleBuyNow = () => {
+  const handleBuyNow = useCallback(() => {
     if (!singleProduct) return
 
     // Check if user is logged in
@@ -72,7 +72,28 @@ const ProductDetail = () => {
     dispatch(addToCart({ ...singleProduct, quantity }))
     toast.success('Redirecting to checkout...')
     navigate('/checkout')
-  }
+  }, [singleProduct, user, quantity, dispatch, navigate])
+
+  const productDetails = useMemo(() => {
+    if (!singleProduct) return {}
+    return {
+      material: singleProduct.material || 'N/A',
+      craftsmanship: singleProduct.craftsmanship || 'N/A',
+      origin: singleProduct.origin || 'N/A',
+      weight: singleProduct.weight || 'N/A',
+      dimensions: singleProduct.dimensions || 'N/A',
+      care: singleProduct.care || 'N/A'
+    }
+  }, [singleProduct])
+
+  const parsedImages = useMemo(() => {
+    if (!singleProduct) return []
+    let images = singleProduct.images
+    if (typeof images === 'string') {
+      try { images = JSON.parse(images) } catch { images = [] }
+    }
+    return Array.isArray(images) ? images : []
+  }, [singleProduct])
 
   if (loading || !singleProduct) {
     return (
@@ -81,21 +102,6 @@ const ProductDetail = () => {
       </div>
     )
   }
-
-  const productDetails = {
-    material: singleProduct.material || 'N/A',
-    craftsmanship: singleProduct.craftsmanship || 'N/A',
-    origin: singleProduct.origin || 'N/A',
-    weight: singleProduct.weight || 'N/A',
-    dimensions: singleProduct.dimensions || 'N/A',
-    care: singleProduct.care || 'N/A'
-  }
-
-  let parsedImages = singleProduct.images
-  if (typeof parsedImages === 'string') {
-    try { parsedImages = JSON.parse(parsedImages) } catch { parsedImages = [] }
-  }
-  if (!Array.isArray(parsedImages)) parsedImages = []
 
   return (
     <div className="min-h-screen py-20 px-4 bg-gradient-to-b from-teal-950 to-teal-900">
@@ -221,6 +227,6 @@ const ProductDetail = () => {
       </div>
     </div>
   )
-}
+})
 
 export default ProductDetail

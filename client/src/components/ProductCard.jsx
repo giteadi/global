@@ -1,78 +1,138 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
 import toast from 'react-hot-toast'
+import { ShoppingBagIcon, EyeIcon } from '@heroicons/react/24/outline'
 
 const ProductCard = React.memo(({ product }) => {
   const dispatch = useDispatch()
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = useCallback((e) => {
     e.preventDefault()
-    dispatch(addToCart(product))
-    toast.success(`${product.name} added to cart!`)
-  }
+    e.stopPropagation()
+    dispatch(addToCart({ ...product, quantity: 1 }))
+    toast.success(`${product.name} added to bag!`, {
+      style: {
+        background: '#0d323a',
+        color: '#fff',
+        border: '1px solid rgba(37, 204, 200, 0.3)',
+        borderRadius: '12px'
+      },
+      iconTheme: {
+        primary: 'var(--gold-bright)',
+        secondary: '#071e24'
+      }
+    })
+  }, [dispatch, product])
+
+  // Handle images array or json string with useMemo
+  const imageUrl = useMemo(() => {
+    let images = product.images
+    if (typeof images === 'string') {
+      try {
+        images = JSON.parse(images)
+      } catch {
+        images = []
+      }
+    }
+    return images && images.length > 0 ? images[0] : null
+  }, [product.images])
 
   return (
-    <div className="bg-teal-800/30 backdrop-blur-sm border border-teal-600/30 rounded-lg overflow-hidden hover:border-yellow-400/50 transition-all transform hover:scale-105 group">
-      {/* Product Image */}
-      <div className="h-64 bg-gradient-to-br from-teal-700 to-teal-800 flex items-center justify-center relative overflow-hidden">
-        <span className="text-6xl group-hover:scale-110 transition-transform duration-300">{product.icon}</span>
+    <div className="apple-glass-card overflow-hidden group flex flex-col h-full transition-all duration-300 hover:shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
+      {/* Product Image Area */}
+      <Link
+        to={`/product/${product.id}`}
+        className="block relative h-60 sm:h-64 overflow-hidden bg-gradient-to-br from-teal-950/80 to-teal-900/60"
+      >
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={product.name}
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            style={{ filter: 'brightness(0.96) contrast(1.05)' }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-6xl group-hover:scale-110 transition-transform duration-300">
+              {product.icon || '🏛️'}
+            </span>
+          </div>
+        )}
+
+        {/* Floating Category Tag */}
+        {product.category && (
+          <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase backdrop-blur-md bg-black/40 border border-teal-500/25 text-[var(--gold-bright)] shadow-md">
+            {product.category}
+          </span>
+        )}
+
+        {/* Discount Badge */}
         {product.discount && (
-          <span className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+          <span
+            className="absolute top-3 right-3 text-white px-2.5 py-0.5 rounded-full text-xs font-bold shadow-lg"
+            style={{ background: 'var(--maroon)', border: '1px solid rgba(255,255,255,0.15)' }}
+          >
             -{product.discount}%
           </span>
         )}
-      </div>
+      </Link>
 
-      {/* Product Info */}
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <span className="text-yellow-400 text-sm uppercase tracking-wider">{product.category}</span>
-          <div className="text-right">
-            <span className="text-2xl text-yellow-400 font-bold">₹{product.price}</span>
+      {/* Product Information */}
+      <div className="p-5 flex flex-col flex-1 justify-between">
+        <div>
+          <div className="flex justify-between items-baseline mb-2">
+            <span
+              className="text-xl font-bold font-serif"
+              style={{ color: 'var(--gold-bright)' }}
+            >
+              ₹{product.price}
+            </span>
             {product.originalPrice && (
-              <span className="text-teal-200 line-through text-sm block">₹{product.originalPrice}</span>
+              <span className="text-xs text-slate-400 line-through">
+                ₹{product.originalPrice}
+              </span>
             )}
           </div>
+
+          <Link to={`/product/${product.id}`}>
+            <h3
+              className="font-serif font-semibold text-base text-white group-hover:text-[var(--gold-bright)] transition-colors line-clamp-1 mb-2"
+              title={product.name}
+            >
+              {product.name}
+            </h3>
+          </Link>
+
+          <p className="text-xs text-[var(--text-soft)] line-clamp-2 leading-relaxed mb-4">
+            {product.description}
+          </p>
         </div>
 
-        <h3 className="text-xl font-serif text-white mb-3 group-hover:text-yellow-400 transition-colors">
-          {product.name}
-        </h3>
-
-        <p className="text-teal-200 text-sm mb-4 line-clamp-2">
-          {product.description}
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2">
+        {/* Apple Tactile Action Buttons */}
+        <div className="flex items-center gap-2 pt-3 border-t border-teal-500/15">
           <button
             onClick={handleAddToCart}
-            className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-semibold transition-all transform hover:scale-105"
+            className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl font-semibold text-xs transition-all apple-press shadow-md"
+            style={{
+              background: 'linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%)',
+              color: '#071e24'
+            }}
           >
-            Add to Cart
+            <ShoppingBagIcon className="w-4 h-4" />
+            <span>Add to Bag</span>
           </button>
+
           <Link
             to={`/product/${product.id}`}
-            className="border border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-4 py-2 rounded-full text-sm font-semibold transition-all"
+            className="flex items-center justify-center p-2.5 rounded-xl border border-teal-500/25 bg-white/5 text-[var(--text-soft)] hover:text-white hover:border-teal-400/40 transition-all apple-press"
+            aria-label="View product details"
           >
-            View
+            <EyeIcon className="w-4 h-4" />
           </Link>
         </div>
-
-        {/* Features */}
-        {product.features && (
-          <div className="mt-4 pt-4 border-t border-teal-600/20">
-            <div className="flex flex-wrap gap-2">
-              {product.features.slice(0, 2).map((feature, index) => (
-                <span key={index} className="text-xs text-teal-200">
-                  • {feature}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

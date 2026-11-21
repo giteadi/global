@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginUser } from '../store/slices/authSlice'
@@ -14,23 +14,23 @@ const Login = React.memo(() => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
+  const handleChange = useCallback((e) => {
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    })
-  }
+    }))
+  }, [])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     try {
-      const result = await dispatch(loginUser(formData)).unwrap()
+      await dispatch(loginUser(formData)).unwrap()
       toast.success('Login successful!')
       navigate('/')
     } catch (error) {
       toast.error(error || 'Login failed')
     }
-  }
+  }, [dispatch, formData, navigate])
 
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
@@ -108,4 +108,4 @@ const Login = React.memo(() => {
   )
 })
 
-export default React.memo(Login)
+export default Login

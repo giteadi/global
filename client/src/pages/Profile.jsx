@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateUserProfile } from '../store/slices/authSlice'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 
-const Profile = () => {
+const Profile = React.memo(() => {
   const dispatch = useDispatch()
   const { user } = useSelector(state => state.auth)
   const [loading, setLoading] = useState(false)
@@ -17,9 +17,6 @@ const Profile = () => {
     pincode: '',
     country: 'India'
   })
-
-  // Memoize form data to prevent unnecessary re-renders
-  const memoizedFormData = useMemo(() => formData, [formData])
 
   useEffect(() => {
     if (user) {
@@ -35,14 +32,14 @@ const Profile = () => {
     }
   }, [user])
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
+  const handleChange = useCallback((e) => {
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    })
-  }
+    }))
+  }, [])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     setLoading(true)
     try {
@@ -52,7 +49,7 @@ const Profile = () => {
       toast.error(error || 'Failed to update profile')
     }
     setLoading(false)
-  }
+  }, [dispatch, formData])
 
   if (!user) {
     return (
@@ -196,6 +193,6 @@ const Profile = () => {
       </motion.div>
     </div>
   )
-}
+})
 
 export default Profile

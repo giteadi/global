@@ -182,4 +182,4 @@ const About = React.memo(() => {
   )
 })
 
-export default React.memo(About)
+export default About

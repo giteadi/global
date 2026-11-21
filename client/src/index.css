@@ -20,19 +20,31 @@
   --white: #fff;
 }
 
-* { box-sizing:border-box; }
-html { scroll-behavior:smooth; }
+* { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
+}
 body {
   background-image: url('/src/assets/buddha-image.jpg');
   background-attachment: fixed;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: brightness(0.7) saturate(1.0);
   color: var(--text-bright);
   font-family: 'Lora', Georgia, serif;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
   position: relative;
+}
+
+#root {
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
 }
 
 body::before {
@@ -289,190 +301,146 @@ nav {
   transform: scale(1.05);
 }
 
-/* ====== RESPONSIVE ADMIN STYLES ====== */
-/* Mobile-first responsive improvements */
+/* ====== RESPONSIVE & APPLE-GRADE DESIGN ENHANCEMENTS ====== */
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+.pt-safe {
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+}
+
+/* Apple Liquid Glass Styling */
+.apple-glass {
+  background: rgba(8, 30, 35, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(37, 204, 200, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+.apple-glass-card {
+  background: linear-gradient(135deg, rgba(10, 45, 52, 0.72) 0%, rgba(8, 30, 35, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(37, 204, 200, 0.16);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-glass-card:hover {
+  border-color: rgba(200, 169, 110, 0.45);
+  box-shadow: 0 16px 40px -10px rgba(37, 204, 200, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Tactile micro-interactions (Apple HIG haptic feel) */
+.apple-press {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.apple-press:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+/* Category pill Apple HIG */
+.apple-pill {
+  padding: 0.375rem 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS bottom sheet styling */
+.ios-sheet-backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.ios-sheet-container {
+  background: linear-gradient(180deg, #0d323a 0%, #081e23 100%);
+  border-top: 1px solid rgba(37, 204, 200, 0.25);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+}
+
+/* Mobile-First Action Buttons (Apple HIG 44px min touch target) */
+.mobile-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-btn:active {
+  transform: scale(0.96);
+}
+
+.mobile-btn-gold {
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
+  color: #071e24;
+  box-shadow: 0 4px 15px rgba(200, 169, 110, 0.25);
+}
+
+.mobile-btn-teal {
+  background: rgba(27, 158, 155, 0.25);
+  border: 1px solid rgba(37, 204, 200, 0.35);
+  color: var(--teal-bright);
+}
+
+.mobile-btn-danger {
+  background: rgba(92, 26, 40, 0.35);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #fda4af;
+}
+
+/* Hide scrollbar for clean horizontal swipe */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Scoped admin responsive styling */
 @media (max-width: 640px) {
-  /* Admin table responsive scrolling */
-  table {
+  .admin-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table-container table {
     font-size: 0.75rem;
     display: block;
-    overflow-x: auto;
     white-space: nowrap;
   }
-  
-  .px-6 {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-  }
-  
-  /* Hide non-essential columns on mobile */
+
   .table-hide-mobile {
     display: none;
   }
-  
-  /* Stack form inputs */
-  .grid.grid-cols-1.md\\:grid-cols-2 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .grid.grid-cols-1.md\\:grid-cols-3 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .grid.grid-cols-2 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .grid.grid-cols-3 {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .grid.grid-cols-4 {
-    grid-template-columns: 1fr 1fr !important;
-  }
-  
-  /* Modal full width on mobile */
-  .max-w-2xl {
-    max-width: 100% !important;
-    margin: 0 0.5rem !important;
-  }
-  
-  /* Button sizing */
-  .btn-primary {
-    width: 100%;
-    padding: 0.75rem 1rem;
-  }
-  
-  /* Admin sidebar adjust - collapse to bottom nav */
-  .h-screen.flex {
-    flex-direction: column;
-  }
-  
-  /* Admin layout padding */
-  .admin-content {
-    padding: 0.5rem !important;
-  }
-  
-  /* Stack flex rows on mobile */
-  .flex-row {
-    flex-direction: column !important;
-  }
-  
-  .items-center {
-    align-items: flex-start !important;
-  }
-  
-  /* Full width on mobile */
-  .w-full-mobile {
-    width: 100% !important;
-  }
-  
-  /* Text size adjustments */
-  .text-sm {
-    font-size: 0.75rem !important;
-  }
-  
-  .text-lg {
-    font-size: 1rem !important;
-  }
-  
-  .text-xl {
-    font-size: 1.125rem !important;
-  }
-  
-  .text-2xl {
-    font-size: 1.25rem !important;
-  }
-  
-  /* Gap adjustments */
-  .gap-6 {
-    gap: 0.75rem !important;
-  }
-  
-  .gap-4 {
-    gap: 0.5rem !important;
-  }
-  
-  /* Padding adjustments */
-  .p-6 {
-    padding: 0.75rem !important;
-  }
-  
-  .p-4 {
-    padding: 0.5rem !important;
-  }
-  
-  /* Margin adjustments */
-  .m-6 {
-    margin: 0.75rem !important;
-  }
-  
-  /* Space adjustments */
-  .space-y-6 > * + * {
-    margin-top: 0.75rem !important;
-  }
-  
-  .space-x-8 > * + * {
-    margin-left: 0 !important;
-    margin-top: 0.5rem !important;
-  }
-  
-  /* Card adjustments */
-  .rounded-lg {
-    border-radius: 0.375rem !important;
-  }
-  
-  /* Admin specific classes */
-  .admin-sidebar {
-    width: 100% !important;
-    position: relative !important;
-    height: auto !important;
-  }
-  
-  .admin-main {
-    margin-left: 0 !important;
-    width: 100% !important;
-  }
-  
-  /* Table specific */
-  thead {
-    display: none;
-  }
-  
-  tbody tr {
-    display: block;
-    margin-bottom: 0.5rem;
-    border: 1px solid var(--glass-border);
-    border-radius: 0.375rem;
-  }
-  
-  tbody td {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem;
-    border-bottom: 1px solid var(--glass-border);
-  }
-  
-  tbody td:before {
-    content: attr(data-label);
-    font-weight: bold;
-    margin-right: 0.5rem;
-  }
-}
-
-@media (min-width: 641px) and (max-width: 1024px) {
-  /* Tablet adjustments */
-  .max-w-2xl {
-    max-width: 90%;
-  }
-  
-  .grid.grid-cols-4 {
-    grid-template-columns: 1fr 1fr !important;
-  }
-}
-
-@media (min-width: 1025px) {
-  /* Desktop - default styles */
 }
 
 /* ====== ANIMATION UTILITY CLASSES ====== */

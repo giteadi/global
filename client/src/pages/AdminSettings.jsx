@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import AdminLayout from '../components/AdminLayout'
 
-const AdminSettings = () => {
+const AdminSettings = React.memo(() => {
   const [settings, setSettings] = useState({
     siteTitle: 'Global Exim Traders',
     siteDescription: 'Where Heritage Meets Global Elegance',
@@ -15,19 +15,19 @@ const AdminSettings = () => {
     smsNotifications: false,
   })
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target
     setSettings(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
-  }
+  }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault()
     // Here you would typically save the settings
     alert('Settings saved successfully!')
-  }
+  }, [])
 
   return (
     <AdminLayout>
@@ -233,6 +233,6 @@ const AdminSettings = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminSettings

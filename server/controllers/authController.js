@@ -119,27 +119,37 @@ exports.login = async (req, res) => {
 // Get current user profile
 exports.getProfile = async (req, res) => {
   try {
-    // Simplified profile response for testing
-    const user = {
-      id: 1,
-      name: 'Admin',
-      email: 'admin@globaleximtraders.com',
-      role: 'admin',
-      phone: '1234567890',
-      address: {
-        street: '123 Main St',
-        city: 'Jaipur',
-        state: 'Rajasthan',
-        pincode: '302001',
-        country: 'India'
-      },
-      created_at: new Date().toISOString()
+    const user = req.user
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authorized'
+      })
     }
 
     res.json({
       success: true,
       data: {
-        user: user
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role || 'customer',
+          phone: user.phone || '',
+          street: user.street || '',
+          city: user.city || '',
+          state: user.state || '',
+          pincode: user.pincode || '',
+          country: user.country || 'India',
+          address: {
+            street: user.street || '',
+            city: user.city || '',
+            state: user.state || '',
+            pincode: user.pincode || '',
+            country: user.country || 'India'
+          },
+          created_at: user.created_at
+        }
       }
     })
   } catch (error) {
@@ -155,11 +165,19 @@ exports.getProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, phone } = req.body
+    const { name, phone, street, city, state, pincode, country } = req.body
     const userId = req.user.id
 
-    // Update user
-    const updatedUser = await User.updateById(userId, { name, phone })
+    // Update user with all submitted profile fields
+    const updatedUser = await User.updateById(userId, { 
+      name, 
+      phone,
+      street,
+      city,
+      state,
+      pincode,
+      country
+    })
 
     res.json({
       success: true,
@@ -168,14 +186,19 @@ exports.updateProfile = async (req, res) => {
           id: updatedUser.id,
           name: updatedUser.name,
           email: updatedUser.email,
-          role: updatedUser.role,
-          phone: updatedUser.phone,
+          role: updatedUser.role || 'customer',
+          phone: updatedUser.phone || '',
+          street: updatedUser.street || '',
+          city: updatedUser.city || '',
+          state: updatedUser.state || '',
+          pincode: updatedUser.pincode || '',
+          country: updatedUser.country || 'India',
           address: {
-            street: updatedUser.street,
-            city: updatedUser.city,
-            state: updatedUser.state,
-            pincode: updatedUser.pincode,
-            country: updatedUser.country
+            street: updatedUser.street || '',
+            city: updatedUser.city || '',
+            state: updatedUser.state || '',
+            pincode: updatedUser.pincode || '',
+            country: updatedUser.country || 'India'
           },
           created_at: updatedUser.created_at
         }

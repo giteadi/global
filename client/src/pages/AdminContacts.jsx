@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetContactsQuery, useUpdateContactStatusMutation, useDeleteContactMutation } from '../store/slices/adminApi'
 import toast from 'react-hot-toast'
 
-const AdminContacts = () => {
+const AdminContacts = React.memo(() => {
   const [selectedContact, setSelectedContact] = useState(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
   
@@ -13,16 +13,16 @@ const AdminContacts = () => {
   const [updateContactStatus] = useUpdateContactStatusMutation()
   const [deleteContact] = useDeleteContactMutation()
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = useCallback(async (id, newStatus) => {
     try {
       await updateContactStatus({ id, status: newStatus }).unwrap()
       toast.success('Status updated successfully')
     } catch (error) {
       toast.error('Failed to update status')
     }
-  }
+  }, [updateContactStatus])
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
       try {
         await deleteContact(id).unwrap()
@@ -31,12 +31,12 @@ const AdminContacts = () => {
         toast.error('Failed to delete contact')
       }
     }
-  }
+  }, [deleteContact])
 
-  const handleViewDetails = (contact) => {
+  const handleViewDetails = useCallback((contact) => {
     setSelectedContact(contact)
     setShowDetailModal(true)
-  }
+  }, [])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -223,6 +223,6 @@ const AdminContacts = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminContacts

@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetPaymentsQuery } from '../store/slices/adminApi'
 
-const AdminPayments = () => {
+const AdminPayments = React.memo(() => {
   const [statusFilter, setStatusFilter] = useState('All')
   const [localStoragePayments, setLocalStoragePayments] = useState([])
-  const { data: apiPayments, isLoading, error } = useGetPaymentsQuery(
-    statusFilter !== 'All' ? { status: statusFilter } : {}
-  )
+  const params = useMemo(() => statusFilter !== 'All' ? { status: statusFilter } : {}, [statusFilter])
+  const { data: apiPayments, isLoading, error } = useGetPaymentsQuery(params)
 
   // Load payments from localStorage
   useEffect(() => {
@@ -16,20 +15,24 @@ const AdminPayments = () => {
   }, [])
 
   // Combine API and localStorage payments
-  const allPayments = [
-    ...(apiPayments?.data?.payments || []),
-    ...localStoragePayments.map(payment => ({
-      ...payment,
-      _id: payment.id,
-      amount: payment.total,
-      method: payment.paymentMethod,
-      customer: payment.userInfo,
-      created_at: payment.timestamp,
-      status: payment.status || 'Completed'
-    }))
-  ]
+  const allPayments = useMemo(() => {
+    return [
+      ...(apiPayments?.data?.payments || []),
+      ...localStoragePayments.map(payment => ({
+        ...payment,
+        _id: payment.id,
+        amount: payment.total,
+        method: payment.paymentMethod,
+        customer: payment.userInfo,
+        created_at: payment.timestamp,
+        status: payment.status || 'Completed'
+      }))
+    ]
+  }, [apiPayments, localStoragePayments])
 
-  const filteredPayments = statusFilter === 'All' ? allPayments : allPayments.filter(payment => payment.status === statusFilter)
+  const filteredPayments = useMemo(() => {
+    return statusFilter === 'All' ? allPayments : allPayments.filter(payment => payment.status === statusFilter)
+  }, [allPayments, statusFilter])
   const statuses = ['All', 'Completed', 'Pending', 'Failed', 'Refunded']
 
   return (
@@ -199,6 +202,6 @@ const AdminPayments = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminPayments

@@ -1,16 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetUsersQuery, useUpdateUserMutation } from '../store/slices/adminApi'
 
-const AdminUsers = () => {
+const AdminUsers = React.memo(() => {
   const [roleFilter, setRoleFilter] = useState('All')
-  const { data: usersData, isLoading, error } = useGetUsersQuery(
-    roleFilter !== 'All' ? { role: roleFilter } : {}
-  )
+  const params = useMemo(() => roleFilter !== 'All' ? { role: roleFilter } : {}, [roleFilter])
+  const { data: usersData, isLoading, error } = useGetUsersQuery(params)
   const users = usersData?.data?.users || []
   const [updateUser] = useUpdateUserMutation()
 
-  const filteredUsers = roleFilter === 'All' ? users || [] : (users || []).filter(user => user.role === roleFilter)
+  const filteredUsers = useMemo(() => {
+    return roleFilter === 'All' ? users || [] : (users || []).filter(user => user.role === roleFilter)
+  }, [users, roleFilter])
   const roles = ['All', 'customer', 'admin']
 
   // Modal state
@@ -24,7 +25,7 @@ const AdminUsers = () => {
     status: 'Active'
   })
 
-  const handleEditUser = (user) => {
+  const handleEditUser = useCallback((user) => {
     setEditingUser(user)
     setFormData({
       name: user.name || '',
@@ -34,9 +35,9 @@ const AdminUsers = () => {
       status: user.status || 'Active'
     })
     setIsModalOpen(true)
-  }
+  }, [])
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = useCallback(async (e) => {
     e.preventDefault()
     try {
       if (editingUser) {
@@ -47,7 +48,7 @@ const AdminUsers = () => {
     } catch (error) {
       alert('Failed to update user')
     }
-  }
+  }, [editingUser, formData, updateUser])
 
   return (
     <AdminLayout>
@@ -334,6 +335,6 @@ const AdminUsers = () => {
       )}
     </AdminLayout>
   )
-}
+})
 
 export default AdminUsers

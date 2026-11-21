@@ -25,6 +25,7 @@ import AdminAnalytics from './pages/AdminAnalytics'
 import AdminSettings from './pages/AdminSettings'
 import Checkout from './pages/Checkout'
 import PaymentSuccess from './pages/PaymentSuccess'
+import AdminRoute from './components/AdminRoute'
 import './styles.css'
 
 // Memoized ScrollToTop component
@@ -97,9 +98,9 @@ function App() {
       <AppInitializer>
         <Router>
           <ScrollToTop />
-          <div className="flex flex-col min-h-screen relative">
+          <div className="flex flex-col min-h-screen relative overflow-x-hidden w-full max-w-full">
             <Navbar />
-            <main className="flex-1 pt-16">
+            <main className="flex-1 w-full max-w-full overflow-x-hidden pb-24 md:pb-0">
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -112,15 +113,15 @@ function App() {
                   <Route path="/forget-password" element={<ForgetPassword />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/admin/products" element={<AdminProducts />} />
-                  <Route path="/admin/orders" element={<AdminOrders />} />
-                  <Route path="/admin/users" element={<AdminUsers />} />
-                  <Route path="/admin/categories" element={<AdminCategories />} />
-                  <Route path="/admin/contacts" element={<AdminContacts />} />
-                  <Route path="/admin/payments" element={<AdminPayments />} />
-                  <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                  <Route path="/admin/settings" element={<AdminSettings />} />
+                  <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+                  <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+                  <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+                  <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+                  <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
+                  <Route path="/admin/contacts" element={<AdminRoute><AdminContacts /></AdminRoute>} />
+                  <Route path="/admin/payments" element={<AdminRoute><AdminPayments /></AdminRoute>} />
+                  <Route path="/admin/analytics" element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+                  <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
                 </Routes>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { forgetPassword } from '../store/slices/authSlice'
@@ -11,7 +11,7 @@ const ForgetPassword = React.memo(() => {
 
   const dispatch = useDispatch()
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     setLoading(true)
     try {
@@ -22,7 +22,7 @@ const ForgetPassword = React.memo(() => {
       toast.error(error || 'Failed to send reset email')
     }
     setLoading(false)
-  }
+  }, [dispatch, email])
 
   return (
     <div className="min-h-screen py-20 px-4">
@@ -81,4 +81,4 @@ const ForgetPassword = React.memo(() => {
   )
 })
 
-export default React.memo(ForgetPassword)
+export default ForgetPassword

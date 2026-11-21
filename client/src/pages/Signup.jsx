@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { signupUser } from '../store/slices/authSlice'
@@ -22,14 +22,14 @@ const Signup = React.memo(() => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
+  const handleChange = useCallback((e) => {
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    })
-  }
+    }))
+  }, [])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     
     if (formData.password !== formData.confirmPassword) {
@@ -44,7 +44,7 @@ const Signup = React.memo(() => {
     } catch (error) {
       toast.error(error || 'Signup failed')
     }
-  }
+  }, [dispatch, formData, navigate])
 
   return (
     <div className="min-h-screen py-20 px-4 bg-black/60">
@@ -216,4 +216,4 @@ const Signup = React.memo(() => {
   )
 })
 
-export default React.memo(Signup)
+export default Signup

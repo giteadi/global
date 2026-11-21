@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetAnalyticsQuery } from '../store/slices/adminApi'
 
-const AdminAnalytics = () => {
+const AdminAnalytics = React.memo(() => {
   const [period, setPeriod] = useState('month')
   const [type, setType] = useState('overview')
-  const { data: analyticsData, isLoading, error } = useGetAnalyticsQuery({ period, type })
+  const queryParams = useMemo(() => ({ period, type }), [period, type])
+  const { data: analyticsData, isLoading, error } = useGetAnalyticsQuery(queryParams)
 
   const analytics = analyticsData?.data || {
     totalRevenue: 0,
@@ -181,6 +182,6 @@ const AdminAnalytics = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminAnalytics

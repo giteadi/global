@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUserProfile } from '../store/slices/authSlice'
+import { getUserProfile, logout } from '../store/slices/authSlice'
 
 const AppInitializer = React.memo(({ children }) => {
   const dispatch = useDispatch()
@@ -8,7 +8,7 @@ const AppInitializer = React.memo(({ children }) => {
 
   // Memoize the condition to prevent unnecessary re-renders
   const shouldFetchProfile = useMemo(() => {
-    return token && !user && !loading && !error && !profileFetchAttempted
+    return Boolean(token && !user && !loading && !error && !profileFetchAttempted)
   }, [token, user, loading, error, profileFetchAttempted])
 
   useEffect(() => {
@@ -16,9 +16,8 @@ const AppInitializer = React.memo(({ children }) => {
       console.log('AppInitializer: Fetching user profile')
       dispatch(getUserProfile())
     } else if (error && profileFetchAttempted) {
-      console.log('AppInitializer: Auth error detected, clearing token')
-      dispatch({ type: 'auth/clearError' })
-      localStorage.removeItem('token')
+      console.log('AppInitializer: Auth error detected, resetting auth state')
+      dispatch(logout())
     }
   }, [shouldFetchProfile, error, profileFetchAttempted, dispatch])
 

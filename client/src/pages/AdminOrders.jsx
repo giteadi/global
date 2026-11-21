@@ -1,19 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetOrdersQuery, useUpdateOrderMutation } from '../store/slices/adminApi'
 import toast from 'react-hot-toast'
 
-const AdminOrders = () => {
+const AdminOrders = React.memo(() => {
   const [statusFilter, setStatusFilter] = useState('All')
-  const params = statusFilter !== 'All' ? { status: statusFilter } : {}
+  const params = useMemo(() => statusFilter !== 'All' ? { status: statusFilter } : {}, [statusFilter])
   const { data: ordersData, isLoading, error, refetch } = useGetOrdersQuery(params)
   const [updateOrder] = useUpdateOrderMutation()
 
   const orders = ordersData?.data?.orders || []
-  const filteredOrders = statusFilter === 'All' ? orders : orders.filter(order => order.status === statusFilter)
+  const filteredOrders = useMemo(() => {
+    return statusFilter === 'All' ? orders : orders.filter(order => order.status === statusFilter)
+  }, [orders, statusFilter])
   const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
 
-  const handleStatusUpdate = async (orderId, newStatus) => {
+  const handleStatusUpdate = useCallback(async (orderId, newStatus) => {
     try {
       await updateOrder({ id: orderId, status: newStatus }).unwrap()
       toast.success('Order status updated successfully')
@@ -21,7 +23,7 @@ const AdminOrders = () => {
     } catch (err) {
       toast.error('Failed to update order status')
     }
-  }
+  }, [updateOrder, refetch])
 
   return (
     <AdminLayout>
@@ -33,7 +35,11 @@ const AdminOrders = () => {
             <p className="text-sm" style={{ color: 'var(--text-soft)' }}>Manage customer orders and shipments</p>
           </div>
           <button
-            className="btn-primary whitespace-nowrap w-full sm:w-auto"
+            className="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 apple-press shadow-lg w-full sm:w-auto whitespace-nowrap"
+            style={{
+              background: 'linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%)',
+              color: '#071e24'
+            }}
           >
             Export Orders
           </button>
@@ -198,6 +204,6 @@ const AdminOrders = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminOrders

@@ -1,36 +1,47 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import { clearCart } from '../store/slices/cartSlice'
 
-const Checkout = () => {
+const BANK_DETAILS = {
+  accountName: "B.R.Ashok Kumar",
+  bankName: "Punjab National Bank",
+  accountNumber: "3631000100063562",
+  ifscCode: "PUNB0453800",
+  upiId: "9885139882@ybl"
+}
+
+const QR_CODE_IMAGE = "https://res.cloudinary.com/bazeercloud/image/upload/v1773650308/WhatsApp_Image_2026-03-16_at_11.22.28_abl7tl.jpg"
+const BANK_IMAGE = "https://res.cloudinary.com/bazeercloud/image/upload/v1773650301/pnb_xs3myt.jpg"
+
+const Checkout = React.memo(() => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const timerRef = useRef(null)
   const { items = [], total = 0 } = useSelector((state) => state.cart || {})
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false)
 
-  const totalWithTax = total * 1.1
+  // Cleanup any pending timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
 
-  const bankDetails = {
-    accountName: "B.R.Ashok Kumar",
-    bankName: "Punjab National Bank",
-    accountNumber: "3631000100063562",
-    ifscCode: "PUNB0453800",
-    upiId: "9885139882@ybl"
-  }
+  const totalWithTax = useMemo(() => (Number(total) || 0) * 1.1, [total])
+  const bankDetails = BANK_DETAILS
+  const qrCodeImage = QR_CODE_IMAGE
+  const bankImage = BANK_IMAGE
 
-  const qrCodeImage = "https://res.cloudinary.com/bazeercloud/image/upload/v1773650308/WhatsApp_Image_2026-03-16_at_11.22.28_abl7tl.jpg"
-  const bankImage = "https://res.cloudinary.com/bazeercloud/image/upload/v1773650301/pnb_xs3myt.jpg"
-
-  const handlePaymentMethodSelect = (method) => {
+  const handlePaymentMethodSelect = useCallback((method) => {
     setSelectedPaymentMethod(method)
-  }
+  }, [])
 
-  const handleConfirmPayment = async () => {
+  const handleConfirmPayment = useCallback(async () => {
     if (!selectedPaymentMethod) {
       toast.error('Please select a payment method')
       return
@@ -39,7 +50,7 @@ const Checkout = () => {
     setIsProcessing(true)
     
     // Simulate payment processing
-    setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       // Create payment record for admin
       const paymentData = {
         id: Date.now(),
@@ -49,31 +60,23 @@ const Checkout = () => {
         status: 'completed',
         timestamp: new Date().toISOString(),
         userInfo: {
-          name: 'Customer', // You can get this from auth state
+          name: 'Customer',
           email: 'customer@example.com'
         }
       }
 
-      // Store payment data (you can send this to your backend)
       console.log('Payment completed:', paymentData)
-      
-      // Show success message
       toast.success('Payment completed successfully!')
-      
-      // Clear cart
       dispatch(clearCart())
-      
-      // Redirect to success page
       navigate('/payment-success', { state: { paymentData } })
-      
       setIsProcessing(false)
     }, 2000)
-  }
+  }, [selectedPaymentMethod, items, totalWithTax, dispatch, navigate])
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = useCallback((text) => {
     navigator.clipboard.writeText(text)
     toast.success('Copied to clipboard!')
-  }
+  }, [])
 
   if (!items.length) {
     return (
@@ -310,6 +313,6 @@ const Checkout = () => {
       </div>
     </div>
   )
-}
+})
 
 export default Checkout

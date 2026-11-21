@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import AdminLayout from '../components/AdminLayout'
 import { useGetProductsQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../store/slices/adminApi'
 import { useGetCategoriesQuery, useCreateCategoryMutation } from '../store/slices/adminApi'
 import toast from 'react-hot-toast'
 
-const AdminProducts = () => {
+const AdminProducts = React.memo(() => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState('All')
   const [showAddModal, setShowAddModal] = useState(false)
@@ -37,12 +37,12 @@ const AdminProducts = () => {
     images: []
   })
 
-  const params = {
+  const params = useMemo(() => ({
     page: currentPage,
     limit: 20, // Increase to 20 products per page for better performance
     ...(filterCategory !== 'All' && { category: filterCategory }),
     ...(searchTerm && { search: searchTerm })
-  }
+  }), [currentPage, filterCategory, searchTerm])
   const { data: productsData, isLoading: loading, refetch } = useGetProductsQuery(params)
   const [createProduct] = useCreateProductMutation()
   const [updateProduct] = useUpdateProductMutation()
@@ -57,21 +57,21 @@ const AdminProducts = () => {
   const totalProducts = productsData?.data?.total || 0
   const totalPages = Math.ceil(totalProducts / 20) || 1
 
-  const handleCategoryFormChange = (e) => {
+  const handleCategoryFormChange = useCallback((e) => {
     const { name, value } = e.target
     setCategoryFormData(prev => ({
       ...prev,
       [name]: value
     }))
-  }
+  }, [])
 
-  const handleFormChange = (e) => {
+  const handleFormChange = useCallback((e) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
       [name]: value
     }))
-  }
+  }, [])
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files)
@@ -225,9 +225,13 @@ const AdminProducts = () => {
           </div>
           <button
             onClick={handleAddProduct}
-            className="btn-primary whitespace-nowrap w-full sm:w-auto"
+            className="min-h-[44px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 apple-press shadow-lg w-full sm:w-auto whitespace-nowrap"
+            style={{
+              background: 'linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%)',
+              color: '#071e24'
+            }}
           >
-            Add New Product
+            <span>+ Add New Product</span>
           </button>
         </div>
 
@@ -365,20 +369,20 @@ const AdminProducts = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button 
-                          onClick={() => handleEditProduct(product)}
-                          style={{ color: 'var(--teal-bright)' }} 
-                          className="mr-3 hover:opacity-80"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteProduct(product.id)}
-                          style={{ color: 'var(--gold-bright)' }} 
-                          className="hover:opacity-80"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex items-center space-x-2">
+                          <button 
+                            onClick={() => handleEditProduct(product)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-950/60 border border-teal-500/30 text-[var(--teal-bright)] hover:bg-teal-900/60 transition-all apple-press"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:bg-rose-900/60 transition-all apple-press"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -946,6 +950,6 @@ const AdminProducts = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminProducts

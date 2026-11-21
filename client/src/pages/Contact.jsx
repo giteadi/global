@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
@@ -13,14 +13,14 @@ const Contact = React.memo(() => {
     message: ''
   })
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
+  const handleChange = useCallback((e) => {
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    })
-  }
+    }))
+  }, [])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     try {
       const response = await fetch(`${API_BASE}/api/contacts`, {
@@ -49,7 +49,7 @@ const Contact = React.memo(() => {
       toast.error('Failed to send message. Please try again.')
       console.error('Contact form error:', error)
     }
-  }
+  }, [formData])
 
   return (
     <div className="min-h-screen py-20 px-4 bg-gradient-to-b from-teal-950 to-teal-900">
@@ -228,4 +228,4 @@ const Contact = React.memo(() => {
   )
 })
 
-export default React.memo(Contact)
+export default Contact

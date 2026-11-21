@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import { useGetDashboardStatsQuery } from '../store/slices/adminApi'
 
-const AdminDashboard = () => {
+const AdminDashboard = React.memo(() => {
   const navigate = useNavigate()
   const { data: stats, isLoading, error } = useGetDashboardStatsQuery()
 
@@ -17,35 +17,35 @@ const AdminDashboard = () => {
   const recentOrders = stats?.data?.recentOrders || []
   const topProducts = stats?.data?.topProducts || []
 
-  const statsCards = [
+  const statsCards = useMemo(() => [
     { title: 'Total Products', value: dashboardData.totalProducts, icon: '📦', loading: isLoading },
     { title: 'Total Orders', value: dashboardData.totalOrders, icon: '📋', loading: isLoading },
     { title: 'Total Users', value: dashboardData.totalUsers, icon: '👥', loading: isLoading },
     { title: 'Revenue', value: `₹${dashboardData.totalRevenue?.toLocaleString() || '0'}`, icon: '💰', loading: isLoading }
-  ]
+  ], [dashboardData.totalProducts, dashboardData.totalOrders, dashboardData.totalUsers, dashboardData.totalRevenue, isLoading])
 
   return (
     <AdminLayout>
       <div className="space-y-6 min-h-[calc(100vh-280px)] flex flex-col">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats Cards - Mobile First Responsive Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {statsCards.map((stat, index) => (
-            <div key={index} style={{ background: 'var(--glass-card)', backdropFilter: 'blur(10px)', border: '1px solid var(--glass-border)' }} className="rounded-lg p-6">
+            <div key={index} className="apple-glass-card rounded-2xl p-4 sm:p-5 transition-all">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm" style={{ color: 'var(--text-soft)' }}>{stat.title}</p>
-                  <p className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm truncate" style={{ color: 'var(--text-soft)' }}>{stat.title}</p>
+                  <p className="text-lg sm:text-2xl font-bold font-serif mt-0.5 truncate" style={{ color: 'var(--text-bright)' }}>
                     {stat.loading ? (
                       <span className="inline-flex items-center gap-1">
-                        <span className="inline-block w-3 h-3 rounded-full bg-teal-400 animate-bounce" style={{ animation: 'bounce 1.4s infinite' }}></span>
-                        <span className="text-sm">Loading</span>
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-teal-400 animate-bounce"></span>
+                        <span className="text-xs">Loading</span>
                       </span>
                     ) : (
                       stat.value
                     )}
                   </p>
                 </div>
-                <div className="text-3xl">{stat.icon}</div>
+                <div className="text-2xl sm:text-3xl ml-2 flex-shrink-0">{stat.icon}</div>
               </div>
             </div>
           ))}
@@ -162,6 +162,6 @@ const AdminDashboard = () => {
       </div>
     </AdminLayout>
   )
-}
+})
 
 export default AdminDashboard
